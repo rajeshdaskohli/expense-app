@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expense App</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<h2>Add Expense</h2>
+
+<input type="date" id="date">
+<input type="text" id="category" placeholder="Category">
+<input type="number" id="amount" placeholder="Amount">
+
+<select id="account"></select>
+
+<button onclick="saveExpense()">Save Expense</button>
+
+<br><br>
+<a href="dashboard.html">Go to Dashboard</a>
+
+<script src="js/api.js"></script>
+<script src="js/expense.js"></script>
+</body>
+</html>
