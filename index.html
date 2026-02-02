@@ -6,12 +6,12 @@
 
 <title>Expense Manager</title>
 
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b0b0b">
+
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#f4f4f4;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#f4f4f4}
 
 .topbar{
   background:#111;
@@ -27,64 +27,60 @@ body{
   padding:14px;
 }
 
-.grid{
+.grid2{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:12px;
+  gap:14px;
 }
 
 .card{
   background:#fff;
-  border-radius:16px;
-  padding:16px;
+  border-radius:20px;
+  padding:14px;
   text-align:center;
   cursor:pointer;
   border:1px solid #ddd;
 }
 
-.cardIcon{
-  font-size:28px;
-  margin-bottom:8px;
-}
+.cardIcon{font-size:28px;margin-bottom:6px}
 
-.page{ display:none; }
-.page.active{ display:block; }
+.page{display:none}
+.page.active{display:block}
 
 .box{
   background:#fff;
-  border-radius:16px;
-  padding:14px;
+  border-radius:18px;
+  padding:16px;
   margin-top:10px;
 }
 
-.lbl{ font-weight:bold; display:block; margin:10px 0 4px; }
+.lbl{font-weight:bold;display:block;margin:10px 0 4px}
 
 .inp{
   width:100%;
-  padding:10px;
-  border-radius:10px;
+  padding:12px;
+  border-radius:12px;
   border:1px solid #ccc;
 }
 
 .btn{
   width:100%;
-  padding:12px;
-  margin-top:10px;
+  padding:14px;
   border:none;
-  border-radius:12px;
+  border-radius:14px;
   background:#111;
   color:#fff;
   font-weight:bold;
+  margin-top:10px;
   cursor:pointer;
 }
-
 </style>
 </head>
 
 <body>
 
 <div class="topbar">
-  <h3>Expense Manager</h3>
+  <h3 id="pageTitle">Home</h3>
 </div>
 
 <div class="container">
@@ -92,11 +88,12 @@ body{
 <!-- HOME PAGE -->
 <div class="page active" id="pageHome">
 
-  <div class="grid">
+  <div class="grid2">
 
-    <div class="card" onclick="showPage('expense')">
+    <div class="card" id="cardExpense">
       <div class="cardIcon">💰</div>
-      <b>Expense</b>
+      <div class="cardTitle">Expense</div>
+      <div class="cardSub">Finance Manager</div>
     </div>
 
   </div>
@@ -104,24 +101,27 @@ body{
 </div>
 
 
-<!-- EXPENSE MENU PAGE -->
+<!-- EXPENSE MENU -->
 <div class="page" id="pageExpense">
 
-  <div class="grid">
+  <div class="grid2">
 
-    <div class="card" onclick="showPage('dashboard')">
+    <div class="card" id="cardDashboard">
       <div class="cardIcon">📊</div>
-      <b>Dashboard</b>
+      <div class="cardTitle">Dashboard</div>
+      <div class="cardSub">View Summary</div>
     </div>
 
-    <div class="card" onclick="showPage('expenseEntry')">
+    <div class="card" id="cardExpenseEntry">
       <div class="cardIcon">✍️</div>
-      <b>Expense Entry</b>
+      <div class="cardTitle">Expense Entry</div>
+      <div class="cardSub">Add Expense</div>
     </div>
 
-    <div class="card" onclick="showPage('addFund')">
+    <div class="card" id="cardAddFund">
       <div class="cardIcon">➕</div>
-      <b>Add Fund</b>
+      <div class="cardTitle">Add Fund</div>
+      <div class="cardSub">Manage Balance</div>
     </div>
 
   </div>
@@ -130,31 +130,33 @@ body{
 
 
 <!-- EXPENSE ENTRY PAGE -->
-<div class="page" id="pageExpenseEntry">
+<div class="page" id="pageEntry">
 
-  <div class="box">
+<div class="box">
 
-    <label class="lbl">Expense Type</label>
+<label class="lbl">Expense Type</label>
 
-    <select class="inp" id="exp_type">
-      <option value="">Select</option>
-      <option>Bank</option>
-      <option>Credit Card</option>
-      <option>Cash</option>
-    </select>
+<select class="inp" id="exp_type">
+  <option value="">Select Type</option>
+  <option>Bank</option>
+  <option>Credit Card</option>
+  <option>Cash</option>
+</select>
 
-    <label class="lbl">Source</label>
+<label class="lbl">Select Source</label>
 
-    <select class="inp" id="exp_source"></select>
+<select class="inp" id="exp_source">
+  <option value="">Select</option>
+</select>
 
-    <label class="lbl">Amount</label>
-    <input class="inp" id="exp_amount" type="number"/>
+<label class="lbl">Amount</label>
+<input class="inp" id="exp_amount" type="number"/>
 
-    <button class="btn" onclick="saveExpense()">
-      Save Expense
-    </button>
+<button class="btn" id="btnSaveExpense">
+  Save Expense
+</button>
 
-  </div>
+</div>
 
 </div>
 
@@ -176,55 +178,56 @@ body{
 
 <div id="addFundBox" style="display:none;">
 
-  <label class="lbl">Select Bank</label>
-  <select class="inp" id="fund_bank"></select>
+<label class="lbl">Select Bank</label>
+<select class="inp" id="fund_bank"></select>
 
-  <label class="lbl">Amount</label>
-  <input class="inp" id="fund_amount" type="number"/>
+<label class="lbl">Amount</label>
+<input class="inp" id="fund_amount" type="number"/>
 
-  <button class="btn" onclick="addFund()">
-    Add Fund
-  </button>
+<button class="btn" id="btnAddFund">
+  Add Fund
+</button>
 
 </div>
 
 
 <div id="payCCBox" style="display:none;">
 
-  <label class="lbl">Credit Card</label>
-  <select class="inp" id="cc_list"></select>
+<label class="lbl">Credit Card</label>
+<select class="inp" id="cc_list"></select>
 
-  <label class="lbl">Bank</label>
-  <select class="inp" id="bank_list"></select>
+<label class="lbl">Bank</label>
+<select class="inp" id="bank_list"></select>
 
-  <label class="lbl">Amount</label>
-  <input class="inp" id="cc_amount" type="number"/>
+<label class="lbl">Amount</label>
+<input class="inp" id="cc_amount" type="number"/>
 
-  <button class="btn" onclick="payCC()">
-    Pay Bill
-  </button>
+<button class="btn" id="btnPayCC">
+  Pay Bill
+</button>
 
 </div>
 
 
 <div id="payEmiBox" style="display:none;">
 
-  <label class="lbl">Loan</label>
-  <select class="inp" id="loan_list"></select>
+<label class="lbl">Loan</label>
+<select class="inp" id="loan_list"></select>
 
-  <label class="lbl">Bank</label>
-  <select class="inp" id="loan_bank"></select>
+<label class="lbl">Bank</label>
+<select class="inp" id="loan_bank"></select>
 
-  <label class="lbl">Amount</label>
-  <input class="inp" id="emi_amount" type="number"/>
+<label class="lbl">Amount</label>
+<input class="inp" id="emi_amount" type="number"/>
 
-  <button class="btn" onclick="payEMI()">
-    Pay EMI
-  </button>
+<button class="btn" id="btnPayEmi">
+  Pay EMI
+</button>
+
+</div>
 
 </div>
 
-</div>
 </div>
 
 
@@ -235,7 +238,7 @@ body{
 
 <h3>Dashboard</h3>
 
-<div id="dashData">
+<div id="dashboardData">
 Loading...
 </div>
 
@@ -249,7 +252,7 @@ Loading...
 <script>
 
 // ==== GOOGLE SHEET WEB APP URL ====
-const API_URL = "PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE";
+const API_URL = "PASTE_YOUR_GOOGLE_SCRIPT_URL";
 
 async function apiPost(data){
   const r = await fetch(API_URL,{
@@ -260,27 +263,34 @@ async function apiPost(data){
 }
 
 
-// NAVIGATION
-function showPage(id){
+// PAGE NAVIGATION
+function showPage(name){
+
   document.querySelectorAll(".page")
     .forEach(p=>p.classList.remove("active"));
 
-  document.getElementById("page"+capitalize(id))
+  document.getElementById("page"+capitalize(name))
     .classList.add("active");
 
-  if(id=="dashboard") loadDashboard();
+  pageTitle.textContent = capitalize(name);
+
+  if(name=="Dashboard") loadDashboard();
 }
 
-
-// CAPITALIZE HELPER
 function capitalize(s){
   return s.charAt(0).toUpperCase()+s.slice(1);
 }
 
 
-// ACTION TYPE LOGIC
-document.getElementById("fund_action")
-.addEventListener("change", function(){
+// CARD EVENTS
+cardExpense.addEventListener("click", ()=>showPage("Expense"));
+cardDashboard.addEventListener("click", ()=>showPage("Dashboard"));
+cardExpenseEntry.addEventListener("click", ()=>showPage("Entry"));
+cardAddFund.addEventListener("click", ()=>showPage("AddFund"));
+
+
+// ACTION TYPE CHANGE
+fund_action.addEventListener("change", function(){
 
   addFundBox.style.display="none";
   payCCBox.style.display="none";
@@ -294,7 +304,7 @@ document.getElementById("fund_action")
 
 
 // SAVE EXPENSE
-async function saveExpense(){
+btnSaveExpense.addEventListener("click", async ()=>{
 
   let type = exp_type.value;
   let source = exp_source.value;
@@ -312,11 +322,11 @@ async function saveExpense(){
 
   alert(r.message);
 
-}
+});
 
 
 // ADD FUND
-async function addFund(){
+btnAddFund.addEventListener("click", async ()=>{
 
   let bank = fund_bank.value;
   let amount = fund_amount.value;
@@ -328,11 +338,11 @@ async function addFund(){
 
   alert(r.message);
 
-}
+});
 
 
 // PAY CREDIT CARD
-async function payCC(){
+btnPayCC.addEventListener("click", async ()=>{
 
   let card = cc_list.value;
   let bank = bank_list.value;
@@ -345,11 +355,11 @@ async function payCC(){
 
   alert(r.message);
 
-}
+});
 
 
 // PAY EMI
-async function payEMI(){
+btnPayEmi.addEventListener("click", async ()=>{
 
   let loan = loan_list.value;
   let bank = loan_bank.value;
@@ -362,7 +372,7 @@ async function payEMI(){
 
   alert(r.message);
 
-}
+});
 
 
 // DASHBOARD LOAD
@@ -372,7 +382,8 @@ async function loadDashboard(){
     action:"getDashboard"
   });
 
-  dashData.innerHTML = JSON.stringify(r, null, 2);
+  dashboardData.innerHTML =
+    "<pre>"+JSON.stringify(r,null,2)+"</pre>";
 
 }
 
