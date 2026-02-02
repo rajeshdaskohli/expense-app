@@ -1,26 +1,1203 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Expense App</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0b0b">
+
+  <title>NED Seva App</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{margin:0;font-family:Arial,sans-serif;background:#f4f4f4;color:#111;}
+
+    :root{
+      --border: rgba(0,0,0,0.12);
+      --muted:#666;
+      --text:#111;
+    }
+
+    .topbar{
+      background:#111;color:#fff;padding:14px 14px;display:flex;align-items:center;gap:12px;
+      position:sticky;top:0;z-index:1000;
+    }
+    .menuBtn{
+  width:44px;height:44px;
+  border:none;
+  border-radius:14px;
+  background:transparent;   /* ✅ grey box हटेगा */
+  box-shadow:none;          /* ✅ अगर shadow हो तो हटे */
+  color:#fff;
+  font-size:22px;
+  cursor:pointer;
+}
+    .menuBtn:active{transform:scale(0.98);}
+    .titleBox{display:flex;flex-direction:column;line-height:1.1;}
+    .appTitle{font-weight:900;font-size:18px;}
+    .appSub{font-weight:800;font-size:12px;opacity:0.85;letter-spacing:0.4px;}
+
+    .container{max-width:540px;margin:0 auto;padding:18px;}
+
+    .menuBtn{
+  width:44px;
+  height:44px;
+  border:none;
+  border-radius:14px;
+  background:transparent;
+  color:#fff;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#btnIcon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.backSvg{
+  width:30px;
+  height:30px;
+}
+.backSvg path{
+  stroke:#d9d9d9;
+  stroke-width:2.2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  fill:none;
+}
+
+/* Drawer */
+.drawer-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  z-index:3000;
+
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+
+  transition:opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.drawer-overlay.show{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+
+.drawer{
+  width:280px;
+  height:100%;
+  background:#fff;
+  position:absolute;
+  left:0;
+  top:0;
+
+  transform:translateX(-110%);
+  transition:transform 0.25s ease;
+
+  box-shadow:6px 0 25px rgba(0,0,0,0.25);
+  padding:14px;
+}
+
+.drawer-overlay.show .drawer{
+  transform:translateX(0);
+}
+    .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:8px 6px 14px;border-bottom:1px solid #eee;margin-bottom:10px;}
+    .drawer-title{font-size:18px;font-weight:900;}
+    .drawer-subtitle{font-size:13px;color:#666;font-weight:700;margin-top:2px;}
+    .drawer-close{
+  width:30px;              /* छोटा */
+  height:30px;             /* छोटा */
+  border:none;
+  border-radius:12px;
+  background:transparent;  /* grey हटेगा */
+  box-shadow:none;
+  font-size:26px;          /* X का size */
+  font-weight:1000;
+  color:#111;
+  text-shadow: 0 0 1px #111;
+  cursor:pointer;
+
+  display:flex;            /* center करने के लिए */
+  align-items:center;
+  justify-content:center;
+
+  position:relative;
+  top:-4px;                /* थोड़ा ऊपर */
+}
+    .drawer-link{
+      display:block;padding:12px 12px;border-radius:14px;text-decoration:none;color:#111;font-weight:800;margin:8px 0;
+      background:#f5f5f5;border:1px solid rgba(0,0,0,0.08);
+    }
+
+    .page{display:none;}
+    .page.active{display:block;}
+
+    .grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  align-items:stretch;
+}
+
+    /* Card */
+    .card{
+  background:#fff;
+  border-radius:20px;
+  padding:12px;          /* पहले 16 था */
+  height:120px;          /* card छोटा */
+  border:1.5px solid rgba(0,0,0,0.18);
+  box-shadow:0 14px 30px rgba(0,0,0,0.08);
+  cursor:pointer;
+  transition:0.12s ease;
+  text-align:center;
+  user-select:none;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+    .card:active{transform:scale(0.98);}
+    .cardIcon{
+  width:auto;
+  height:auto;
+  background:transparent;
+  border:none;
+  border-radius:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  margin:0 auto 10px;
+}
+    .cardTitle{font-weight:900;font-size:16px;margin-bottom:4px;}
+    .cardSub{font-weight:800;color:#666;font-size:13px;}
+
+    .box{
+      background:#fff;border-radius:18px;padding:16px;border:1px solid rgba(0,0,0,0.10);
+      box-shadow:0 12px 26px rgba(0,0,0,0.06);
+    }
+
+    .field{margin-bottom:14px;}
+    .lbl{display:block;font-size:16px;font-weight:900;margin-bottom:8px;color:#111;}
+    .lbl span{color:#c00000;}
+
+    .inp{
+      width:100%;height:54px;padding:0 14px;border-radius:14px;border:1px solid #d8d8d8;
+      background:#fff;font-size:16px;outline:none;transition:0.15s;
+    }
+    .inp:focus{border-color:#111;box-shadow:0 0 0 3px rgba(0,0,0,0.12);}
+    .inp.error{border-color:#b00020 !important;box-shadow:0 0 0 3px rgba(176,0,32,0.12) !important;}
+
+    .sel{
+      appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;
+    }
+
+    .mobileWrap{display:flex;gap:10px;align-items:center;}
+    .cc{
+      width:74px;height:54px;border-radius:14px;background:#f1f1f1;border:1px solid #d8d8d8;
+      display:flex;align-items:center;justify-content:center;font-weight:900;color:#111;flex-shrink:0;
+    }
+
+    .btnRow2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;}
+    .btn{
+      height:56px;border:none;border-radius:16px;font-size:18px;font-weight:900;cursor:pointer;transition:0.12s;width:100%;
+    }
+    .btn:active{transform:scale(0.99);}
+    .btnBlack{background:#111;color:#fff;}
+    .btnLight{background:#eef2ff;color:#111;border:1px solid rgba(0,0,0,0.10);}
+
+    /* PC Enter press feel */
+    .btn.pressed, .smallBtn.pressed, .modalBtn.pressed{
+      transform:scale(0.98);
+      filter:brightness(0.96);
+    }
+
+    .err{display:none;margin-top:6px;font-size:13px;font-weight:900;color:#b00020;}
+
+    /* PIN */
+    .pinCell{
+      width:56px !important;height:56px !important;text-align:center;font-size:22px;font-weight:900;
+      -webkit-text-security: disc;
+      text-security: disc;
+    }
+
+    .toast{
+      position:fixed;left:50%;bottom:22px;transform:translateX(-50%);
+      background:#111;color:#fff;padding:12px 14px;border-radius:16px;font-weight:800;
+      display:none;z-index:5000;max-width:92%;text-align:center;
+    }
+
+    /* Modal */
+    .modalOverlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.55);
+      display:none;align-items:center;justify-content:center;
+      z-index:6000;padding:16px;
+    }
+    .modalOverlay.show{display:flex;}
+    .modal{
+      width:100%;max-width:420px;background:#fff;border-radius:18px;
+      border:1px solid rgba(0,0,0,0.12);
+      box-shadow:0 18px 40px rgba(0,0,0,0.25);
+      padding:16px;
+    }
+    .modalTitle{font-size:18px;font-weight:900;margin:0 0 6px;}
+    .modalText{font-size:14px;font-weight:800;color:#555;margin:0 0 14px;line-height:1.35;}
+    .modalBtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .modalBtn{
+      height:52px;border:none;border-radius:14px;font-weight:900;font-size:16px;cursor:pointer;
+    }
+    .modalYes{background:#111;color:#fff;}
+    .modalNo{background:#f2f2f2;color:#111;}
+    .modalBtn:active{transform:scale(0.99);}
+
+    /* Edit Panel */
+    .editPanel{
+      margin-top:14px;
+      background:#fff;border-radius:18px;padding:16px;
+      border:1px solid rgba(0,0,0,0.10);
+      box-shadow:0 12px 26px rgba(0,0,0,0.06);
+      display:none;
+    }
+    .editTitle{
+      font-size:18px;font-weight:900;margin:0 0 12px;
+      display:flex;align-items:center;gap:10px;
+    }
+
+    /* ===== ULTRA COMPACT RESULT CARD ===== */
+    .cardsWrap{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:11px;
+    }
+
+    .rCard{
+      background:#fff;
+      border-radius:16px;
+      padding:8px;
+      border:1px solid rgba(0,0,0,0.14);
+      box-shadow:0 6px 14px rgba(0,0,0,0.05);
+    }
+
+    .rRow{
+      display:grid;
+      grid-template-columns: 95px 1fr;
+      gap:8px;
+      align-items:center;
+      padding:3px 0;
+    }
+
+    .rLabel{
+      font-size:14px;
+      font-weight:900;
+      color:#777;
+      margin:0;
+      line-height:1.05;
+    }
+
+    .rValue{
+      font-size:14px;
+      font-weight:900;
+      color:#111;
+      margin:0;
+      line-height:1.1;
+      word-break:break-word;
+    }
+
+    .rActions{
+      display:flex;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .rActions button{
+      flex:1;
+      height:40px;
+      border:none;
+      border-radius:14px;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      transition:0.12s;
+    }
+
+    .rActions button:active{
+      transform:scale(0.98);
+    }
+
+    .rEdit{background:#e8f0ff;color:#1f3b8b;}
+    .rDel{background:#ffdcdc;color:#9b1c1c;}
+  </style>
 </head>
+
 <body>
 
-<h2>Add Expense</h2>
+  <div class="topbar">
+    <button class="menuBtn" id="leftBtn" aria-label="Back/Menu">
+  <span id="btnIcon">☰</span>
+</button>
+    <div class="titleBox">
+      <div class="appTitle" id="pageTitle">Home</div>
+      <div class="appSub" id="pageSub">NORTH EAST DELHI SEVA</div>
+    </div>
+  </div>
 
-<input type="date" id="date">
-<input type="text" id="category" placeholder="Category">
-<input type="number" id="amount" placeholder="Amount">
+  <div class="drawer-overlay" id="drawerOverlay">
+    <div class="drawer">
+      <div class="drawer-header">
+        <div>
+          <div class="drawer-title">Menu</div>
+          <div class="drawer-subtitle">NED Seva App</div>
+        </div>
+        <button class="drawer-close" id="drawerClose" type="button">✕</button>
+      </div>
+      <a href="#" class="drawer-link" id="menuHome">🏠 Home</a>
+      <a href="#" class="drawer-link" id="menuSM">🌐 SM Seva</a>
+    </div>
+  </div>
 
-<select id="account"></select>
+  <div class="container">
 
-<button onclick="saveExpense()">Save Expense</button>
+    <div class="page active" id="pageHome">
+      <div class="grid2">
+        <div class="card" id="cardSM">
+          <div class="cardIcon">🌐</div>
+          <div class="cardTitle">SM Seva</div>
+          <div class="cardSub">Open category</div>
+        </div>
+        <div class="card" id="cardComing">
+          <div class="cardIcon">➕</div>
+          <div class="cardTitle">More</div>
+          <div class="cardSub">Coming soon</div>
+        </div>
+      </div>
+    </div>
 
-<br><br>
-<a href="dashboard.html">Go to Dashboard</a>
+    <div class="page" id="pageSM">
+      <div class="grid2">
+        <div class="card" id="cardEntry">
+          <div class="cardIcon">✍️</div>
+          <div class="cardTitle">Entry Seva</div>
+          <div class="cardSub">Data Entry</div>
+        </div>
 
-<script src="js/api.js"></script>
-<script src="js/expense.js"></script>
+        <div class="card" id="cardSearch">
+          <div class="cardIcon">🔎</div>
+          <div class="cardTitle">Search Update</div>
+          <div class="cardSub">Search / Update / Delete</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY PAGE -->
+    <div class="page" id="pageEntry">
+      <form id="regForm" class="box" novalidate>
+        <div class="field">
+          <label class="lbl">Name <span>*</span></label>
+          <input class="inp" type="text" id="f_name" placeholder="Enter Name">
+          <div class="err" id="err_name">Name required</div>
+        </div>
+
+        <div class="field">
+          <label class="lbl">Relation <span>*</span></label>
+          <select class="inp sel" id="f_relation">
+            <option value="">Select Relation</option>
+            <option>S/O</option>
+            <option>D/O</option>
+            <option>W/O</option>
+          </select>
+          <div class="err" id="err_relation">Select Relation</div>
+        </div>
+
+        <div class="field">
+          <label class="lbl">Guardian's Name <span>*</span></label>
+          <input class="inp" type="text" id="f_guardian" placeholder="Enter guardian name">
+          <div class="err" id="err_guardian">Guardian required</div>
+        </div>
+
+        <div class="field">
+          <label class="lbl">Mobile Number <span>*</span></label>
+          <div class="mobileWrap">
+            <div class="cc">+91</div>
+            <input class="inp" type="tel" id="f_mobile" placeholder="Enter 10 digit mobile" inputmode="numeric" maxlength="10">
+          </div>
+          <div class="err" id="err_mobile">Mobile must be 10 digits</div>
+        </div>
+
+        <div class="field">
+          <label class="lbl">Age <span>*</span></label>
+          <input class="inp" type="number" id="f_age" placeholder="Enter Age" min="1" max="120">
+          <div class="err" id="err_age">Age required</div>
+        </div>
+
+        <div class="field">
+          <label class="lbl">Vidhansabha <span>*</span></label>
+          <select class="inp sel" id="f_vidhansabha">
+            <option value="">Select Vidhansabha</option>
+            <option>Babarpur</option><option>Burari</option><option>Ghonda</option><option>Gokalpur</option>
+            <option>Karawal Nagar</option><option>Mustafabad</option><option>Rohtas Nagar</option><option>Seelampur</option>
+            <option>Seemapuri</option><option>Timarpur</option>
+          </select>
+          <div class="err" id="err_vidhansabha">Select Vidhansabha</div>
+        </div>
+
+        <div class="field">
+          <label class="lbl">Mantra <span>*</span></label>
+          <select class="inp sel" id="f_mantra">
+            <option value="">Select Mantra</option>
+            <option>Pratham Mantra</option><option>Second Mantra</option><option>Third Mantra</option>
+          </select>
+          <div class="err" id="err_mantra">Select Mantra</div>
+        </div>
+
+        <div class="btnRow2">
+          <button class="btn btnBlack" type="submit">Submit</button>
+          <button class="btn btnLight" type="button" id="btnClear">Clear</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- SEARCH PAGE -->
+    <div class="page" id="pageSearch">
+      <div class="box">
+
+        <div id="pinBox">
+          <div class="field">
+            <label class="lbl">Enter 4 Digit PIN <span>*</span></label>
+
+            <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;">
+              <input class="inp pinCell" id="p1" type="password" inputmode="numeric" maxlength="1" autocomplete="off" />
+              <input class="inp pinCell" id="p2" type="password" inputmode="numeric" maxlength="1" autocomplete="off" />
+              <input class="inp pinCell" id="p3" type="password" inputmode="numeric" maxlength="1" autocomplete="off" />
+              <input class="inp pinCell" id="p4" type="password" inputmode="numeric" maxlength="1" autocomplete="off" />
+            </div>
+
+            <div class="err" id="err_pin" style="text-align:center;">Wrong PIN</div>
+          </div>
+
+          <div class="btnRow2">
+            <button class="btn btnBlack" id="btnUnlock" type="button">Unlock</button>
+            <button class="btn btnLight" id="btnPinClear" type="button">Clear</button>
+          </div>
+        </div>
+
+        <div id="searchBox" style="display:none;">
+          <div class="field">
+  <label class="lbl">Search By</label>
+  <select class="inp sel" id="searchBy">
+    <option value="all">All (Name/Mobile)</option>
+    <option value="name">Name</option>
+    <option value="mobile">Mobile</option>
+    <option value="vidhansabha">Vidhansabha</option>
+    <option value="mantra">Mantra</option>
+  </select>
+</div>
+          <div class="field">
+            <label class="lbl">Search (Name / Mobile)</label>
+            <input class="inp" id="searchInput" placeholder="Type starting letters or numbers..." autocomplete="off">
+          </div>
+
+          <button class="btn btnLight" id="btnReset" type="button">Clear Search</button>
+
+          <div id="statusBar" style="
+            margin-top:12px;padding:12px;border-radius:14px;font-weight:900;text-align:center;
+            background:#dff8e6;color:#0a6b2b;display:none;
+          ">⏳ Searching... Please wait</div>
+
+          <div id="resultWrap" style="margin-top:14px;"></div>
+
+          <!-- EDIT PANEL -->
+          <div class="editPanel" id="editPanel">
+            <div class="editTitle">✏️ Edit / Update</div>
+
+            <div class="field">
+              <label class="lbl">Name <span>*</span></label>
+              <input class="inp" id="e_name" placeholder="Enter Name">
+              <div class="err" id="err_e_name">Name required</div>
+            </div>
+
+            <div class="field">
+              <label class="lbl">Relation <span>*</span></label>
+              <select class="inp sel" id="e_relation">
+                <option value="">Select Relation</option>
+                <option>S/O</option>
+                <option>D/O</option>
+                <option>W/O</option>
+              </select>
+              <div class="err" id="err_e_relation">Select Relation</div>
+            </div>
+
+            <div class="field">
+              <label class="lbl">Guardian's Name <span>*</span></label>
+              <input class="inp" id="e_guardian" placeholder="Enter guardian name">
+              <div class="err" id="err_e_guardian">Guardian required</div>
+            </div>
+
+            <div class="field">
+              <label class="lbl">Mobile Number <span>*</span></label>
+              <div class="mobileWrap">
+                <div class="cc">+91</div>
+                <input class="inp" id="e_mobile" inputmode="numeric" maxlength="10" placeholder="Enter 10 digit mobile">
+              </div>
+              <div class="err" id="err_e_mobile">Mobile must be 10 digits</div>
+            </div>
+
+            <div class="field">
+              <label class="lbl">Age <span>*</span></label>
+              <input class="inp" id="e_age" type="number" min="1" max="120" placeholder="Enter Age">
+              <div class="err" id="err_e_age">Age required</div>
+            </div>
+
+            <div class="field">
+              <label class="lbl">Vidhansabha <span>*</span></label>
+              <select class="inp sel" id="e_vidhansabha">
+                <option value="">Select Vidhansabha</option>
+                <option>Babarpur</option><option>Burari</option><option>Ghonda</option><option>Gokalpur</option>
+                <option>Karawal Nagar</option><option>Mustafabad</option><option>Rohtas Nagar</option><option>Seelampur</option>
+                <option>Seemapuri</option><option>Timarpur</option>
+              </select>
+              <div class="err" id="err_e_vidhansabha">Select Vidhansabha</div>
+            </div>
+
+            <div class="field">
+              <label class="lbl">Mantra <span>*</span></label>
+              <select class="inp sel" id="e_mantra">
+                <option value="">Select Mantra</option>
+                <option>Pratham Mantra</option><option>Second Mantra</option><option>Third Mantra</option>
+              </select>
+              <div class="err" id="err_e_mantra">Select Mantra</div>
+            </div>
+
+            <div class="btnRow2">
+              <button class="btn btnBlack" id="btnUpdate" type="button">Update</button>
+              <button class="btn btnLight" id="btnEditClose" type="button">Close</button>
+            </div>
+          </div>
+
+          <button class="btn btnBlack" id="btnExport" type="button" style="margin-top:14px;">Export PDF</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modalOverlay" id="modalOverlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modalTitle" id="modalTitle">Confirm</div>
+      <div class="modalText" id="modalText">Are you sure?</div>
+      <div class="modalBtns">
+        <button class="modalBtn modalNo" id="modalNo" type="button">No</button>
+        <button class="modalBtn modalYes" id="modalYes" type="button">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🔥 PASTE YOUR WEB APP URL HERE
+    const API_URL = "https://script.google.com/macros/s/AKfycbx5sA5yOh6oX_Oz00PRPueefDK4cD8VE2sj82lzWDTdjN5ayVdBPdusUPkScx-oNhJZ/exec";
+
+    async function apiPost(payload){
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    }
+
+    // Toast
+    const toast = document.getElementById("toast");
+    let toastTimer=null;
+    function showToast(msg){
+      toast.textContent=msg;
+      toast.style.display="block";
+      clearTimeout(toastTimer);
+      toastTimer=setTimeout(()=>toast.style.display="none",1800);
+    }
+
+    // Modal
+    const modalOverlay = document.getElementById("modalOverlay");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalText = document.getElementById("modalText");
+    const modalNo = document.getElementById("modalNo");
+    const modalYes = document.getElementById("modalYes");
+    let modalResolve = null;
+
+    function pressFeel(btn){
+      if(!btn) return;
+      btn.classList.add("pressed");
+      setTimeout(()=>btn.classList.remove("pressed"), 130);
+    }
+
+    function openModal(title, text){
+      modalTitle.textContent = title || "Confirm";
+      modalText.textContent = text || "Are you sure?";
+      modalOverlay.classList.add("show");
+      modalYes.focus();
+      return new Promise((resolve)=>{ modalResolve = resolve; });
+    }
+    function closeModal(val){
+      modalOverlay.classList.remove("show");
+      if(modalResolve){ modalResolve(val); modalResolve=null; }
+    }
+    modalNo.addEventListener("click", ()=>{ pressFeel(modalNo); closeModal(false); });
+    modalYes.addEventListener("click", ()=>{ pressFeel(modalYes); closeModal(true); });
+    modalOverlay.addEventListener("click", (e)=>{ if(e.target===modalOverlay) closeModal(false); });
+
+    // Keyboard for modal (Enter/Esc)
+    document.addEventListener("keydown", (e)=>{
+      if(!modalOverlay.classList.contains("show")) return;
+      if(e.key === "Escape"){
+        e.preventDefault();
+        pressFeel(modalNo);
+        closeModal(false);
+      }
+      if(e.key === "Enter"){
+        e.preventDefault();
+        pressFeel(modalYes);
+        closeModal(true);
+      }
+    });
+
+    // Pages
+    const pageTitle = document.getElementById("pageTitle");
+    const pageSub = document.getElementById("pageSub");
+    const leftBtn = document.getElementById("leftBtn");
+    const btnIcon = document.getElementById("btnIcon");
+
+function setLeftIcon(type){
+  if(type==="menu"){
+    btnIcon.textContent = "☰";
+  }else{
+    btnIcon.innerHTML = `
+      <svg class="backSvg" viewBox="0 0 24 24">
+        <path d="M15 6 L9 12 L15 18"></path>
+      </svg>
+    `;
+  }
+}
+    const pageHome = document.getElementById("pageHome");
+    const pageSM = document.getElementById("pageSM");
+    const pageEntry = document.getElementById("pageEntry");
+    const pageSearch = document.getElementById("pageSearch");
+
+    const cardSM = document.getElementById("cardSM");
+    const cardEntry = document.getElementById("cardEntry");
+    const cardSearch = document.getElementById("cardSearch");
+
+    let currentPage = "home";
+
+    function setHeaderFor(page){
+      if(page==="home"){
+        pageTitle.textContent="Home";
+        pageSub.textContent="NORTH EAST DELHI SEVA";
+        setLeftIcon("menu");
+      }else if(page==="sm"){
+        pageTitle.textContent="SM Seva";
+        pageSub.textContent="Category Options";
+        setLeftIcon("back");
+      }else if(page==="entry"){
+        pageTitle.textContent="Entry Seva";
+        pageSub.textContent="Data Entry";
+        setLeftIcon("back");
+      }else if(page==="search"){
+        pageTitle.textContent="SM Seva Update";
+        pageSub.textContent="Search / Update / Delete";
+        setLeftIcon("back");
+      }
+    }
+
+    function showPage(name, push=true){
+      [pageHome,pageSM,pageEntry,pageSearch].forEach(p=>p.classList.remove("active"));
+
+      if(name==="home") pageHome.classList.add("active");
+      if(name==="sm") pageSM.classList.add("active");
+      if(name==="entry") pageEntry.classList.add("active");
+      if(name==="search") pageSearch.classList.add("active");
+
+      currentPage = name;
+      setHeaderFor(name);
+
+      // ✅ history update
+      if(push){
+        history.pushState({page:name}, "", "#"+name);
+      }
+    }
+
+    // Drawer
+    const drawerOverlay = document.getElementById("drawerOverlay");
+    const drawerClose = document.getElementById("drawerClose");
+    const menuHome = document.getElementById("menuHome");
+    const menuSM = document.getElementById("menuSM");
+
+    function openDrawer(){ drawerOverlay.classList.add("show"); }
+    function closeDrawer(){ drawerOverlay.classList.remove("show"); }
+
+    // Left button (☰ / ←)
+    leftBtn.addEventListener("click", ()=>{
+      if(currentPage==="home") openDrawer();
+      else history.back();
+    });
+
+    drawerClose.addEventListener("click", closeDrawer);
+    drawerOverlay.addEventListener("click", (e)=>{ if(e.target===drawerOverlay) closeDrawer(); });
+
+    menuHome.addEventListener("click", (e)=>{ e.preventDefault(); closeDrawer(); showPage("home"); });
+    menuSM.addEventListener("click", (e)=>{ e.preventDefault(); closeDrawer(); showPage("sm"); });
+
+    // Card clicks
+    cardSM.addEventListener("click", ()=>showPage("sm"));
+    cardEntry.addEventListener("click", ()=>showPage("entry"));
+    cardSearch.addEventListener("click", ()=>showPage("search"));
+
+    // Back button from browser/mobile
+    window.addEventListener("popstate", (e)=>{
+      // अगर modal खुला है तो बंद
+      if(modalOverlay.classList.contains("show")){
+        modalOverlay.classList.remove("show");
+        return;
+      }
+
+      // अगर edit खुला है तो बंद
+      const editPanel = document.getElementById("editPanel");
+      const resultWrap = document.getElementById("resultWrap");
+      if(editPanel && editPanel.style.display==="block"){
+        editPanel.style.display="none";
+        if(resultWrap) resultWrap.style.display="block";
+        return;
+      }
+
+      const page = (e.state && e.state.page) ? e.state.page : "home";
+      showPage(page, false);
+    });
+
+    // First state
+    history.replaceState({page:"home"}, "", "#home");
+
+    // Validation helpers
+    function hideAllErrors(){
+      document.querySelectorAll(".err").forEach(e=>e.style.display="none");
+      document.querySelectorAll(".inp").forEach(i=>i.classList.remove("error"));
+    }
+    function showError(inputId, errId){
+      const inp = document.getElementById(inputId);
+      const err = document.getElementById(errId);
+      if(inp) inp.classList.add("error");
+      if(err) err.style.display="block";
+      if(inp) inp.focus();
+    }
+
+    // Mobile digits only
+    const f_mobile = document.getElementById("f_mobile");
+    f_mobile.addEventListener("input", ()=>{
+      f_mobile.value = f_mobile.value.replace(/\D/g,"").slice(0,10);
+    });
+
+    // Clear form
+    document.getElementById("btnClear").addEventListener("click", ()=>{
+      pressFeel(document.getElementById("btnClear"));
+      document.getElementById("f_name").value="";
+      document.getElementById("f_relation").value="";
+      document.getElementById("f_guardian").value="";
+      document.getElementById("f_mobile").value="";
+      document.getElementById("f_age").value="";
+      document.getElementById("f_vidhansabha").value="";
+      document.getElementById("f_mantra").value="";
+      hideAllErrors();
+      showToast("Saved");
+    });
+
+    // Save
+    document.getElementById("regForm").addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      hideAllErrors();
+
+      const name = document.getElementById("f_name").value.trim();
+      const relation = document.getElementById("f_relation").value.trim();
+      const guardian = document.getElementById("f_guardian").value.trim();
+      const mobile = document.getElementById("f_mobile").value.trim();
+      const age = document.getElementById("f_age").value.trim();
+      const vidhansabha = document.getElementById("f_vidhansabha").value.trim();
+      const mantra = document.getElementById("f_mantra").value.trim();
+
+      if(!name) return showError("f_name","err_name");
+      if(!relation) return showError("f_relation","err_relation");
+      if(!guardian) return showError("f_guardian","err_guardian");
+      if(!/^\d{10}$/.test(mobile)) return showError("f_mobile","err_mobile");
+      if(!age) return showError("f_age","err_age");
+      if(!vidhansabha) return showError("f_vidhansabha","err_vidhansabha");
+      if(!mantra) return showError("f_mantra","err_mantra");
+
+      showToast("Saving...");
+
+      try{
+        const r = await apiPost({ action:"save", name, relation, guardian, mobile, age, vidhansabha, mantra });
+        if(!r.ok){ showToast(r.message || "Not saved"); return; }
+        showToast("Saved ✅");
+        document.getElementById("btnClear").click();
+      }catch(err){
+        showToast("Network error");
+      }
+    });
+
+    // SEARCH
+    const pinBox = document.getElementById("pinBox");
+    const searchBox = document.getElementById("searchBox");
+    const p1 = document.getElementById("p1");
+    const p2 = document.getElementById("p2");
+    const p3 = document.getElementById("p3");
+    const p4 = document.getElementById("p4");
+    const btnUnlock = document.getElementById("btnUnlock");
+    const btnPinClear = document.getElementById("btnPinClear");
+    const err_pin = document.getElementById("err_pin");
+
+    const searchInput = document.getElementById("searchInput");
+    const searchBy = document.getElementById("searchBy");
+    const btnReset = document.getElementById("btnReset");
+    const btnExport = document.getElementById("btnExport");
+    const statusBar = document.getElementById("statusBar");
+    const resultWrap = document.getElementById("resultWrap");
+
+    // Edit panel elements
+    const editPanel = document.getElementById("editPanel");
+    const btnUpdate = document.getElementById("btnUpdate");
+    const btnEditClose = document.getElementById("btnEditClose");
+
+    const e_name = document.getElementById("e_name");
+    const e_relation = document.getElementById("e_relation");
+    const e_guardian = document.getElementById("e_guardian");
+    const e_mobile = document.getElementById("e_mobile");
+    const e_age = document.getElementById("e_age");
+    const e_vidhansabha = document.getElementById("e_vidhansabha");
+    const e_mantra = document.getElementById("e_mantra");
+
+    let editOldMobile = "";
+    let lastSearchResults = [];
+    let searchTimer = null;
+
+    // block paste in pin
+    [p1,p2,p3,p4].forEach(el=>{
+      el.addEventListener("paste",(e)=>e.preventDefault());
+    });
+
+    // PIN digit only + auto focus
+    [p1,p2,p3,p4].forEach((el, idx)=>{
+      el.addEventListener("input", ()=>{
+        el.value = el.value.replace(/\D/g,"").slice(0,1);
+        if(el.value && idx < 3){ [p2,p3,p4][idx].focus(); }
+      });
+    });
+
+    // Backspace focus prev
+    [p1,p2,p3,p4].forEach((el, idx)=>{
+      el.addEventListener("keydown",(e)=>{
+        if(e.key==="Backspace" && !el.value && idx>0){
+          [p1,p2,p3,p4][idx-1].focus();
+        }
+      });
+    });
+
+    function getPinValue(){ return (p1.value+p2.value+p3.value+p4.value).trim(); }
+    function clearPin(){
+      p1.value="";p2.value="";p3.value="";p4.value="";
+      err_pin.style.display="none";
+      p1.focus();
+    }
+    btnPinClear.addEventListener("click", ()=>{
+      pressFeel(btnPinClear);
+      clearPin();
+    });
+
+    function showStatus(text){
+      statusBar.style.display="block";
+      statusBar.textContent=text;
+    }
+    function hideStatus(){ statusBar.style.display="none"; }
+
+    // Enter on PIN unlock with feel
+    [p1,p2,p3,p4].forEach(el=>{
+      el.addEventListener("keydown",(e)=>{
+        if(e.key==="Enter"){
+          e.preventDefault();
+          pressFeel(btnUnlock);
+          btnUnlock.click();
+        }
+      });
+    });
+
+    btnUnlock.addEventListener("click", async ()=>{
+      pressFeel(btnUnlock);
+
+      const entered = getPinValue();
+      if(entered.length !== 4){
+        err_pin.textContent="PIN required";
+        err_pin.style.display="block";
+        return;
+      }
+
+      try{
+        const r = await apiPost({ action:"getPin" });
+        if(!r.ok){ showToast(r.message || "PIN error"); return; }
+
+        const realPin = String(r.pin || "").trim();
+        if(entered !== realPin){
+          err_pin.textContent="Wrong PIN";
+          err_pin.style.display="block";
+          clearPin();
+          return;
+        }
+
+        pinBox.style.display="none";
+        searchBox.style.display="block";
+        searchInput.focus();
+        resultWrap.innerHTML = "";
+        editPanel.style.display="none";
+      }catch(e){
+        showToast("Network error");
+      }
+    });
+
+    // edit mobile digits only
+    e_mobile.addEventListener("input", ()=>{
+      e_mobile.value = e_mobile.value.replace(/\D/g,"").slice(0,10);
+    });
+
+    btnEditClose.addEventListener("click", ()=>{
+      pressFeel(btnEditClose);
+      editPanel.style.display="none";
+      editOldMobile = "";
+      resultWrap.style.display = "block";
+    });
+
+    function editShow(rec){
+      editOldMobile = String(rec.mobile || "");
+      e_name.value = rec.name || "";
+      e_relation.value = rec.relation || "";
+      e_guardian.value = rec.guardian || "";
+      e_mobile.value = String(rec.mobile || "");
+      e_age.value = rec.age || "";
+      e_vidhansabha.value = rec.vidhansabha || "";
+      e_mantra.value = rec.mantra || "";
+
+      hideAllErrors();
+      resultWrap.style.display = "none";
+      editPanel.style.display="block";
+      e_name.focus();
+      editPanel.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    btnUpdate.addEventListener("click", async ()=>{
+      pressFeel(btnUpdate);
+      hideAllErrors();
+
+      const name = e_name.value.trim();
+      const relation = e_relation.value.trim();
+      const guardian = e_guardian.value.trim();
+      const mobile = e_mobile.value.trim();
+      const age = e_age.value.trim();
+      const vidhansabha = e_vidhansabha.value.trim();
+      const mantra = e_mantra.value.trim();
+
+      if(!name) return showError("e_name","err_e_name");
+      if(!relation) return showError("e_relation","err_e_relation");
+      if(!guardian) return showError("e_guardian","err_e_guardian");
+      if(!/^\d{10}$/.test(mobile)) return showError("e_mobile","err_e_mobile");
+      if(!age) return showError("e_age","err_e_age");
+      if(!vidhansabha) return showError("e_vidhansabha","err_e_vidhansabha");
+      if(!mantra) return showError("e_mantra","err_e_mantra");
+
+      const ok = await openModal("Update Record", "Kya aap is record ko update karna chahte hain?");
+      if(!ok) return;
+
+      try{
+        const res = await apiPost({
+          action:"update",
+          oldMobile: editOldMobile,
+          name, relation, guardian, mobile, age, vidhansabha, mantra
+        });
+
+        if(!res.ok){ showToast(res.message || "Update failed"); return; }
+
+        showToast("Updated ✅");
+        editPanel.style.display="none";
+        resultWrap.style.display="block";
+        renderResults(searchInput.value.trim());
+      }catch(e){
+        showToast("Network error");
+      }
+    });
+
+    // Search input debounce
+    searchInput.addEventListener("input", ()=>{
+      clearTimeout(searchTimer);
+      searchTimer=setTimeout(()=>{
+        const q = searchInput.value.trim();
+        if(q.length===0){
+          hideStatus();
+          resultWrap.innerHTML = "";
+          lastSearchResults = [];
+          editPanel.style.display="none";
+          resultWrap.style.display="block";
+          return;
+        }
+        renderResults(q);
+      },250);
+    });
+
+    btnReset.addEventListener("click", ()=>{
+      pressFeel(btnReset);
+      searchInput.value="";
+      hideStatus();
+      resultWrap.innerHTML="";
+      lastSearchResults = [];
+      editPanel.style.display="none";
+      resultWrap.style.display="block";
+      searchInput.focus();
+    });
+
+    function makeCard(rec){
+      return `
+        <div class="rCard">
+          <div class="rRow"><div class="rLabel">Name</div><div class="rValue">${rec.name || ""}</div></div>
+          <div class="rRow"><div class="rLabel">Mobile</div><div class="rValue">${rec.mobile || ""}</div></div>
+          <div class="rRow"><div class="rLabel">Relation</div><div class="rValue">${rec.relation || ""}</div></div>
+          <div class="rRow"><div class="rLabel">Guardian</div><div class="rValue">${rec.guardian || ""}</div></div>
+          <div class="rRow"><div class="rLabel">Age</div><div class="rValue">${rec.age || ""}</div></div>
+          <div class="rRow"><div class="rLabel">Vidhansabha</div><div class="rValue">${rec.vidhansabha || ""}</div></div>
+          <div class="rRow"><div class="rLabel">Mantra</div><div class="rValue">${rec.mantra || ""}</div></div>
+
+          <div class="rActions">
+            <button class="rEdit" data-mobile="${rec.mobile}" type="button">Edit</button>
+            <button class="rDel" data-mobile="${rec.mobile}" type="button">Delete</button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function renderResults(q){
+      showStatus("⏳ Searching... Please wait");
+
+      try{
+        const r = await apiPost({ 
+  action:"search", 
+  q: q || "",
+  by: searchBy.value
+});
+        if(!r.ok){
+          hideStatus();
+          resultWrap.innerHTML="";
+          showToast(r.message || "Search error");
+          return;
+        }
+
+        const rows = r.results || [];
+        lastSearchResults = rows;
+        hideStatus();
+
+        let html = `
+          <div style="background:#dff8e6;color:#0a6b2b;font-weight:900;padding:12px;border-radius:14px;text-align:center;margin-bottom:12px;">
+            ✅ Results: ${rows.length}
+          </div>
+        `;
+
+        if(rows.length===0){
+          html += `<div style="padding:14px;font-weight:900;color:#666;text-align:center;">No result found</div>`;
+          resultWrap.innerHTML=html;
+          editPanel.style.display="none";
+          resultWrap.style.display="block";
+          return;
+        }
+
+        html += `<div class="cardsWrap">${rows.map(makeCard).join("")}</div>`;
+        resultWrap.innerHTML = html;
+        resultWrap.style.display="block";
+
+        // Delete
+        resultWrap.querySelectorAll(".rDel").forEach(btn=>{
+          btn.addEventListener("click", async ()=>{
+            pressFeel(btn);
+            const mobile = btn.getAttribute("data-mobile");
+            const ok = await openModal("Delete Record", "Kya aap is record ko delete karna chahte hain?");
+            if(!ok) return;
+
+            const res = await apiPost({ action:"delete", mobile });
+            if(!res.ok){ showToast(res.message || "Delete failed"); return; }
+
+            showToast("Deleted ✅");
+            editPanel.style.display="none";
+            resultWrap.style.display="block";
+            renderResults(searchInput.value.trim());
+          });
+        });
+
+        // Edit open panel
+        resultWrap.querySelectorAll(".rEdit").forEach(btn=>{
+          btn.addEventListener("click", ()=>{
+            pressFeel(btn);
+            const mobile = btn.getAttribute("data-mobile");
+            const rec = rows.find(x=>String(x.mobile)===String(mobile));
+            if(!rec){ showToast("Record not found"); return; }
+            editShow(rec);
+          });
+        });
+
+      }catch(e){
+        hideStatus();
+        resultWrap.innerHTML="";
+        showToast("Network error");
+      }
+    }
+
+    // PDF Export
+    btnExport.addEventListener("click", ()=>{
+      pressFeel(btnExport);
+
+      if(!lastSearchResults || lastSearchResults.length===0){
+        showToast("No data to export");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      let y=12;
+      doc.setFontSize(14);
+      doc.text("SM Seva Search List", 10, y);
+      y += 8;
+
+      doc.setFontSize(10);
+      lastSearchResults.forEach((r, idx)=>{
+        const line = `${idx+1}. ${r.name} | ${r.mobile} | ${r.vidhansabha} | ${r.mantra}`;
+        if(y>280){ doc.addPage(); y=12; }
+        doc.text(line, 10, y);
+        y += 7;
+      });
+
+      doc.save("SM-Seva-List.pdf");
+    });
+  </script>
+
+  <script>
+    // Service Worker (optional)
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./service-worker.js");
+    }
+  </script>
+
 </body>
 </html>
