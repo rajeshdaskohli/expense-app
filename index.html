@@ -5,19 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="theme-color" content="#111">
   <title>Smart Expense Manager</title>
-  
-  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkV4cGVuc2UgU2V2YSIsCiAgInNob3J0X25hbWUiIjogIkV4cGVuc2UiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzExMSIsCiAgInRoZW1lX2NvbG9yIjogIiMxMTEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZnJlZXBpay5jb20vNTEyLzI0ODkvMjQ4OTU2NC5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIsCiAgICAgICJwdXJwb3NlIjogImFueSBtYXNrYWJsZSIKICAgIH0KICBdCn0=">
-
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js');
-    });
-  }
-</script>
-
   <style>
-    /* ⚠️ आपकी ओरिजिनल स्टाइलिंग (इमेज 5 के अनुसार) - कोई बदलाव नहीं */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Roboto, sans-serif; }
     body { margin: 0; background: #f0f2f5; color: #1a1a1a; }
     .topbar { background: #111; color: #fff; padding: 15px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 1000; }
@@ -54,7 +42,6 @@
     .menu-link { display: block; padding: 15px; background: #f5f5f5; margin-bottom: 10px; border-radius: 10px; text-decoration: none; color: #111; font-weight: 700; }
     .toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); background: #111; color: #fff; padding: 12px 25px; border-radius: 50px; display: none; font-size: 14px; z-index: 3000; }
     .card-btn { background: #fff; border-radius: 18px; padding: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-    .card-btn:active { background: #f5f5f5; }
   </style>
 </head>
 <body>
@@ -63,7 +50,7 @@
     <button class="menuBtn" id="leftBtn">☰</button>
     <div class="titleBox">
       <b id="pageTitle">Home</b>
-      <small>Expense</small>
+      <small>Expense Seva</small>
     </div>
   </div>
 
@@ -71,16 +58,13 @@
     <div class="drawer">
       <h2 style="margin-top:0">Menu</h2>
       <div class="menu-link" onclick="showPage('home')">🏠 Home</div>
-      <div class="menu-link" onclick="showPage('sm')">💰 Expense</div>
+      <div class="menu-link" onclick="showPage('sm')">💰 Expense Seva</div>
       <div class="menu-link" onclick="location.reload()">🔄 Refresh App</div>
     </div>
   </div>
 
   <div class="container">
     <div class="page active" id="pageHome">
-      <div style="text-align: center; margin-bottom: 25px;">
-        <img src="https://cdn-icons-png.freepik.com/512/2489/2489564.png" style="width: 100px; border-radius: 20px;">
-      </div>
       <div class="card-btn" onclick="showPage('sm')">
         <div style="font-size: 40px; margin-bottom: 10px;">💰</div>
         <b>Open Expense Seva</b>
@@ -91,7 +75,8 @@
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div class="card-btn" onclick="showPage('dashboard')">📊 Dashboard</div>
         <div class="card-btn" onclick="showPage('entry')">✍️ Entry</div>
-        <div class="card-btn" onclick="showPage('addfund')">🏦 Funds</div>
+        <div class="card-btn" onclick="showPage('addfund')">🏦 Add Funds</div>
+        <div class="card-btn" onclick="showPage('payments')">💳 Bills/EMI</div>
       </div>
     </div>
 
@@ -102,13 +87,11 @@
         <div class="sum-card fund-month"><h4>Funds</h4><p id="sumFund">₹0</p></div>
         <div class="sum-card" onclick="showPage('addfund')"><h4>Action</h4><p style="font-size:14px">Manage 🏦</p></div>
       </div>
-
       <div class="box">
         <div class="box-title">🏦 Accounts & Cards</div>
         <div id="bankList"></div>
         <div id="cardList" style="margin-top:10px; border-top:1px solid #eee; padding-top:10px"></div>
       </div>
-
       <div class="box-title">🕒 Recent Activity</div>
       <div id="historyList"></div>
     </div>
@@ -123,31 +106,52 @@
         </select>
         <div id="divBankList" style="display:none;"><label class="lbl">Select Bank</label><select class="inp" id="expBank"></select></div>
         <div id="divCardList" style="display:none;"><label class="lbl">Select Card</label><select class="inp" id="expCard"></select></div>
+        
+        <label class="lbl">Category</label>
+        <select class="inp" id="expCategory">
+          <option value="Food">🍔 Food</option>
+          <option value="Shopping">🛍️ Shopping</option>
+          <option value="Bills">🧾 Bills</option>
+          <option value="Travel">🚗 Travel</option>
+          <option value="Health">💊 Health</option>
+          <option value="Other">📦 Other</option>
+        </select>
+
+        <label class="lbl">Remark (खर्च किस लिए किया?)</label>
+        <input type="text" class="inp" id="expRemark" placeholder="उदा: पेट्रोल, दूध, रिचार्ज...">
+
         <label class="lbl">Amount</label>
         <input type="number" class="inp" id="expAmount" placeholder="0.00" inputmode="decimal">
-        
-        <label class="lbl">Remark</label>
-        <input type="text" class="inp" id="expRemark" placeholder="Optional">
-        
         <button class="btn" id="btnSaveExp" onclick="saveExpense()">Submit Expense</button>
       </div>
     </div>
 
     <div class="page" id="pageAddfund">
       <div class="box">
-        <label class="lbl">I want to...</label>
-        <select class="inp" id="fundAction" onchange="toggleFundFields()">
-          <option value="addfund">➕ Deposit Fund</option>
-          <option value="cc">💳 Pay Card Bill</option>
-          <option value="emi">📉 Pay Loan EMI</option>
-        </select>
-        <label class="lbl">Select Bank</label>
+        <div class="box-title">➕ Add Deposit</div>
+        <label class="lbl">Target Bank</label>
         <select class="inp" id="targetBank"></select>
-        <div id="fCC" style="display:none;"><label class="lbl">Select Credit Card</label><select class="inp" id="targetCC"></select></div>
-        <div id="fLoan" style="display:none;"><label class="lbl">Select Loan</label><select class="inp" id="targetLoan"></select></div>
         <label class="lbl">Amount</label>
         <input type="number" class="inp" id="fundAmount" placeholder="0.00" inputmode="decimal">
-        <button class="btn" id="btnSaveFund" onclick="processFund()">Process Transaction</button>
+        <button class="btn" id="btnSaveFund" onclick="processDeposit()">Add to Bank</button>
+      </div>
+    </div>
+
+    <div class="page" id="pagePayments">
+      <div class="box">
+        <div class="box-title">💳 Bill & EMI Payments</div>
+        <label class="lbl">Payment Type</label>
+        <select class="inp" id="payAction" onchange="togglePayFields()">
+          <option value="cc">💳 Credit Card Bill</option>
+          <option value="emi">📉 Loan EMI</option>
+        </select>
+        <label class="lbl">Pay From (Bank)</label>
+        <select class="inp" id="payFromBank"></select>
+        <div id="pCC"><label class="lbl">Select Credit Card</label><select class="inp" id="payTargetCC"></select></div>
+        <div id="pLoan" style="display:none;"><label class="lbl">Select Loan</label><select class="inp" id="payTargetLoan"></select></div>
+        <label class="lbl">Amount</label>
+        <input type="number" class="inp" id="payAmount" placeholder="0.00" inputmode="decimal">
+        <button class="btn" id="btnSavePay" onclick="processBillPay()">Process Payment</button>
       </div>
     </div>
   </div>
@@ -170,7 +174,7 @@
 
     async function renderPage(name) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      const target = document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1).toLowerCase());
+      const target = document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1));
       if(target) target.classList.add('active');
       const isHome = (name === 'home');
       document.getElementById("pageTitle").innerText = isHome ? "Home" : name.toUpperCase();
@@ -191,29 +195,31 @@
       document.getElementById("divCardList").style.display = (m==='card') ? 'block' : 'none';
     }
 
-    function toggleFundFields() {
-      const a = document.getElementById("fundAction").value;
-      document.getElementById("fCC").style.display = (a==='cc') ? 'block' : 'none';
-      document.getElementById("fLoan").style.display = (a==='emi') ? 'block' : 'none';
+    function togglePayFields() {
+      const a = document.getElementById("payAction").value;
+      document.getElementById("pCC").style.display = (a==='cc') ? 'block' : 'none';
+      document.getElementById("pLoan").style.display = (a==='emi') ? 'block' : 'none';
     }
 
     async function refreshData() {
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
-      if(res.ok) {
-        db = res;
-        updateDropdowns();
-        if(location.hash === "#dashboard") updateDashboardUI();
-      }
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
+        if(res.ok) {
+          db = res;
+          updateDropdowns();
+          if(location.hash === "#dashboard") updateDashboardUI();
+        }
+      } catch(e) { console.log(e); }
     }
 
     function updateDropdowns() {
       const bH = db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
       const cH = db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
       const lH = db.loans.map(l => `<option value="${l.name}">${l.name}</option>`).join("");
-      ["expBank", "targetBank"].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerHTML = bH; });
-      if(document.getElementById("expCard")) document.getElementById("expCard").innerHTML = cH;
-      if(document.getElementById("targetCC")) document.getElementById("targetCC").innerHTML = cH;
-      if(document.getElementById("targetLoan")) document.getElementById("targetLoan").innerHTML = lH;
+      ["expBank", "targetBank", "payFromBank"].forEach(id => document.getElementById(id).innerHTML = bH);
+      document.getElementById("expCard").innerHTML = cH;
+      document.getElementById("payTargetCC").innerHTML = cH;
+      document.getElementById("payTargetLoan").innerHTML = lH;
     }
 
     function updateDashboardUI() {
@@ -221,64 +227,62 @@
       document.getElementById("sumToday").innerText = "₹" + parseFloat(s.todayExp).toFixed(2);
       document.getElementById("sumMonth").innerText = "₹" + parseFloat(s.monthExp).toFixed(2);
       document.getElementById("sumFund").innerText = "₹" + parseFloat(s.monthFund).toFixed(2);
-
-      // ✅ बैंक बैलेंस कलर लॉजिक (माइनस = लाल)
-      document.getElementById("bankList").innerHTML = db.banks.map(b => {
-        const val = parseFloat(b.balance);
-        return `<div class="statRow"><span>${b.name}</span><b class="${val < 0 ? 'val-neg' : 'val-pos'}">₹${val.toFixed(2)}</b></div>`;
-      }).join("");
-
-      // ✅ कार्ड कलर लॉजिक (0 = हरा)
-      document.getElementById("cardList").innerHTML = db.cards.map(c => {
-        const due = parseFloat(c.due);
-        return `<div class="statRow"><span>${c.name}</span><b class="${due <= 0 ? 'val-pos' : 'val-neg'}">₹${due.toFixed(2)}</b></div>`;
-      }).join("");
-      
-      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-        <div class="hist-item">
-          <div class="hist-meta">
-            <span class="hist-name">${t.name}</span>
-            <span class="hist-date">${t.date}</span>
-            <span class="hist-tag">${t.type}</span>
-          </div>
-          <b class="${(t.type==='Add Fund'?'val-pos':'val-neg')}">
-            ${(t.type==='Add Fund'?'+':'-')}₹${parseFloat(t.amount).toFixed(2)}
-          </b>
-        </div>
-      `).join("");
+      document.getElementById("bankList").innerHTML = db.banks.map(b => `<div class="statRow"><span>${b.name}</span><b class="val-pos">₹${parseFloat(b.balance).toFixed(2)}</b></div>`).join("");
+      document.getElementById("cardList").innerHTML = db.cards.map(c => `<div class="statRow"><span>${c.name}</span><b class="val-neg">₹${parseFloat(c.due).toFixed(2)}</b></div>`).join("");
+      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `<div class="hist-item"><div class="hist-meta"><span class="hist-name">${t.name}</span><span class="hist-date">${t.date}</span><span class="hist-tag">${t.type}</span></div><b class="${(t.type==='Add Fund'?'val-pos':'val-neg')}">${(t.type==='Add Fund'?'+':'-')}₹${parseFloat(t.amount).toFixed(2)}</b></div>`).join("");
     }
 
     async function saveExpense() {
-      const amtEl = document.getElementById("expAmount");
-      const remEl = document.getElementById("expRemark");
-      const amt = parseFloat(amtEl.value);
-      if(!amt) return alert("Enter amount");
-      
       const mode = document.getElementById("payMode").value;
+      const amt = parseFloat(document.getElementById("expAmount").value);
+      const cat = document.getElementById("expCategory").value;
+      const rem = document.getElementById("expRemark").value;
       let name = (mode==='cash')?'Cash':(mode==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
-      
-      btnLoad("btnSaveExp", true);
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "save", type: mode, name: name, amount: amt, remark: remEl.value}) }).then(r => r.json());
-      btnLoad("btnSaveExp", false);
-      if(res.ok) { 
-        amtEl.value = ""; remEl.value = ""; // ऑटो रिसेट
-        showToast("Success ✅"); showPage("dashboard"); 
-      }
-    }
-
-    async function processFund() {
-      const amtEl = document.getElementById("fundAmount");
-      const amt = parseFloat(amtEl.value);
       if(!amt) return alert("Enter amount");
-      const payload = { action: "processFund", fundAction: document.getElementById("fundAction").value, amount: amt, bankName: document.getElementById("targetBank").value, ccName: document.getElementById("targetCC").value, loanName: document.getElementById("targetLoan").value };
-      btnLoad("btnSaveFund", true);
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(r => r.json());
-      btnLoad("btnSaveFund", false);
-      if(res.ok) { amtEl.value = ""; showToast("Updated ✅"); showPage("dashboard"); }
+      btnLoad("btnSaveExp", true);
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "save", type: mode, name: name, amount: amt, category: cat, remark: rem}) }).then(r => r.json());
+      btnLoad("btnSaveExp", false);
+      if(res.ok) { showToast("Success ✅"); showPage("dashboard"); } else { alert(res.message); }
     }
 
-    function showToast(m) { const t = document.getElementById("toast"); t.innerText = m; t.style.display="block"; setTimeout(()=>t.style.display="none", 2500); }
-    function btnLoad(id, load) { const b = document.getElementById(id); b.disabled = load; b.innerText = load ? "Processing..." : "Submit"; }
+    async function processDeposit() {
+      const amt = parseFloat(document.getElementById("fundAmount").value);
+      if(!amt) return alert("Enter amount");
+      btnLoad("btnSaveFund", true);
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "processFund", fundAction: "addfund", amount: amt, bankName: document.getElementById("targetBank").value}) }).then(r => r.json());
+      btnLoad("btnSaveFund", false);
+      if(res.ok) { showToast("Fund Added ✅"); showPage("dashboard"); }
+    }
+
+    async function processBillPay() {
+      const act = document.getElementById("payAction").value;
+      const amt = parseFloat(document.getElementById("payAmount").value);
+      if(!amt) return alert("Enter amount");
+      btnLoad("btnSavePay", true);
+      const payload = {
+        action: "processFund",
+        fundAction: act,
+        amount: amt,
+        bankName: document.getElementById("payFromBank").value,
+        ccName: document.getElementById("payTargetCC").value,
+        loanName: document.getElementById("payTargetLoan").value
+      };
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(r => r.json());
+      btnLoad("btnSavePay", false);
+      if(res.ok) { showToast("Payment Done ✅"); showPage("dashboard"); }
+    }
+
+    function showToast(m) { 
+      const t = document.getElementById("toast"); t.innerText = m; t.style.display="block"; 
+      setTimeout(()=>t.style.display="none", 2500); 
+    }
+    
+    function btnLoad(id, load) {
+      const b = document.getElementById(id);
+      b.disabled = load;
+      b.innerText = load ? "Processing..." : "Submit";
+    }
+
     document.getElementById("drawerOverlay").onclick = (e) => { if(e.target.id==='drawerOverlay') e.target.style.display='none'; };
   </script>
 </body>
