@@ -2,37 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="theme-color" content="#0b0b0b">
-  <title>Expense Manager</title>
+  <title>Expense Manager Pro</title>
   <style>
-    /* पुराने CSS के सभी गुण यहाँ बरकरार हैं */
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-    body{margin:0;font-family:Arial,sans-serif;background:#f4f4f4;color:#111;}
-    .topbar{background:#111;color:#fff;padding:14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:1000;}
-    .menuBtn{width:44px;height:44px;border:none;background:transparent;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-    .titleBox{display:flex;flex-direction:column;}
-    .appTitle{font-weight:900;font-size:18px;}
-    .appSub{font-weight:800;font-size:12px;opacity:0.8;}
-    .container{max-width:540px;margin:0 auto;padding:18px;}
-    .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;opacity:0;visibility:hidden;transition:0.2s;}
-    .drawer-overlay.show{opacity:1;visibility:visible;}
-    .drawer{width:280px;height:100%;background:#fff;position:absolute;left:0;top:0;transform:translateX(-100%);transition:0.2s;padding:20px;}
-    .drawer-overlay.show .drawer{transform:translateX(0);}
-    .page{display:none;} .page.active{display:block;}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-    .card{background:#fff;border-radius:20px;padding:12px;height:120px;border:1.5px solid rgba(0,0,0,0.18);text-align:center;display:flex;flex-direction:column;justify-content:center;cursor:pointer;transition:0.1s;}
-    .card:active{transform:scale(0.95);}
-    .cardIcon{font-size:28px;margin-bottom:8px;}
-    .box{background:#fff;border-radius:18px;padding:16px;border:1px solid rgba(0,0,0,0.1);margin-bottom:16px;box-shadow:0 4px 10px rgba(0,0,0,0.05);}
-    .lbl{display:block;font-size:15px;font-weight:900;margin-bottom:8px;}
-    .inp{width:100%;height:54px;padding:0 14px;border-radius:14px;border:1px solid #ccc;font-size:16px;margin-bottom:15px;outline:none;}
-    .btn{height:56px;border:none;border-radius:16px;font-size:18px;font-weight:900;cursor:pointer;width:100%;transition:0.1s;}
-    .btnBlack{background:#111;color:#fff;}
-    .btnBlack:active{transform:scale(0.97);}
-    .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#111;color:#fff;padding:12px 20px;border-radius:16px;display:none;z-index:5000;}
-    .statRow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee;}
-    .val-pos{color:green;font-weight:900;} .val-neg{color:red;font-weight:900;}
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f4; color: #111; overflow-x: hidden; }
+    
+    /* Top Navigation */
+    .topbar { background: #111; color: #fff; padding: 14px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+    .menuBtn { width: 44px; height: 44px; border: none; background: transparent; color: #fff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .titleBox { display: flex; flex-direction: column; }
+    .appTitle { font-weight: 900; font-size: 18px; letter-spacing: 0.5px; }
+    .appSub { font-weight: 700; font-size: 10px; opacity: 0.7; text-transform: uppercase; }
+
+    /* Layout & Container */
+    .container { max-width: 500px; margin: 0 auto; padding: 16px; min-height: calc(100vh - 72px); }
+    .page { display: none; animation: fadeIn 0.3s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Drawer Menu */
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; opacity: 0; visibility: hidden; transition: 0.3s; }
+    .drawer-overlay.show { opacity: 1; visibility: visible; }
+    .drawer { width: 280px; height: 100%; background: #fff; position: absolute; left: 0; top: 0; transform: translateX(-100%); transition: 0.3s; padding: 25px; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
+    .drawer-overlay.show .drawer { transform: translateX(0); }
+    .drawer h3 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+    .menu-item { width: 100%; padding: 15px; margin-bottom: 10px; border: none; background: #f9f9f9; border-radius: 12px; text-align: left; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+    .menu-item:active { background: #eee; }
+
+    /* Cards & UI Elements */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .card { background: #fff; border-radius: 20px; padding: 20px; border: 1px solid rgba(0,0,0,0.08); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.2s; }
+    .card:active { transform: scale(0.95); background: #fafafa; }
+    .cardIcon { font-size: 32px; margin-bottom: 10px; }
+    
+    .box { background: #fff; border-radius: 20px; padding: 20px; border: 1px solid rgba(0,0,0,0.08); margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .lbl { display: block; font-size: 14px; font-weight: 800; margin-bottom: 8px; color: #555; }
+    .inp { width: 100%; height: 54px; padding: 0 15px; border-radius: 14px; border: 1.5px solid #eee; font-size: 16px; margin-bottom: 18px; outline: none; background: #fafafa; }
+    .inp:focus { border-color: #111; background: #fff; }
+    
+    .btn { height: 56px; border: none; border-radius: 16px; font-size: 18px; font-weight: 900; cursor: pointer; width: 100%; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .btnBlack { background: #111; color: #fff; }
+    .btnBlack:active { transform: scale(0.98); opacity: 0.9; }
+    
+    /* Stats & Lists */
+    .statRow { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+    .statRow:last-child { border: none; }
+    .val-pos { color: #2e7d32; font-weight: 800; }
+    .val-neg { color: #d32f2f; font-weight: 800; }
+
+    .toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); background: #111; color: #fff; padding: 12px 24px; border-radius: 50px; display: none; z-index: 5000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-weight: 600; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -41,24 +61,26 @@
     <button class="menuBtn" id="leftBtn">☰</button>
     <div class="titleBox">
       <b class="appTitle" id="pageTitle">Home</b>
-      <small class="appSub" id="pageSub">EXPENSE MANAGER</small>
+      <small class="appSub">Expense Manager</small>
     </div>
   </div>
 
   <div class="drawer-overlay" id="drawerOverlay">
     <div class="drawer">
-      <h3>Menu</h3>
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <button class="btn" onclick="showPage('home')">🏠 Home</button>
-        <button class="btn" onclick="showPage('sm')">💰 Expense Seva</button>
-      </div>
+      <h3>Quick Menu</h3>
+      <button class="menu-item" onclick="showPage('home')">🏠 Home</button>
+      <button class="menu-item" onclick="showPage('sm')">💰 Expense Seva</button>
+      <button class="menu-item" onclick="location.reload()">🔄 Refresh App</button>
     </div>
   </div>
 
   <div class="container">
     <div class="page active" id="pageHome">
       <div class="grid2">
-        <div class="card" onclick="showPage('sm')"><div class="cardIcon">💰</div><b>Expense Seva</b></div>
+        <div class="card" onclick="showPage('sm')">
+          <div class="cardIcon">💰</div>
+          <b>Expense Seva</b>
+        </div>
       </div>
     </div>
 
@@ -71,9 +93,18 @@
     </div>
 
     <div class="page" id="pageDashboard">
-      <div class="box"><h3>🏦 Banks</h3><div id="bankList">Loading...</div></div>
-      <div class="box"><h3>💳 Cards</h3><div id="cardList">Loading...</div></div>
-      <div class="box"><h3>📉 Loans</h3><div id="loanList">Loading...</div></div>
+      <div class="box">
+        <h3 style="margin-top:0">🏦 Banks</h3>
+        <div id="bankList">Loading...</div>
+      </div>
+      <div class="box">
+        <h3 style="margin-top:0">💳 Cards</h3>
+        <div id="cardList">Loading...</div>
+      </div>
+      <div class="box">
+        <h3 style="margin-top:0">📉 Loans</h3>
+        <div id="loanList">Loading...</div>
+      </div>
     </div>
 
     <div class="page" id="pageEntry">
@@ -96,9 +127,9 @@
         </div>
 
         <label class="lbl">Amount</label>
-        <input type="number" class="inp" id="expAmount" placeholder="0.00">
+        <input type="number" class="inp" id="expAmount" placeholder="0.00" inputmode="decimal">
         
-        <button class="btn btnBlack" onclick="saveExpense()">Submit</button>
+        <button class="btn btnBlack" id="btnSaveExp" onclick="saveExpense()">Submit Entry</button>
       </div>
     </div>
 
@@ -106,16 +137,30 @@
         <div class="box">
             <label class="lbl">Action</label>
             <select class="inp" id="fundAction" onchange="toggleFundFields()">
-                <option value="add">Add Fund</option>
+                <option value="addfund">Add Fund (Deposit)</option>
                 <option value="cc">Pay CC Bill</option>
                 <option value="emi">Pay EMI</option>
             </select>
-            <div id="fBank"><label class="lbl">Bank</label><select class="inp" id="targetBank"></select></div>
-            <div id="fCC" style="display:none;"><label class="lbl">Card</label><select class="inp" id="targetCC"></select></div>
-            <div id="fLoan" style="display:none;"><label class="lbl">Loan</label><select class="inp" id="targetLoan"></select></div>
+
+            <div id="fBank">
+              <label class="lbl">Select Bank</label>
+              <select class="inp" id="targetBank"></select>
+            </div>
+
+            <div id="fCC" style="display:none;">
+              <label class="lbl">Select Card</label>
+              <select class="inp" id="targetCC"></select>
+            </div>
+
+            <div id="fLoan" style="display:none;">
+              <label class="lbl">Select Loan</label>
+              <select class="inp" id="targetLoan"></select>
+            </div>
+
             <label class="lbl">Amount</label>
-            <input type="number" class="inp" id="fundAmount">
-            <button class="btn btnBlack" onclick="processFund()">Submit</button>
+            <input type="number" class="inp" id="fundAmount" placeholder="0.00" inputmode="decimal">
+            
+            <button class="btn btnBlack" id="btnSaveFund" onclick="processFund()">Process Payment</button>
         </div>
     </div>
   </div>
@@ -123,31 +168,38 @@
   <div class="toast" id="toast"></div>
 
   <script>
+    // ⚠️ यहाँ अपना नया Deploy URL पेस्ट करें
     const API_URL = "https://script.google.com/macros/s/AKfycbwXkJo6belMLPwHAEQLoA9VD1MNCArzuddtcqYRQSFsvTeuo0tjP8Ilut5ZU0Yf4HtA/exec"; 
     let db = { banks: [], cards: [], loans: [] };
 
-    // --- बैक बटन हैंडलर ---
-    window.onpopstate = function() {
+    // --- बैक बटन और नेविगेशन लॉजिक ---
+    window.addEventListener('load', () => {
+      history.replaceState({page: 'home'}, 'Home', '#home');
+    });
+
+    window.onpopstate = function(event) {
       const page = location.hash.replace('#','') || 'home';
       renderPage(page, false);
     };
 
     function showPage(name) {
-      location.hash = name;
+      if (location.hash !== '#' + name) {
+        location.hash = name;
+      }
       renderPage(name, true);
     }
 
-    function renderPage(name, push) {
+    async function renderPage(name, push) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       const target = document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1));
       if(target) target.classList.add('active');
 
-      const isHome = name === 'home';
+      const isHome = (name === 'home');
       document.getElementById("pageTitle").textContent = isHome ? "Home" : name.toUpperCase();
       document.getElementById("leftBtn").textContent = isHome ? "☰" : "←";
-      
       document.getElementById("drawerOverlay").classList.remove("show");
-      if(!isHome) fetchDashboard();
+
+      if(!isHome) await fetchDashboard();
     }
 
     document.getElementById("leftBtn").onclick = () => {
@@ -158,7 +210,7 @@
       }
     };
 
-    // --- फील्ड्स टॉगल ---
+    // --- फॉर्म फील्ड्स मैनेजमेंट ---
     function toggleEntryFields() {
       const mode = document.getElementById("payMode").value;
       document.getElementById("divBankList").style.display = (mode === 'bank') ? 'block' : 'none';
@@ -171,52 +223,123 @@
         document.getElementById("fLoan").style.display = (act === 'emi') ? 'block' : 'none';
     }
 
-    // --- डेटा फंक्शन्स ---
+    // --- API कम्युनिकेशन ---
     async function apiPost(payload) {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      });
-      return await res.json();
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        return await res.json();
+      } catch (e) {
+        showToast("Connection Error!");
+        return { ok: false };
+      }
     }
 
     async function fetchDashboard() {
       const res = await apiPost({ action: "getDashboard" });
       if(res.ok) {
         db = res;
-        renderDashboard();
-        // Dropdowns भरें
-        document.getElementById("expBank").innerHTML = db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
-        document.getElementById("expCard").innerHTML = db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
-        document.getElementById("targetBank").innerHTML = db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
-        document.getElementById("targetCC").innerHTML = db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
-        document.getElementById("targetLoan").innerHTML = db.loans.map(l => `<option value="${l.name}">${l.name}</option>`).join("");
+        fillDropdowns();
+        if(location.hash === "#dashboard") renderDashboardView();
       }
     }
 
-    function renderDashboard() {
-      document.getElementById("bankList").innerHTML = db.banks.map(b => `<div class="statRow"><span>${b.name}</span><span class="val-pos">₹${b.balance}</span></div>`).join("");
-      document.getElementById("cardList").innerHTML = db.cards.map(c => `<div class="statRow"><span>${c.name}</span><span class="val-neg">₹${c.due}</span></div>`).join("");
-      document.getElementById("loanList").innerHTML = db.loans.map(l => `<div class="statRow"><span>${l.name}</span><span class="val-neg">₹${l.emi}</span></div>`).join("");
+    function fillDropdowns() {
+      const bankHTML = db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
+      const cardHTML = db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+      const loanHTML = db.loans.map(l => `<option value="${l.name}">${l.name}</option>`).join("");
+
+      ["expBank", "targetBank"].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.innerHTML = bankHTML;
+      });
+      
+      const expCard = document.getElementById("expCard");
+      if(expCard) expCard.innerHTML = cardHTML;
+      
+      const targetCC = document.getElementById("targetCC");
+      if(targetCC) targetCC.innerHTML = cardHTML;
+      
+      const targetLoan = document.getElementById("targetLoan");
+      if(targetLoan) targetLoan.innerHTML = loanHTML;
     }
 
+    function renderDashboardView() {
+      document.getElementById("bankList").innerHTML = db.banks.length ? db.banks.map(b => `<div class="statRow"><span>${b.name}</span><b class="val-pos">₹${b.balance}</b></div>`).join("") : "No Data";
+      document.getElementById("cardList").innerHTML = db.cards.length ? db.cards.map(c => `<div class="statRow"><span>${c.name}</span><b class="val-neg">₹${c.due}</b></div>`).join("") : "No Data";
+      document.getElementById("loanList").innerHTML = db.loans.length ? db.loans.map(l => `<div class="statRow"><span>${l.name}</span><b class="val-neg">₹${l.emi}</b></div>`).join("") : "No Data";
+    }
+
+    // --- सेविंग फंक्शन्स ---
     async function saveExpense() {
       const mode = document.getElementById("payMode").value;
       const amt = document.getElementById("expAmount").value;
       let name = "Cash";
+      
       if(mode === 'bank') name = document.getElementById("expBank").value;
       if(mode === 'card') name = document.getElementById("expCard").value;
 
-      showToast("Saving...");
+      if(!amt || amt <= 0) return alert("Please enter valid amount");
+
+      setLoading("btnSaveExp", true);
       const res = await apiPost({ action: "save", type: mode, name: name, amount: parseFloat(amt) });
-      if(res.ok) { showToast("Saved ✅"); showPage('dashboard'); }
+      setLoading("btnSaveExp", false);
+
+      if(res.ok) { 
+        showToast("Saved Successfully ✅"); 
+        document.getElementById("expAmount").value = "";
+        showPage('dashboard'); 
+      }
     }
 
+    async function processFund() {
+      const act = document.getElementById("fundAction").value;
+      const amt = document.getElementById("fundAmount").value;
+      const bank = document.getElementById("targetBank").value;
+
+      if(!amt || !bank) return alert("Fill all fields");
+
+      const payload = { 
+        action: "processFund", 
+        fundAction: act, 
+        amount: parseFloat(amt), 
+        bankName: bank,
+        ccName: document.getElementById("targetCC").value,
+        loanName: document.getElementById("targetLoan").value
+      };
+
+      setLoading("btnSaveFund", true);
+      const res = await apiPost(payload);
+      setLoading("btnSaveFund", false);
+
+      if(res.ok) { 
+        showToast("Updated ✅"); 
+        document.getElementById("fundAmount").value = "";
+        showPage('dashboard'); 
+      } else {
+        alert("Error: " + res.message);
+      }
+    }
+
+    // --- यूटिलिटीज़ ---
     function showToast(m) { 
         const t = document.getElementById("toast"); t.innerText = m; t.style.display="block"; 
-        setTimeout(()=>t.style.display="none", 2000); 
+        setTimeout(()=>t.style.display="none", 2500); 
     }
+
+    function setLoading(id, status) {
+      const btn = document.getElementById(id);
+      if(status) { btn.disabled = true; btn.innerText = "Processing..."; btn.style.opacity="0.6"; }
+      else { btn.disabled = false; btn.innerText = "Submit"; btn.style.opacity="1"; }
+    }
+
+    // Close drawer on overlay click
+    document.getElementById("drawerOverlay").onclick = (e) => {
+      if(e.target.id === "drawerOverlay") document.getElementById("drawerOverlay").classList.remove("show");
+    };
   </script>
 </body>
 </html>
