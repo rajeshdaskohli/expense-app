@@ -1,362 +1,360 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0b0b">
+  <title>Expense Manager</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{margin:0;font-family:Arial,sans-serif;background:#f4f4f4;color:#111;}
+    :root{ --border: rgba(0,0,0,0.12); --muted:#666; --text:#111; }
+    .topbar{background:#111;color:#fff;padding:14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:1000;}
+    .menuBtn{width:44px;height:44px;border:none;border-radius:14px;background:transparent;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .menuBtn:active{transform:scale(0.98);}
+    .titleBox{display:flex;flex-direction:column;line-height:1.1;}
+    .appTitle{font-weight:900;font-size:18px;}
+    .appSub{font-weight:800;font-size:12px;opacity:0.85;letter-spacing:0.4px;}
+    .container{max-width:540px;margin:0 auto;padding:18px;}
+    .backSvg{width:30px;height:30px;}
+    .backSvg path{stroke:#d9d9d9;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;fill:none;}
 
-<title>My Expense App</title>
+    /* Drawer */
+    .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:3000;opacity:0;visibility:hidden;pointer-events:none;transition:0.25s;}
+    .drawer-overlay.show{opacity:1;visibility:visible;pointer-events:auto;}
+    .drawer{width:280px;height:100%;background:#fff;position:absolute;left:0;top:0;transform:translateX(-110%);transition:0.25s;box-shadow:6px 0 25px rgba(0,0,0,0.25);padding:14px;}
+    .drawer-overlay.show .drawer{transform:translateX(0);}
+    .drawer-header{display:flex;align-items:center;justify-content:space-between;padding:8px 6px 14px;border-bottom:1px solid #eee;margin-bottom:10px;}
+    .drawer-title{font-size:18px;font-weight:900;}
+    .drawer-close{width:30px;height:30px;border:none;background:transparent;font-size:26px;font-weight:1000;cursor:pointer;}
+    .drawer-link{display:block;padding:12px;border-radius:14px;text-decoration:none;color:#111;font-weight:800;margin:8px 0;background:#f5f5f5;border:1px solid rgba(0,0,0,0.08);}
 
-<style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{margin:0;font-family:Arial;background:#f4f4f4;color:#111;}
-
-.topbar{
-  background:#111;color:#fff;padding:14px;
-  display:flex;align-items:center;gap:12px;
-  position:sticky;top:0;z-index:1000;
-}
-.menuBtn{
-  width:44px;height:44px;
-  border:none;background:transparent;
-  color:#fff;font-size:22px;cursor:pointer;
-}
-
-.container{max-width:540px;margin:0 auto;padding:18px;}
-
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-
-.card{
-  background:#fff;
-  border-radius:20px;
-  padding:12px;
-  height:120px;
-  border:1.5px solid rgba(0,0,0,0.18);
-  box-shadow:0 14px 30px rgba(0,0,0,0.08);
-  cursor:pointer;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  text-align:center;
-}
-
-.cardTitle{font-weight:900;font-size:16px;}
-.cardSub{font-weight:800;color:#666;font-size:13px;}
-
-.page{display:none;}
-.page.active{display:block;}
-
-.box{
-  background:#fff;
-  border-radius:18px;
-  padding:16px;
-  border:1px solid rgba(0,0,0,0.10);
-  margin-top:10px;
-}
-
-.field{margin-bottom:14px;}
-.lbl{font-weight:900;margin-bottom:6px;}
-
-.inp{
-  width:100%;height:50px;
-  border-radius:12px;
-  border:1px solid #ccc;
-  padding:10px;
-}
-
-.btn{
-  height:52px;
-  border:none;
-  border-radius:14px;
-  font-weight:900;
-  width:100%;
-  margin-top:10px;
-}
-
-.btnBlack{background:#111;color:#fff;}
-
-</style>
+    /* UI Components */
+    .page{display:none;}
+    .page.active{display:block;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .card{background:#fff;border-radius:20px;padding:12px;height:120px;border:1.5px solid rgba(0,0,0,0.18);box-shadow:0 14px 30px rgba(0,0,0,0.08);cursor:pointer;transition:0.12s;text-align:center;display:flex;flex-direction:column;justify-content:center;}
+    .card:active{transform:scale(0.98);}
+    .cardIcon{font-size:28px;margin-bottom:10px;}
+    .cardTitle{font-weight:900;font-size:16px;}
+    .cardSub{font-weight:800;color:#666;font-size:13px;}
+    .box{background:#fff;border-radius:18px;padding:16px;border:1px solid rgba(0,0,0,0.10);box-shadow:0 12px 26px rgba(0,0,0,0.06);margin-bottom:16px;}
+    .field{margin-bottom:14px;}
+    .lbl{display:block;font-size:15px;font-weight:900;margin-bottom:8px;}
+    .inp{width:100%;height:54px;padding:0 14px;border-radius:14px;border:1px solid #d8d8d8;font-size:16px;outline:none;}
+    .inp:focus{border-color:#111;}
+    .sel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;}
+    .btn{height:56px;border:none;border-radius:16px;font-size:18px;font-weight:900;cursor:pointer;transition:0.12s;width:100%;}
+    .btn:active{transform:scale(0.96); filter: brightness(0.9);}
+    .btnBlack{background:#111;color:#fff;}
+    .btnLight{background:#eef2ff;color:#111;border:1px solid rgba(0,0,0,0.10);}
+    .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#111;color:#fff;padding:12px 14px;border-radius:16px;font-weight:800;display:none;z-index:5000;}
+    
+    /* Dashboard Stats */
+    .statRow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee;}
+    .statRow:last-child{border:none;}
+    .val-pos{color:green;font-weight:900;}
+    .val-neg{color:red;font-weight:900;}
+  </style>
 </head>
-
 <body>
 
-<div class="topbar">
-  <button class="menuBtn" onclick="goHome()">☰</button>
-  <div>
-    <div id="pageTitle">Home</div>
-    <div id="pageSub">Expense Manager</div>
-  </div>
-</div>
-
-<div class="container">
-
-<!-- HOME -->
-<div class="page active" id="pageHome">
-  <div class="grid2">
-    <div class="card" onclick="openExpense()">
-      <div class="cardTitle">💰 Expense</div>
-      <div class="cardSub">Manage Money</div>
-    </div>
-
-    <div class="card">
-      <div class="cardTitle">➕ More</div>
-      <div class="cardSub">Coming Soon</div>
+  <div class="topbar">
+    <button class="menuBtn" id="leftBtn">
+      <span id="btnIcon">☰</span>
+    </button>
+    <div class="titleBox">
+      <div class="appTitle" id="pageTitle">Home</div>
+      <div class="appSub" id="pageSub">EXPENSE MANAGER</div>
     </div>
   </div>
-</div>
 
-<!-- EXPENSE MAIN -->
-<div class="page" id="pageExpense">
-  <div class="grid2">
-    <div class="card" onclick="showPage('dashboard')">
-      <div class="cardTitle">📊 Dashboard</div>
-      <div class="cardSub">Summary</div>
-    </div>
-
-    <div class="card" onclick="showPage('entry')">
-      <div class="cardTitle">📝 Expense Entry</div>
-      <div class="cardSub">Add Expense</div>
-    </div>
-
-    <div class="card" onclick="showPage('fund')">
-      <div class="cardTitle">➕ Add Fund</div>
-      <div class="cardSub">Money Actions</div>
+  <div class="drawer-overlay" id="drawerOverlay">
+    <div class="drawer">
+      <div class="drawer-header">
+        <div><div class="drawer-title">Menu</div></div>
+        <button class="drawer-close" id="drawerClose">✕</button>
+      </div>
+      <a href="#" class="drawer-link" onclick="showPage('home')">🏠 Home</a>
+      <a href="#" class="drawer-link" onclick="showPage('expense')">💰 Expense Seva</a>
     </div>
   </div>
-</div>
 
-
-<!-- DASHBOARD -->
-<div class="page" id="pageDashboard">
-
-<div class="box">
-  <h3>Dashboard Summary</h3>
-
-  <p><b>Total Banks:</b> <span id="totalBanks">0</span></p>
-  <p><b>Total Bank Balance:</b> ₹<span id="bankBalance">0</span></p>
-
-  <p><b>Total Credit Cards:</b> <span id="totalCards">0</span></p>
-  <p><b>Total Card Balance:</b> ₹<span id="cardBalance">0</span></p>
-
-  <p><b>Total Loans:</b> <span id="totalLoans">0</span></p>
-  <p><b>Total EMI Pending:</b> ₹<span id="loanBalance">0</span></p>
-
-  <p><b>Monthly Expense:</b> ₹<span id="monthlyExpense">0</span></p>
-</div>
-
-</div>
-
-
-<!-- EXPENSE ENTRY -->
-<div class="page" id="pageEntry">
-
-<div class="box">
-<h3>Expense Entry</h3>
-
-<div class="field">
-<label class="lbl">Expense Type</label>
-<select class="inp" id="expType" onchange="typeChange()">
-<option value="">Select</option>
-<option value="bank">Bank Expense</option>
-<option value="card">Credit Card Expense</option>
-<option value="cash">Cash Expense</option>
-</select>
-</div>
-
-<div class="field" id="bankBox" style="display:none">
-<label class="lbl">Select Bank</label>
-<select class="inp" id="bankList"></select>
-</div>
-
-<div class="field" id="cardBox" style="display:none">
-<label class="lbl">Select Credit Card</label>
-<select class="inp" id="cardList"></select>
-</div>
-
-<div class="field">
-<label class="lbl">Amount</label>
-<input class="inp" id="expAmount" type="number">
-</div>
-
-<button class="btn btnBlack" onclick="saveExpense()">Save Expense</button>
-
-</div>
-</div>
-
-
-
-<!-- ADD FUND -->
-<div class="page" id="pageFund">
-
-<div class="box">
-<h3>Add Fund / Payments</h3>
-
-<div class="field">
-<label class="lbl">Action Type</label>
-<select class="inp" id="fundType" onchange="fundChange()">
-<option value="">Select</option>
-<option value="add">Add Fund</option>
-<option value="bill">Pay Credit Card Bill</option>
-<option value="emi">Pay EMI</option>
-</select>
-</div>
-
-
-<div id="addBox" style="display:none">
-
-<div class="field">
-<label class="lbl">Select Bank</label>
-<select class="inp" id="addBank"></select>
-</div>
-
-<div class="field">
-<label class="lbl">Amount</label>
-<input class="inp" id="addAmount" type="number">
-</div>
-
-<button class="btn btnBlack" onclick="addFund()">Add Fund</button>
-
-</div>
-
-
-
-<div id="billBox" style="display:none">
-
-<div class="field">
-<label class="lbl">Credit Card</label>
-<select class="inp" id="billCard"></select>
-</div>
-
-<div class="field">
-<label class="lbl">From Bank</label>
-<select class="inp" id="billBank"></select>
-</div>
-
-<div class="field">
-<label class="lbl">Amount</label>
-<input class="inp" id="billAmount" type="number">
-</div>
-
-<button class="btn btnBlack" onclick="payBill()">Pay Bill</button>
-
-</div>
-
-
-
-<div id="emiBox" style="display:none">
-
-<div class="field">
-<label class="lbl">Select Loan</label>
-<select class="inp" id="loanList"></select>
-</div>
-
-<div class="field">
-<label class="lbl">From Bank</label>
-<select class="inp" id="emiBank"></select>
-</div>
-
-<div class="field">
-<label class="lbl">Amount</label>
-<input class="inp" id="emiAmount" type="number">
-</div>
-
-<button class="btn btnBlack" onclick="payEMI()">Pay EMI</button>
-
-</div>
-
-
-</div>
-</div>
-
-
-</div>
-
-<script>
-
-// Dummy Google Sheet API URL
-const API_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL";
-
-function goHome(){
-  showPage("home");
-}
-
-function showPage(p){
-  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-
-  if(p=="home") document.getElementById("pageHome").classList.add("active");
-  if(p=="expense") document.getElementById("pageExpense").classList.add("active");
-  if(p=="dashboard") document.getElementById("pageDashboard").classList.add("active");
-  if(p=="entry") document.getElementById("pageEntry").classList.add("active");
-  if(p=="fund") document.getElementById("pageFund").classList.add("active");
-}
-
-function openExpense(){
-  showPage("expense");
-}
-
-
-// -------- EXPENSE ENTRY LOGIC --------
-
-function typeChange(){
-  let t = document.getElementById("expType").value;
-
-  document.getElementById("bankBox").style.display = (t=="bank")?"block":"none";
-  document.getElementById("cardBox").style.display = (t=="card")?"block":"none";
-}
-
-function saveExpense(){
-  alert("Expense Saved (Connect Google Sheet Here)");
-}
-
-
-// -------- ADD FUND LOGIC --------
-
-function fundChange(){
-  let t = document.getElementById("fundType").value;
-
-  document.getElementById("addBox").style.display = (t=="add")?"block":"none";
-  document.getElementById("billBox").style.display = (t=="bill")?"block":"none";
-  document.getElementById("emiBox").style.display = (t=="emi")?"block":"none";
-}
-
-function addFund(){
-  alert("Fund Added to Bank (Google Sheet Logic Add Here)");
-}
-
-function payBill(){
-  alert("Credit Card Bill Paid");
-}
-
-function payEMI(){
-  alert("EMI Paid");
-}
-
-
-// -------- DASHBOARD --------
-
-function loadDashboard(){
-
-  // Google Sheet se real data yahan load hoga
-
-  document.getElementById("totalBanks").innerText = 3;
-  document.getElementById("bankBalance").innerText = 45000;
-
-  document.getElementById("totalCards").innerText = 2;
-  document.getElementById("cardBalance").innerText = 12000;
-
-  document.getElementById("totalLoans").innerText = 1;
-  document.getElementById("loanBalance").innerText = 30000;
-
-  document.getElementById("monthlyExpense").innerText = 8000;
-
-}
-
-loadDashboard();
-
-</script>
-
+  <div class="container">
+    <div class="page active" id="pageHome">
+      <div class="grid2">
+        <div class="card" onclick="showPage('expense')">
+          <div class="cardIcon">💰</div>
+          <div class="cardTitle">Expense Seva</div>
+          <div class="cardSub">Manage Money</div>
+        </div>
+        <div class="card" style="opacity:0.5;">
+          <div class="cardIcon">➕</div>
+          <div class="cardTitle">More</div>
+          <div class="cardSub">Coming soon</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="pageExpense">
+      <div class="grid2">
+        <div class="card" onclick="showPage('dashboard')">
+          <div class="cardIcon">📊</div>
+          <div class="cardTitle">Dashboard</div>
+          <div class="cardSub">View Balance</div>
+        </div>
+        <div class="card" onclick="showPage('entry')">
+          <div class="cardIcon">✍️</div>
+          <div class="cardTitle">Expense Entry</div>
+          <div class="cardSub">Spend Money</div>
+        </div>
+        <div class="card" onclick="showPage('addfund')">
+          <div class="cardIcon">🏦</div>
+          <div class="cardTitle">Add Fund</div>
+          <div class="cardSub">Pay Bill / EMI</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="pageDashboard">
+      <div class="box">
+        <h3 style="margin-top:0;">🏦 Bank Balance</h3>
+        <div id="bankList"></div>
+      </div>
+      <div class="box">
+        <h3 style="margin-top:0;">💳 Credit Cards</h3>
+        <div id="cardList"></div>
+      </div>
+      <div class="box">
+        <h3 style="margin-top:0;">📉 Loans / EMI</h3>
+        <div id="loanList"></div>
+      </div>
+    </div>
+
+    <div class="page" id="pageEntry">
+      <div class="box">
+        <div class="field">
+          <label class="lbl">Payment From</label>
+          <select class="inp sel" id="expSource">
+            <optgroup label="Banks" id="optBanks"></optgroup>
+            <optgroup label="Cards" id="optCards"></optgroup>
+            <option value="Cash">Cash</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Amount</label>
+          <input type="number" class="inp" id="expAmount" placeholder="Enter Amount">
+        </div>
+        <button class="btn btnBlack" onclick="saveExpense()">Submit Expense</button>
+      </div>
+    </div>
+
+    <div class="page" id="pageAddfund">
+      <div class="box">
+        <div class="field">
+          <label class="lbl">Select Action</label>
+          <select class="inp sel" id="fundAction" onchange="toggleFundFields()">
+            <option value="">-- Select --</option>
+            <option value="add">Add Fund</option>
+            <option value="cc">Pay Credit Card Bill</option>
+            <option value="emi">Pay EMI</option>
+          </select>
+        </div>
+
+        <div id="fieldCC" style="display:none;">
+          <div class="field">
+            <label class="lbl">Select Credit Card</label>
+            <select class="inp sel" id="targetCC"></select>
+          </div>
+        </div>
+
+        <div id="fieldEMI" style="display:none;">
+          <div class="field">
+            <label class="lbl">Select Loan</label>
+            <select class="inp sel" id="targetLoan"></select>
+          </div>
+        </div>
+
+        <div id="fieldBank" style="display:none;">
+          <div class="field">
+            <label class="lbl">Select Bank</label>
+            <select class="inp sel" id="targetBank"></select>
+          </div>
+        </div>
+
+        <div class="field" id="fieldAmt" style="display:none;">
+          <label class="lbl">Amount</label>
+          <input type="number" class="inp" id="fundAmount" placeholder="Enter Amount">
+        </div>
+
+        <button class="btn btnBlack" id="fundBtn" style="display:none;" onclick="processFund()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Initial Data (In future, fetch this from Google Sheets)
+    let db = {
+      banks: [
+        { name: "SBI Bank", balance: 50000 },
+        { name: "HDFC Bank", balance: 25000 }
+      ],
+      cards: [
+        { name: "HDFC Regalia", due: 12000, billDate: "05 Feb" },
+        { name: "ICICI Amazon", due: 5000, billDate: "10 Feb" }
+      ],
+      loans: [
+        { name: "Home Loan", emi: 15000, status: "Pending" },
+        { name: "Car Loan", emi: 8000, status: "Paid" }
+      ],
+      cash: 2000
+    };
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.style.display = "block";
+      setTimeout(() => t.style.display = "none", 2000);
+    }
+
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+      
+      const title = document.getElementById("pageTitle");
+      const sub = document.getElementById("pageSub");
+      const btnIcon = document.getElementById("btnIcon");
+
+      if(name === 'home') {
+        title.textContent = "Home";
+        sub.textContent = "EXPENSE MANAGER";
+        btnIcon.textContent = "☰";
+      } else {
+        title.textContent = name.toUpperCase();
+        btnIcon.innerHTML = `<svg class="backSvg" viewBox="0 0 24 24"><path d="M15 6 L9 12 L15 18"></path></svg>`;
+      }
+      
+      if(name === 'dashboard') renderDashboard();
+      if(name === 'entry') updateEntryDropdowns();
+      if(name === 'addfund') updateFundDropdowns();
+      
+      document.getElementById("drawerOverlay").classList.remove("show");
+    }
+
+    // --- Dashboard Logic ---
+    function renderDashboard() {
+      const bList = document.getElementById("bankList");
+      bList.innerHTML = db.banks.map(b => `
+        <div class="statRow"><span>${b.name}</span><span class="val-pos">₹${b.balance}</span></div>
+      `).join("") + `<div class="statRow"><span>Cash</span><span class="val-pos">₹${db.cash}</span></div>`;
+
+      const cList = document.getElementById("cardList");
+      cList.innerHTML = db.cards.map(c => `
+        <div class="statRow">
+          <div><b>${c.name}</b><br><small>Bill: ${c.billDate}</small></div>
+          <span class="val-neg">₹${c.due}</span>
+        </div>
+      `).join("");
+
+      const lList = document.getElementById("loanList");
+      lList.innerHTML = db.loans.map(l => `
+        <div class="statRow">
+          <span>${l.name} (EMI)</span>
+          <span class="${l.status==='Paid'?'val-pos':'val-neg'}">₹${l.emi} [${l.status}]</span>
+        </div>
+      `).join("");
+    }
+
+    // --- Expense Entry Logic ---
+    function updateEntryDropdowns() {
+      document.getElementById("optBanks").innerHTML = db.banks.map(b => `<option value="bank|${b.name}">${b.name}</option>`).join("");
+      document.getElementById("optCards").innerHTML = db.cards.map(c => `<option value="card|${c.name}">${c.name}</option>`).join("");
+    }
+
+    function saveExpense() {
+      const source = document.getElementById("expSource").value;
+      const amt = parseFloat(document.getElementById("expAmount").value);
+      if(!amt) return showToast("Enter valid amount");
+
+      const [type, name] = source.split("|");
+      if(type === "bank") {
+        let b = db.banks.find(x => x.name === name);
+        b.balance -= amt;
+      } else if(type === "card") {
+        let c = db.cards.find(x => x.name === name);
+        c.due += amt;
+      } else {
+        db.cash -= amt;
+      }
+      showToast("Expense Recorded ✅");
+      document.getElementById("expAmount").value = "";
+    }
+
+    // --- Add Fund / Pay Bill Logic ---
+    function updateFundDropdowns() {
+      document.getElementById("targetBank").innerHTML = db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
+      document.getElementById("targetCC").innerHTML = db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+      document.getElementById("targetLoan").innerHTML = db.loans.map(l => `<option value="${l.name}">${l.name}</option>`).join("");
+    }
+
+    function toggleFundFields() {
+      const act = document.getElementById("fundAction").value;
+      const btn = document.getElementById("fundBtn");
+      document.getElementById("fieldBank").style.display = (act==='cc'||act==='emi'||act==='add') ? "block" : "none";
+      document.getElementById("fieldCC").style.display = (act==='cc') ? "block" : "none";
+      document.getElementById("fieldEMI").style.display = (act==='emi') ? "block" : "none";
+      document.getElementById("fieldAmt").style.display = act ? "block" : "none";
+      btn.style.display = act ? "block" : "none";
+      
+      if(act==='add') btn.textContent = "Add Fund";
+      else if(act==='cc') btn.textContent = "Pay Bill";
+      else if(act==='emi') btn.textContent = "Pay EMI";
+    }
+
+    function processFund() {
+      const act = document.getElementById("fundAction").value;
+      const amt = parseFloat(document.getElementById("fundAmount").value);
+      const bankName = document.getElementById("targetBank").value;
+      
+      if(!amt) return showToast("Enter amount");
+
+      let bank = db.banks.find(x => x.name === bankName);
+
+      if(act === 'add') {
+        bank.balance += amt;
+        showToast("Fund Added ✅");
+      } 
+      else if(act === 'cc') {
+        let ccName = document.getElementById("targetCC").value;
+        let cc = db.cards.find(x => x.name === ccName);
+        bank.balance -= amt;
+        cc.due -= amt;
+        showToast("Bill Paid ✅");
+      } 
+      else if(act === 'emi') {
+        let loanName = document.getElementById("targetLoan").value;
+        let loan = db.loans.find(x => x.name === loanName);
+        bank.balance -= amt;
+        loan.status = "Paid";
+        showToast("EMI Paid ✅");
+      }
+
+      document.getElementById("fundAmount").value = "";
+      showPage('dashboard');
+    }
+
+    // Menu Toggle
+    document.getElementById("leftBtn").onclick = () => {
+      const activePage = document.querySelector('.page.active').id;
+      if(activePage === 'pageHome') document.getElementById("drawerOverlay").classList.add("show");
+      else showPage('home');
+    };
+    document.getElementById("drawerClose").onclick = () => document.getElementById("drawerOverlay").classList.remove("show");
+
+  </script>
 </body>
 </html>
