@@ -1,8 +1,10 @@
+<link rel="manifest" href="manifest.json">
+
 <script>
-  // Service Worker: इसके बिना क्रोम 'Install' का ऑप्शन नहीं देता
+  // Service Worker को रजिस्टर करें
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGV2ZW50ID0+IHsgfSk7');
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js');
     });
   }
 </script>
