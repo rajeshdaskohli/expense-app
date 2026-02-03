@@ -1,1 +1,15 @@
-<link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkV4cGVuc2UgU2V2YSIsCiAgInNob3J0X25hbWUiIjogIkV4cGVuc2UiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzExMSIsCiAgInRoZW1lX2NvbG9yIjogIiMxMTEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi8yNDU0LzI0NTQyODkucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
+{
+  "name": "Expense Seva",
+  "short_name": "Expense",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#111",
+  "theme_color": "#111",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2454/2454289.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
