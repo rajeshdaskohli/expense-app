@@ -23,25 +23,21 @@
     .exp-month { border-left-color: #e91e63; }
     .fund-month { border-left-color: #4caf50; }
     .box { background: #fff; border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .box-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-    .statRow { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
-    .statRow:last-child { border: none; }
-    .hist-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #eee; }
-    .hist-meta { display: flex; flex-direction: column; }
-    .hist-name { font-weight: 700; font-size: 15px; }
-    .hist-date { font-size: 11px; color: #888; margin-top: 2px; }
-    .hist-tag { font-size: 9px; padding: 2px 6px; background: #f0f0f0; border-radius: 4px; width: fit-content; margin-top: 5px; font-weight: 700; color: #555; }
+    .box-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; }
     .inp { width: 100%; height: 52px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 12px; padding: 0 15px; margin-bottom: 15px; font-size: 16px; outline: none; }
     .lbl { font-size: 13px; font-weight: 700; color: #444; margin-bottom: 6px; display: block; }
     .btn { width: 100%; height: 54px; background: #111; color: #fff; border: none; border-radius: 15px; font-size: 17px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-    .btn:active { transform: scale(0.97); }
+    .statRow { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+    .hist-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #eee; }
+    .hist-meta { display: flex; flex-direction: column; }
+    .hist-tag { font-size: 9px; padding: 2px 6px; background: #f0f0f0; border-radius: 4px; width: fit-content; margin-top: 5px; font-weight: 700; color: #555; }
     .val-pos { color: #2e7d32; }
     .val-neg { color: #c62828; }
     .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; }
     .drawer { width: 280px; height: 100%; background: #fff; padding: 25px; position: relative; }
     .menu-link { display: block; padding: 15px; background: #f5f5f5; margin-bottom: 10px; border-radius: 10px; text-decoration: none; color: #111; font-weight: 700; }
-    .toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); background: #111; color: #fff; padding: 12px 25px; border-radius: 50px; display: none; font-size: 14px; z-index: 3000; }
-    .card-btn { background: #fff; border-radius: 18px; padding: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); background: #111; color: #fff; padding: 12px 25px; border-radius: 50px; display: none; z-index: 3000; }
+    .card-btn { background: #fff; border-radius: 18px; padding: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 10px;}
   </style>
 </head>
 <body>
@@ -85,7 +81,7 @@
         <div class="sum-card exp-today"><h4>Today</h4><p id="sumToday">₹0</p></div>
         <div class="sum-card exp-month"><h4>Month</h4><p id="sumMonth">₹0</p></div>
         <div class="sum-card fund-month"><h4>Funds</h4><p id="sumFund">₹0</p></div>
-        <div class="sum-card" onclick="showPage('addfund')"><h4>Action</h4><p style="font-size:14px">Manage 🏦</p></div>
+        <div class="sum-card" onclick="showPage('addfund')"><h4>Action</h4><p style="font-size:14px">Deposit 🏦</p></div>
       </div>
       <div class="box">
         <div class="box-title">🏦 Accounts & Cards</div>
@@ -107,18 +103,11 @@
         <div id="divBankList" style="display:none;"><label class="lbl">Select Bank</label><select class="inp" id="expBank"></select></div>
         <div id="divCardList" style="display:none;"><label class="lbl">Select Card</label><select class="inp" id="expCard"></select></div>
         
-        <label class="lbl">Category</label>
-        <select class="inp" id="expCategory">
-          <option value="Food">🍔 Food</option>
-          <option value="Shopping">🛍️ Shopping</option>
-          <option value="Bills">🧾 Bills</option>
-          <option value="Travel">🚗 Travel</option>
-          <option value="Health">💊 Health</option>
-          <option value="Other">📦 Other</option>
-        </select>
+        <label class="lbl">Category (From Sheet)</label>
+        <select class="inp" id="expCategory"><option>Loading...</option></select>
 
-        <label class="lbl">Remark (खर्च किस लिए किया?)</label>
-        <input type="text" class="inp" id="expRemark" placeholder="उदा: पेट्रोल, दूध, रिचार्ज...">
+        <label class="lbl">Remark</label>
+        <input type="text" class="inp" id="expRemark" placeholder="खर्च का विवरण">
 
         <label class="lbl">Amount</label>
         <input type="number" class="inp" id="expAmount" placeholder="0.00" inputmode="decimal">
@@ -139,7 +128,7 @@
 
     <div class="page" id="pagePayments">
       <div class="box">
-        <div class="box-title">💳 Bill & EMI Payments</div>
+        <div class="box-title">💳 Bill & EMI</div>
         <label class="lbl">Payment Type</label>
         <select class="inp" id="payAction" onchange="togglePayFields()">
           <option value="cc">💳 Credit Card Bill</option>
@@ -147,7 +136,7 @@
         </select>
         <label class="lbl">Pay From (Bank)</label>
         <select class="inp" id="payFromBank"></select>
-        <div id="pCC"><label class="lbl">Select Credit Card</label><select class="inp" id="payTargetCC"></select></div>
+        <div id="pCC"><label class="lbl">Select Card</label><select class="inp" id="payTargetCC"></select></div>
         <div id="pLoan" style="display:none;"><label class="lbl">Select Loan</label><select class="inp" id="payTargetLoan"></select></div>
         <label class="lbl">Amount</label>
         <input type="number" class="inp" id="payAmount" placeholder="0.00" inputmode="decimal">
@@ -159,8 +148,8 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwXkJo6belMLPwHAEQLoA9VD1MNCArzuddtcqYRQSFsvTeuo0tjP8Ilut5ZU0Yf4HtA/exec"; 
-    let db = { banks: [], cards: [], loans: [], summary: {} };
+    const API_URL = "https://script.google.com/macros/s/AKfycbwXkJo6belMLPwHAEQLoA9VD1MNCArzuddtcqYRQSFsvTeuo0tjP8Ilut5ZU0Yf4HtA/exec"; // यहाँ अपनी नई Deployment URL डालें
+    let db = { banks: [], cards: [], loans: [], summary: {}, categories: [] };
 
     window.onpopstate = () => {
       const page = location.hash.replace('#','') || 'home';
@@ -209,27 +198,32 @@
           updateDropdowns();
           if(location.hash === "#dashboard") updateDashboardUI();
         }
-      } catch(e) { console.log(e); }
+      } catch(e) { console.error("Error fetching data", e); }
     }
 
     function updateDropdowns() {
       const bH = db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
       const cH = db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
       const lH = db.loans.map(l => `<option value="${l.name}">${l.name}</option>`).join("");
+      
       ["expBank", "targetBank", "payFromBank"].forEach(id => document.getElementById(id).innerHTML = bH);
       document.getElementById("expCard").innerHTML = cH;
       document.getElementById("payTargetCC").innerHTML = cH;
       document.getElementById("payTargetLoan").innerHTML = lH;
+
+      if(db.categories) {
+        document.getElementById("expCategory").innerHTML = db.categories.map(c => `<option value="${c}">${c}</option>`).join("");
+      }
     }
 
     function updateDashboardUI() {
       const s = db.summary;
-      document.getElementById("sumToday").innerText = "₹" + parseFloat(s.todayExp).toFixed(2);
-      document.getElementById("sumMonth").innerText = "₹" + parseFloat(s.monthExp).toFixed(2);
-      document.getElementById("sumFund").innerText = "₹" + parseFloat(s.monthFund).toFixed(2);
+      document.getElementById("sumToday").innerText = "₹" + parseFloat(s.todayExp || 0).toFixed(2);
+      document.getElementById("sumMonth").innerText = "₹" + parseFloat(s.monthExp || 0).toFixed(2);
+      document.getElementById("sumFund").innerText = "₹" + parseFloat(s.monthFund || 0).toFixed(2);
       document.getElementById("bankList").innerHTML = db.banks.map(b => `<div class="statRow"><span>${b.name}</span><b class="val-pos">₹${parseFloat(b.balance).toFixed(2)}</b></div>`).join("");
       document.getElementById("cardList").innerHTML = db.cards.map(c => `<div class="statRow"><span>${c.name}</span><b class="val-neg">₹${parseFloat(c.due).toFixed(2)}</b></div>`).join("");
-      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `<div class="hist-item"><div class="hist-meta"><span class="hist-name">${t.name}</span><span class="hist-date">${t.date}</span><span class="hist-tag">${t.type}</span></div><b class="${(t.type==='Add Fund'?'val-pos':'val-neg')}">${(t.type==='Add Fund'?'+':'-')}₹${parseFloat(t.amount).toFixed(2)}</b></div>`).join("");
+      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `<div class="hist-item"><div class="hist-meta"><span class="hist-name">${t.name}</span><span class="hist-tag">${t.type}</span></div><b class="${(t.type.includes('Fund')?'val-pos':'val-neg')}">₹${parseFloat(t.amount).toFixed(2)}</b></div>`).join("");
     }
 
     async function saveExpense() {
@@ -238,30 +232,36 @@
       const cat = document.getElementById("expCategory").value;
       const rem = document.getElementById("expRemark").value;
       let name = (mode==='cash')?'Cash':(mode==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
+      
       if(!amt) return alert("Enter amount");
       btnLoad("btnSaveExp", true);
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "save", type: mode, name: name, amount: amt, category: cat, remark: rem}) }).then(r => r.json());
+      const res = await fetch(API_URL, { 
+        method: "POST", 
+        body: JSON.stringify({action: "save", type: mode, name: name, amount: amt, category: cat, remark: rem}) 
+      }).then(r => r.json());
       btnLoad("btnSaveExp", false);
-      if(res.ok) { showToast("Success ✅"); showPage("dashboard"); } else { alert(res.message); }
+      if(res.ok) { showToast("Success ✅"); showPage("dashboard"); }
     }
 
     async function processDeposit() {
       const amt = parseFloat(document.getElementById("fundAmount").value);
       if(!amt) return alert("Enter amount");
       btnLoad("btnSaveFund", true);
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "processFund", fundAction: "addfund", amount: amt, bankName: document.getElementById("targetBank").value}) }).then(r => r.json());
+      const res = await fetch(API_URL, { 
+        method: "POST", 
+        body: JSON.stringify({action: "processFund", fundAction: "addfund", amount: amt, bankName: document.getElementById("targetBank").value}) 
+      }).then(r => r.json());
       btnLoad("btnSaveFund", false);
-      if(res.ok) { showToast("Fund Added ✅"); showPage("dashboard"); }
+      if(res.ok) { showToast("Updated ✅"); showPage("dashboard"); }
     }
 
     async function processBillPay() {
-      const act = document.getElementById("payAction").value;
       const amt = parseFloat(document.getElementById("payAmount").value);
       if(!amt) return alert("Enter amount");
       btnLoad("btnSavePay", true);
       const payload = {
         action: "processFund",
-        fundAction: act,
+        fundAction: document.getElementById("payAction").value,
         amount: amt,
         bankName: document.getElementById("payFromBank").value,
         ccName: document.getElementById("payTargetCC").value,
@@ -279,8 +279,7 @@
     
     function btnLoad(id, load) {
       const b = document.getElementById(id);
-      b.disabled = load;
-      b.innerText = load ? "Processing..." : "Submit";
+      if(b) { b.disabled = load; b.innerText = load ? "Wait..." : "Submit"; }
     }
 
     document.getElementById("drawerOverlay").onclick = (e) => { if(e.target.id==='drawerOverlay') e.target.style.display='none'; };
