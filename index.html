@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="theme-color" content="#111">
   <title>Smart Expense Manager</title>
+  <link rel="manifest" href="manifest.json">
+
+<script>
+  // Service Worker को रजिस्टर करें
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js');
+    });
+  }
+</script>
+
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Roboto, sans-serif; }
     body { margin: 0; background: #f0f2f5; color: #1a1a1a; }
