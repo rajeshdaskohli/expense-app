@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="theme-color" content="#111">
   <title>Smart Expense Manager</title>
+  
   <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkV4cGVuc2UgU2V2YSIsCiAgInNob3J0X25hbWUiIjogIkV4cGVuc2UiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzExMSIsCiAgInRoZW1lX2NvbG9yIjogIiMxMTEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2kuaW1ndXIuY29tL3pXbXlRclIucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
 
 <script>
@@ -56,8 +57,6 @@
   </style>
 </head>
 <body>
-  
-  
 
   <div class="topbar">
     <button class="menuBtn" id="leftBtn">☰</button>
@@ -71,13 +70,16 @@
     <div class="drawer">
       <h2 style="margin-top:0">Menu</h2>
       <div class="menu-link" onclick="showPage('home')">🏠 Home</div>
-      <div class="menu-link" onclick="showPage('My Manager')">💰 Expense</div>
+      <div class="menu-link" onclick="showPage('sm')">💰 Expense</div>
       <div class="menu-link" onclick="location.reload()">🔄 Refresh App</div>
     </div>
   </div>
 
   <div class="container">
     <div class="page active" id="pageHome">
+      <div style="text-align: center; margin-bottom: 25px;">
+        <img src="https://i.imgur.com/zWmyQrR.png" style="width: 100px; border-radius: 22px; box-shadow: 0 8px 15px rgba(0,0,0,0.1);">
+      </div>
       <div class="card-btn" onclick="showPage('sm')">
         <div style="font-size: 40px; margin-bottom: 10px;">💰</div>
         <b>Open Expense Seva</b>
@@ -88,7 +90,7 @@
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div class="card-btn" onclick="showPage('dashboard')">📊 Dashboard</div>
         <div class="card-btn" onclick="showPage('entry')">✍️ Entry</div>
-        <div class="card-btn" onclick="showPage('addfund')">🏦 Funds</div>
+        <div class="card-btn" onclick="showPage('addfund')" style="grid-column: span 2;">🏦 Funds Management</div>
       </div>
     </div>
 
@@ -122,6 +124,10 @@
         <div id="divCardList" style="display:none;"><label class="lbl">Select Card</label><select class="inp" id="expCard"></select></div>
         <label class="lbl">Amount</label>
         <input type="number" class="inp" id="expAmount" placeholder="0.00" inputmode="decimal">
+        
+        <label class="lbl">Remark (Optional)</label>
+        <input type="text" class="inp" id="expRemark" placeholder="What for?">
+        
         <button class="btn" id="btnSaveExp" onclick="saveExpense()">Submit Expense</button>
       </div>
     </div>
@@ -211,22 +217,31 @@
 
     function updateDashboardUI() {
       const s = db.summary;
-      // ✅ .toFixed(2) यहाँ लगाया गया है ताकि 0000000 न दिखे
       document.getElementById("sumToday").innerText = "₹" + parseFloat(s.todayExp).toFixed(2);
       document.getElementById("sumMonth").innerText = "₹" + parseFloat(s.monthExp).toFixed(2);
       document.getElementById("sumFund").innerText = "₹" + parseFloat(s.monthFund).toFixed(2);
 
-      document.getElementById("bankList").innerHTML = db.banks.map(b => `
-        <div class="statRow">
-          <span>${b.name}</span>
-          <b class="val-pos">₹${parseFloat(b.balance).toFixed(2)}</b>
-        </div>`).join("");
+      // ✅ बैंक बैलेंस: माइनस होने पर लाल, वरना हरा
+      document.getElementById("bankList").innerHTML = db.banks.map(b => {
+        const bal = parseFloat(b.balance);
+        const cls = bal < 0 ? "val-neg" : "val-pos";
+        return `
+          <div class="statRow">
+            <span>${b.name}</span>
+            <b class="${cls}">₹${bal.toFixed(2)}</b>
+          </div>`;
+      }).join("");
 
-      document.getElementById("cardList").innerHTML = db.cards.map(c => `
-        <div class="statRow">
-          <span>${c.name}</span>
-          <b class="val-neg">₹${parseFloat(c.due).toFixed(2)}</b>
-        </div>`).join("");
+      // ✅ क्रेडिट कार्ड: 0 होने पर हरा, वरना लाल
+      document.getElementById("cardList").innerHTML = db.cards.map(c => {
+        const due = parseFloat(c.due);
+        const cls = due <= 0 ? "val-pos" : "val-neg";
+        return `
+          <div class="statRow">
+            <span>${c.name}</span>
+            <b class="${cls}">₹${due.toFixed(2)}</b>
+          </div>`;
+      }).join("");
       
       document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
         <div class="hist-item">
@@ -244,18 +259,30 @@
 
     async function saveExpense() {
       const mode = document.getElementById("payMode").value;
-      const amt = parseFloat(document.getElementById("expAmount").value);
+      const amtEl = document.getElementById("expAmount");
+      const remEl = document.getElementById("expRemark");
+      const amt = parseFloat(amtEl.value);
       let name = (mode==='cash')?'Cash':(mode==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
+      
       if(!amt) return alert("Enter amount");
+      
       btnLoad("btnSaveExp", true);
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "save", type: mode, name: name, amount: amt}) }).then(r => r.json());
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "save", type: mode, name: name, amount: amt, remark: remEl.value}) }).then(r => r.json());
       btnLoad("btnSaveExp", false);
-      if(res.ok) { showToast("Success ✅"); showPage("dashboard"); } else { alert(res.message); }
+      
+      if(res.ok) { 
+        // ✅ सबमिट के बाद अमाउंट और रिमार्क जीरो/खाली करना
+        amtEl.value = ""; 
+        remEl.value = "";
+        showToast("Success ✅"); 
+        showPage("dashboard"); 
+      } else { alert(res.message); }
     }
 
     async function processFund() {
       const act = document.getElementById("fundAction").value;
-      const amt = parseFloat(document.getElementById("fundAmount").value);
+      const amtEl = document.getElementById("fundAmount");
+      const amt = parseFloat(amtEl.value);
       if(!amt) return alert("Enter amount");
       const payload = {
         action: "processFund",
@@ -268,7 +295,12 @@
       btnLoad("btnSaveFund", true);
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(r => r.json());
       btnLoad("btnSaveFund", false);
-      if(res.ok) { showToast("Updated ✅"); showPage("dashboard"); } else { alert(res.message); }
+      if(res.ok) { 
+        // ✅ सबमिट के बाद अमाउंट खाली करना
+        amtEl.value = "";
+        showToast("Updated ✅"); 
+        showPage("dashboard"); 
+      } else { alert(res.message); }
     }
 
     function showToast(m) { 
