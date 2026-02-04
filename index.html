@@ -46,7 +46,7 @@
     <button class="menuBtn" id="leftBtn">☰</button>
     <div class="titleBox">
       <b id="pageTitle">Home</b>
-      <small>Expense Manager</small>
+      <small>Expense Seva</small>
     </div>
   </div>
 
@@ -54,20 +54,20 @@
     <div class="drawer">
       <h2 style="margin-top:0">Menu</h2>
       <div class="menu-link" onclick="showPage('home')">🏠 Home</div>
-      <div class="menu-link" onclick="showPage('Expense Manager')">💰 Expense Manager</div>
+      <div class="menu-link" onclick="showPage('sm')">💰 Expense Seva</div>
       <div class="menu-link" onclick="location.reload()">🔄 Refresh App</div>
     </div>
   </div>
 
   <div class="container">
     <div class="page active" id="pageHome">
-      <div class="card-btn" onclick="showPage('Expense Manager')">
+      <div class="card-btn" onclick="showPage('sm')">
         <div style="font-size: 40px; margin-bottom: 10px;">💰</div>
-        <b>Open Expense Manager</b>
+        <b>Open Expense Seva</b>
       </div>
     </div>
 
-    <div class="page" id="pageExpenseManager">
+    <div class="page" id="pageSm">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div class="card-btn" onclick="showPage('dashboard')">📊 Dashboard</div>
         <div class="card-btn" onclick="showPage('entry')">✍️ Entry</div>
@@ -103,11 +103,11 @@
         <div id="divBankList" style="display:none;"><label class="lbl">Select Bank</label><select class="inp" id="expBank"></select></div>
         <div id="divCardList" style="display:none;"><label class="lbl">Select Card</label><select class="inp" id="expCard"></select></div>
         
-        <label class="lbl">Category</label>
+        <label class="lbl">Category (From Sheet)</label>
         <select class="inp" id="expCategory"><option>Loading...</option></select>
 
         <label class="lbl">Remark</label>
-        <input type="text" class="inp" id="expRemark" placeholder="Details of expenses">
+        <input type="text" class="inp" id="expRemark" placeholder="खर्च का विवरण">
 
         <label class="lbl">Amount</label>
         <input type="number" class="inp" id="expAmount" placeholder="0.00" inputmode="decimal">
@@ -148,7 +148,7 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwXkJo6belMLPwHAEQLoA9VD1MNCArzuddtcqYRQSFsvTeuo0tjP8Ilut5ZU0Yf4HtA/exec"; // यहाँ अपनी नई Deployment URL डालें
+    const API_URL = "YOUR_SCRIPT_URL_HERE"; // यहाँ अपनी नई Deployment URL डालें
     let db = { banks: [], cards: [], loans: [], summary: {}, categories: [] };
 
     window.onpopstate = () => {
