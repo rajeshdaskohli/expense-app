@@ -46,7 +46,7 @@
     <button class="menuBtn" id="leftBtn">☰</button>
     <div class="titleBox">
       <b id="pageTitle">Home</b>
-      <small>Expense Seva</small>
+      <small>Expense Manager</small>
     </div>
   </div>
 
@@ -54,16 +54,16 @@
     <div class="drawer">
       <h2 style="margin-top:0">Menu</h2>
       <div class="menu-link" onclick="showPage('home')">🏠 Home</div>
-      <div class="menu-link" onclick="showPage('sm')">💰 Expense Seva</div>
+      <div class="menu-link" onclick="showPage('sm')">💰 Expense Manager</div>
       <div class="menu-link" onclick="location.reload()">🔄 Refresh App</div>
     </div>
   </div>
 
   <div class="container">
     <div class="page active" id="pageHome">
-      <div class="card-btn" onclick="showPage('sm')">
+      <div class="card-btn" onclick="showPage('Expense Manager')">
         <div style="font-size: 40px; margin-bottom: 10px;">💰</div>
-        <b>Open Expense Seva</b>
+        <b>Open Expense Manager</b>
       </div>
     </div>
 
@@ -103,7 +103,7 @@
         <div id="divBankList" style="display:none;"><label class="lbl">Select Bank</label><select class="inp" id="expBank"></select></div>
         <div id="divCardList" style="display:none;"><label class="lbl">Select Card</label><select class="inp" id="expCard"></select></div>
         
-        <label class="lbl">Category (From Sheet)</label>
+        <label class="lbl">Category</label>
         <select class="inp" id="expCategory"><option>Loading...</option></select>
 
         <label class="lbl">Remark</label>
