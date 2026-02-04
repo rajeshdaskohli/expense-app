@@ -85,13 +85,20 @@
       </div>
       <div class="box-title">🏷️ Category Summary</div>
       <div class="cat-grid" id="catSummaryGrid"></div>
+      
       <div class="box">
         <div class="box-title"><span>🏦 Bank Accounts</span><span id="bankSubtotal" class="subtotal val-pos">₹0</span></div>
         <div id="bankList"></div>
       </div>
+
       <div class="box">
         <div class="box-title"><span>💳 Credit Cards</span><span id="cardSubtotal" class="subtotal val-neg">₹0</span></div>
         <div id="cardList"></div>
+      </div>
+
+      <div class="box">
+        <div class="box-title">🕒 Recent Activity (1 Month)</div>
+        <div id="historyList" style="max-height: 400px; overflow-y: auto;"></div>
       </div>
     </div>
 
@@ -111,41 +118,13 @@
       </div>
     </div>
 
-    <div class="page" id="pageAddfund">
-      <div class="box">
-        <div class="box-title">➕ Add Deposit</div>
-        <label class="lbl">Target Bank</label>
-        <select class="inp" id="targetBank"></select>
-        <label class="lbl">Amount</label>
-        <input type="number" class="inp" id="fundAmount" placeholder="0.00">
-        <button class="btn" id="btnSaveFund" onclick="processDeposit()">Add to Bank</button>
-      </div>
     </div>
-
-    <div class="page" id="pagePayments">
-      <div class="box">
-        <div class="box-title">💳 Bill & EMI Payment</div>
-        <label class="lbl">Type</label>
-        <select class="inp" id="payAction" onchange="togglePayFields()">
-          <option value="cc">💳 Credit Card Bill</option>
-          <option value="emi">📉 Loan EMI</option>
-        </select>
-        <label class="lbl">Pay From (Bank)</label>
-        <select class="inp" id="payFromBank"></select>
-        <div id="pCC"><label class="lbl">Select Card</label><select class="inp" id="payTargetCC"></select></div>
-        <div id="pLoan" style="display:none;"><label class="lbl">Select Loan</label><select class="inp" id="payTargetLoan"></select></div>
-        <label class="lbl">Amount</label>
-        <input type="number" class="inp" id="payAmount" placeholder="0.00">
-        <button class="btn" id="btnSavePay" onclick="processBillPay()">Process Payment</button>
-      </div>
-    </div>
-  </div>
 
   <div class="toast" id="toast"></div>
 
   <script>
-    const API_URL = "आपका_नया_WEB_APP_URL_यहाँ_डालें"; 
-    let db = { banks: [], cards: [], loans: [], summary: { catTotals: {} }, categories: [] };
+    const API_URL = "https://script.google.com/macros/s/AKfycby6jYAt8taH9cobBk8J49dI34rCY1OC85tUv2XyKxN7NKp7XmTQbGTdBZBeeFR1fFp9Wg/exec"; 
+    let db = null;
 
     window.onpopstate = () => renderPage(location.hash.replace('#','') || 'home');
     function showPage(name) { location.hash = name; renderPage(name); }
@@ -156,7 +135,7 @@
       if(target) target.classList.add('active');
       document.getElementById("pageTitle").innerText = name.toUpperCase();
       document.getElementById("drawerOverlay").style.display = "none";
-      if(name !== 'home') await refreshData();
+      if(name !== 'home') await refreshData(name === 'dashboard');
     }
 
     document.getElementById("leftBtn").onclick = () => {
@@ -164,7 +143,8 @@
       else window.history.back();
     };
 
-    async function refreshData() {
+    async function refreshData(force = false) {
+      if(db && !force) return;
       try {
         const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
         if(res.ok) {
@@ -176,15 +156,19 @@
     }
 
     function updateDropdowns() {
+      if(document.getElementById("payMode").innerHTML !== "") return; // Blinking fix
+
       const selectPlaceholder = `<option value="" disabled selected>Select...</option>`;
       const bH = selectPlaceholder + db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
       const cH = selectPlaceholder + db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
       
-      ["expBank", "targetBank", "payFromBank"].forEach(id => document.getElementById(id).innerHTML = bH);
-      document.getElementById("expCard").innerHTML = cH;
-      document.getElementById("payTargetCC").innerHTML = cH;
-      document.getElementById("expCategory").innerHTML = selectPlaceholder + db.categories.map(c => `<option value="${c}">${c}</option>`).join("");
+      ["expBank", "targetBank", "payFromBank"].forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.innerHTML = bH;
+      });
 
+      document.getElementById("expCard").innerHTML = cH;
+      document.getElementById("expCategory").innerHTML = selectPlaceholder + db.categories.map(c => `<option value="${c}">${c}</option>`).join("");
       document.getElementById("payMode").innerHTML = `
         <option value="" disabled selected>Select Mode...</option>
         <option value="cash">💵 Cash</option>
@@ -218,6 +202,21 @@
         return `<div class="statRow"><span>${c.name}</span><b class="val-neg">₹${c.due}</b></div>`;
       }).join("");
       document.getElementById("cardSubtotal").innerText = "₹" + cSum.toFixed(2);
+
+      // HISTORY LIST LOGIC
+      if (s.recentTrans) {
+        document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
+          <div class="statRow" style="align-items: center; border-bottom: 1px solid #eee;">
+            <div style="flex: 1; padding: 5px 0;">
+              <div style="font-size: 14px; font-weight: bold;">${t.name}</div>
+              <div style="font-size: 11px; color: #888;">${t.date} • ${t.category}</div>
+            </div>
+            <div class="${t.type === 'Add Fund' ? 'val-pos' : 'val-neg'}" style="font-weight: 800;">
+              ${t.type === 'Add Fund' ? '+' : '-'}₹${t.amount}
+            </div>
+          </div>
+        `).join("");
+      }
     }
 
     function toggleEntryFields() {
@@ -229,7 +228,7 @@
     async function saveExpense() {
       const mode = document.getElementById("payMode").value;
       const amt = parseFloat(document.getElementById("expAmount").value);
-      if(!amt || !mode) return alert("Mode और Amount सही चुनें");
+      if(!amt || !mode) return alert("Select Mode and Amount");
       const payload = {
         action: "save",
         type: mode,
@@ -241,7 +240,7 @@
       btnLoad("btnSaveExp", true);
       const res = await fetch(API_URL, { method:"POST", body:JSON.stringify(payload) }).then(r=>r.json());
       btnLoad("btnSaveExp", false);
-      if(res.ok) { showToast("सफलतापूर्वक सेव हुआ ✅"); showPage("dashboard"); }
+      if(res.ok) { showToast("Success ✅"); showPage("dashboard"); }
     }
 
     function showToast(m) { 
