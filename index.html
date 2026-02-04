@@ -1,123 +1,358 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Expense Seva Fixed</title>
+  <meta name="theme-color" content="#111">
+  <title>Smart Expense Manager</title>
   <style>
-    :root { --primary: #111; --bg: #f4f6f9; --success: #27ae60; --danger: #e74c3c; }
-    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    body { margin: 0; background: var(--bg); padding-bottom: 40px; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body { margin: 0; background: #f0f2f5; color: #1a1a1a; }
+    .topbar { background: #111; color: #fff; padding: 15px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 1000; }
+    .menuBtn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+    .titleBox b { font-size: 18px; display: block; }
+    .titleBox small { font-size: 10px; opacity: 0.6; text-transform: uppercase; }
     .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    
+    /* Summary Grid */
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .sum-card { background: #fff; padding: 15px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid #111; }
+    .sum-card h4 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
+    .sum-card p { margin: 5px 0 0; font-size: 18px; font-weight: 800; }
+    .exp-today { border-left-color: #ff9800; }
+    .exp-month { border-left-color: #e91e63; }
+    .fund-month { border-left-color: #4caf50; }
 
-    /* ऊपर के 4 बड़े कार्ड्स */
-    .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .card-main { background: #fff; padding: 15px; border-radius: 18px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .card-main h4 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
-    .card-main p { margin: 8px 0 0; font-size: 20px; font-weight: 800; }
+    /* Category Mini Cards */
+    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
+    .cat-mini-card { background: #fff; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #eee; }
+    .cat-mini-card h5 { margin: 0; font-size: 9px; color: #888; text-transform: uppercase; overflow: hidden; white-space: nowrap; }
+    .cat-mini-card p { margin: 3px 0 0; font-size: 12px; font-weight: 700; }
 
-    /* कैटेगरी कार्ड्स - 3 कॉलम ग्रिड (ऊपर वाले कार्ड्स जैसा स्टाइल) */
-    .section-title { font-weight: 800; margin: 20px 0 10px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
-    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-    .cat-item { 
-      background: #fff; 
-      padding: 12px 5px; 
-      border-radius: 14px; 
-      text-align: center; 
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-      border-bottom: 3px solid #eee; /* बॉटम लाइन स्टाइल */
-    }
-    .cat-item h5 { margin: 0; font-size: 10px; color: #888; text-transform: uppercase; }
-    .cat-item p { margin: 5px 0 0; font-size: 14px; font-weight: 700; color: #111; }
+    /* Layout Elements */
+    .box { background: #fff; border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .box-title { font-size: 15px; font-weight: 800; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+    .subtotal { font-size: 14px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+    .statRow { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+    
+    /* Inputs & Buttons */
+    .inp { width: 100%; height: 50px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 12px; padding: 0 15px; margin-bottom: 15px; font-size: 16px; outline: none; }
+    .lbl { font-size: 13px; font-weight: 700; color: #444; margin-bottom: 5px; display: block; }
+    .btn { width: 100%; height: 54px; background: #111; color: #fff; border: none; border-radius: 15px; font-size: 17px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .card-btn { background: #fff; border-radius: 18px; padding: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; margin-bottom: 10px; }
 
-    /* बैंक और कार्ड की लिस्ट */
-    .white-box { background: #fff; border-radius: 20px; padding: 5px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
-    .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f2f2f2; }
-    .row:last-child { border-bottom: none; }
-    .val-pos { color: var(--success); font-weight: 800; }
-    .val-neg { color: var(--danger); font-weight: 800; }
-    .total-row { display: flex; justify-content: space-between; font-weight: 800; padding: 10px 5px; }
+    /* History Styles */
+    .hist-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px; border-radius: 12px; margin-bottom: 8px; border: 1px solid #eee; }
+    .hist-meta { display: flex; flex-direction: column; }
+    .hist-tag { font-size: 9px; padding: 2px 6px; background: #f0f0f0; border-radius: 4px; width: fit-content; margin-top: 3px; font-weight: 700; }
+    .filter-btn { font-size: 10px; padding: 5px 10px; border-radius: 6px; border: 1px solid #ddd; background: #fff; cursor: pointer; margin-left: 5px; }
+    .active-filter { background: #111; color: #fff; border-color: #111; }
+
+    .val-pos { color: #2e7d32; }
+    .val-neg { color: #c62828; }
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; }
+    .drawer { width: 280px; height: 100%; background: #fff; padding: 25px; }
+    .toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); background: #111; color: #fff; padding: 12px 25px; border-radius: 50px; display: none; z-index: 3000; }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="top-grid">
-    <div class="card-main" style="border-color:#ff9800"><h4>Today</h4><p id="sumToday">₹0</p></div>
-    <div class="card-main" style="border-color:#e91e63"><h4>Month</h4><p id="sumMonth">₹0</p></div>
-    <div class="card-main" style="border-color:#4caf50"><h4>Funds</h4><p id="sumFund">₹0</p></div>
-    <div class="card-main" style="border-color:#2196f3" onclick="refreshData()"><h4>Status</h4><p id="syncText" style="font-size:13px">Refresh 🔄</p></div>
+  <div class="topbar">
+    <button class="menuBtn" id="leftBtn">☰</button>
+    <div class="titleBox">
+      <b id="pageTitle">Home</b>
+      <small>Expense Seva</small>
+    </div>
   </div>
 
-  <div class="section-title">🏷️ Category Summary</div>
-  <div class="cat-grid" id="catGrid"></div>
+  <div class="drawer-overlay" id="drawerOverlay">
+    <div class="drawer">
+      <h2 style="margin-top:0">Menu</h2>
+      <div style="cursor:pointer; padding:15px; background:#f5f5f5; border-radius:10px; margin-bottom:10px;" onclick="showPage('home')">🏠 Home</div>
+      <div style="cursor:pointer; padding:15px; background:#f5f5f5; border-radius:10px; margin-bottom:10px;" onclick="showPage('sm')">💰 Expense Seva</div>
+    </div>
+  </div>
 
-  <div class="total-row"><span>🏦 Bank Accounts</span><span id="bankSubtotal" class="val-pos">₹0</span></div>
-  <div class="white-box" id="bankList"></div>
+  <div class="container">
+    <div class="page active" id="pageHome">
+      <div class="card-btn" onclick="showPage('sm')">
+        <div style="font-size: 40px; margin-bottom: 10px;">💰</div>
+        <b>Open Expense Seva</b>
+      </div>
+    </div>
 
-  <div class="total-row"><span>💳 Credit Cards</span><span id="cardSubtotal" class="val-neg">₹0</span></div>
-  <div class="white-box" id="cardList"></div>
-</div>
+    <div class="page" id="pageSm">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="card-btn" onclick="showPage('dashboard')">📊 Dashboard</div>
+        <div class="card-btn" onclick="showPage('entry')">✍️ Entry</div>
+        <div class="card-btn" onclick="showPage('addfund')">🏦 Add Funds</div>
+        <div class="card-btn" onclick="showPage('payments')">💳 Bills/EMI</div>
+      </div>
+    </div>
 
-<script>
-  // **अपना नया DEPLOY URL यहाँ डालें**
-  const API_URL = "https://script.google.com/macros/s/AKfycbzp58VdwStGxbBMWOc4UlrKR6qQdVrviza-EE9OnhLgqNrIn-751M0XIhw-munTRnXcXA/exec"; 
+    <div class="page" id="pageDashboard">
+      <div class="summary-grid">
+        <div class="sum-card exp-today"><h4>Today</h4><p id="sumToday">₹0</p></div>
+        <div class="sum-card exp-month"><h4>Month</h4><p id="sumMonth">₹0</p></div>
+        <div class="sum-card fund-month"><h4>Funds</h4><p id="sumFund">₹0</p></div>
+        <div class="sum-card" onclick="showPage('addfund')"><h4>Action</h4><p style="font-size:13px">Deposit 🏦</p></div>
+      </div>
 
-  async function refreshData() {
-    document.getElementById("syncText").innerText = "Syncing...";
-    try {
-      const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) });
-      const res = await response.json();
-      if(res.ok) { 
-        renderData(res);
-        document.getElementById("syncText").innerText = "Success ✅";
-      }
-    } catch(e) { document.getElementById("syncText").innerText = "Failed ❌"; }
-  }
+      <div class="box-title">🏷️ Category Summary</div>
+      <div class="cat-grid" id="catSummaryGrid"></div>
 
-  function renderData(db) {
-    const s = db.summary;
+      <div class="box">
+        <div class="box-title">
+          <span>🏦 Bank Accounts</span>
+          <span id="bankSubtotal" class="subtotal val-pos">₹0</span>
+        </div>
+        <div id="bankList"></div>
+      </div>
 
-    // 1. मुख्य कार्ड्स
-    document.getElementById("sumToday").innerText = "₹" + s.todayExp;
-    document.getElementById("sumMonth").innerText = "₹" + s.monthExp;
-    document.getElementById("sumFund").innerText = "₹" + s.monthFund;
+      <div class="box">
+        <div class="box-title">
+          <span>💳 Credit Cards</span>
+          <span id="cardSubtotal" class="subtotal val-neg">₹0</span>
+        </div>
+        <div id="cardList"></div>
+      </div>
 
-    // 2. कैटेगरी कार्ड्स (फिक्स ग्रिड लॉजिक)
-    let catHTML = "";
-    db.categories.forEach(name => {
-      let val = Math.round(Number(s.catTotals[name] || 0));
-      catHTML += `
-        <div class="cat-item">
-          <h5>${name}</h5>
-          <p>₹${val}</p>
-        </div>`;
-    });
-    document.getElementById("catGrid").innerHTML = catHTML;
+      <div class="box-title">
+        <span>🕒 Activity</span>
+        <div>
+          <button class="filter-btn active-filter" onclick="filterHistory('all', this)">All</button>
+          <button class="filter-btn" onclick="filterHistory('7d', this)">7D</button>
+          <button class="filter-btn" onclick="filterHistory('30d', this)">30D</button>
+        </div>
+      </div>
+      <div id="historyList"></div>
+    </div>
 
-    // 3. बैंक लिस्ट (गणित फिक्स)
-    let bSum = 0;
-    let bHTML = db.banks.map(b => {
-      let amt = Number(b.balance);
-      bSum += amt;
-      return `<div class="row"><span>${b.name}</span><span class="val-pos">₹${amt.toFixed(2)}</span></div>`;
-    }).join("");
-    document.getElementById("bankList").innerHTML = bHTML;
-    document.getElementById("bankSubtotal").innerText = "₹" + bSum.toFixed(2);
+    <div class="page" id="pageEntry">
+      <div class="box">
+        <label class="lbl">Payment Mode</label>
+        <select class="inp" id="payMode" onchange="toggleEntryFields()">
+          <option value="cash">💵 Cash</option>
+          <option value="bank">🏦 Bank Transfer</option>
+          <option value="card">💳 Credit Card</option>
+        </select>
+        <div id="divBankList" style="display:none;"><label class="lbl">Select Bank</label><select class="inp" id="expBank"></select></div>
+        <div id="divCardList" style="display:none;"><label class="lbl">Select Card</label><select class="inp" id="expCard"></select></div>
+        
+        <label class="lbl">Category</label>
+        <select class="inp" id="expCategory"><option>Loading...</option></select>
 
-    // 4. कार्ड लिस्ट
-    let cSum = 0;
-    let cHTML = db.cards.map(c => {
-      let due = Number(c.due);
-      cSum += due;
-      return `<div class="row"><span>${c.name}</span><span class="val-neg">₹${due.toFixed(2)}</span></div>`;
-    }).join("");
-    document.getElementById("cardList").innerHTML = cHTML;
-    document.getElementById("cardSubtotal").innerText = "₹" + cSum.toFixed(2);
-  }
+        <label class="lbl">Remark</label>
+        <input type="text" class="inp" id="expRemark" placeholder="उदा: पेट्रोल, दूध...">
 
-  window.onload = refreshData;
-</script>
+        <label class="lbl">Amount</label>
+        <input type="number" class="inp" id="expAmount" placeholder="0.00" inputmode="decimal">
+        <button class="btn" id="btnSaveExp" onclick="saveExpense()">Submit Expense</button>
+      </div>
+    </div>
 
+    <div class="page" id="pageAddfund">
+      <div class="box">
+        <div class="box-title">➕ Add Deposit</div>
+        <label class="lbl">Target Bank</label>
+        <select class="inp" id="targetBank"></select>
+        <label class="lbl">Amount</label>
+        <input type="number" class="inp" id="fundAmount" placeholder="0.00">
+        <button class="btn" id="btnSaveFund" onclick="processDeposit()">Add to Bank</button>
+      </div>
+    </div>
+
+    <div class="page" id="pagePayments">
+      <div class="box">
+        <div class="box-title">💳 Bill & EMI Payment</div>
+        <label class="lbl">Type</label>
+        <select class="inp" id="payAction" onchange="togglePayFields()">
+          <option value="cc">💳 Credit Card Bill</option>
+          <option value="emi">📉 Loan EMI</option>
+        </select>
+        <label class="lbl">Pay From (Bank)</label>
+        <select class="inp" id="payFromBank"></select>
+        <div id="pCC"><label class="lbl">Select Card</label><select class="inp" id="payTargetCC"></select></div>
+        <div id="pLoan" style="display:none;"><label class="lbl">Select Loan</label><select class="inp" id="payTargetLoan"></select></div>
+        <label class="lbl">Amount</label>
+        <input type="number" class="inp" id="payAmount" placeholder="0.00">
+        <button class="btn" id="btnSavePay" onclick="processBillPay()">Process Payment</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzp58VdwStGxbBMWOc4UlrKR6qQdVrviza-EE9OnhLgqNrIn-751M0XIhw-munTRnXcXA/exec"; 
+    let db = { banks: [], cards: [], loans: [], summary: { recentTrans: [], catTotals: {} }, categories: [] };
+    let fullHistory = [];
+
+    // Navigation
+    window.onpopstate = () => renderPage(location.hash.replace('#','') || 'home');
+    function showPage(name) { location.hash = name; renderPage(name); }
+    
+    async function renderPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const target = document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1));
+      if(target) target.classList.add('active');
+      document.getElementById("pageTitle").innerText = name.toUpperCase();
+      document.getElementById("drawerOverlay").style.display = "none";
+      if(name !== 'home') await refreshData();
+    }
+
+    document.getElementById("leftBtn").onclick = () => {
+      if(!location.hash || location.hash === "#home") document.getElementById("drawerOverlay").style.display = "block";
+      else window.history.back();
+    };
+
+    // Data Management
+    async function refreshData() {
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
+        if(res.ok) {
+          db = res;
+          fullHistory = db.summary.recentTrans;
+          updateDropdowns();
+          if(location.hash === "#dashboard") updateDashboardUI();
+        }
+      } catch(e) { console.error(e); }
+    }
+
+    function updateDropdowns() {
+      const bH = db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
+      const cH = db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+      const lH = db.loans.map(l => `<option value="${l}">${l}</option>`).join("");
+      
+      ["expBank", "targetBank", "payFromBank"].forEach(id => document.getElementById(id).innerHTML = bH);
+      document.getElementById("expCard").innerHTML = cH;
+      document.getElementById("payTargetCC").innerHTML = cH;
+      document.getElementById("payTargetLoan").innerHTML = lH;
+      document.getElementById("expCategory").innerHTML = db.categories.map(c => `<option value="${c}">${c}</option>`).join("");
+    }
+
+    function updateDashboardUI() {
+      const s = db.summary;
+      document.getElementById("sumToday").innerText = "₹" + (s.todayExp || 0);
+      document.getElementById("sumMonth").innerText = "₹" + (s.monthExp || 0);
+      document.getElementById("sumFund").innerText = "₹" + (s.monthFund || 0);
+
+      // Category Summary (Top 6)
+      let catHTML = "";
+      Object.entries(s.catTotals || {}).slice(0, 6).forEach(([name, val]) => {
+        catHTML += `<div class="cat-mini-card"><h5>${name}</h5><p>₹${val}</p></div>`;
+      });
+      document.getElementById("catSummaryGrid").innerHTML = catHTML;
+
+      // Banks Subtotal
+      let bSum = 0;
+      document.getElementById("bankList").innerHTML = db.banks.map(b => {
+        bSum += b.balance;
+        return `<div class="statRow"><span>${b.name}</span><b class="val-pos">₹${b.balance}</b></div>`;
+      }).join("");
+      document.getElementById("bankSubtotal").innerText = "₹" + bSum;
+
+      // Cards Subtotal
+      let cSum = 0;
+      document.getElementById("cardList").innerHTML = db.cards.map(c => {
+        cSum += c.due;
+        return `<div class="statRow"><span>${c.name}</span><b class="val-neg">₹${c.due}</b></div>`;
+      }).join("");
+      document.getElementById("cardSubtotal").innerText = "₹" + cSum;
+
+      filterHistory('all', document.querySelector('.filter-btn'));
+    }
+
+    function filterHistory(type, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
+      if(btn) btn.classList.add('active-filter');
+
+      const now = new Date();
+      let filtered = fullHistory.filter(t => {
+        const parts = t.date.split('/'); 
+        const tDate = new Date(parts[2], parts[1]-1, parts[0]);
+        const diff = (now - tDate) / (1000*60*60*24);
+        if(type === '7d') return diff <= 7;
+        if(type === '30d') return diff <= 30;
+        return true;
+      });
+
+      document.getElementById("historyList").innerHTML = filtered.map(t => `
+        <div class="hist-item">
+          <div class="hist-meta">
+            <span style="font-weight:700;font-size:14px">${t.name}</span>
+            <span class="hist-tag">${t.type}</span>
+            <small style="color:#888;font-size:10px">${t.date}</small>
+          </div>
+          <b class="${t.type.includes('Fund')?'val-pos':'val-neg'}">₹${t.amount}</b>
+        </div>
+      `).join("");
+    }
+
+    // Forms Logic
+    function toggleEntryFields() {
+      const m = document.getElementById("payMode").value;
+      document.getElementById("divBankList").style.display = (m==='bank') ? 'block' : 'none';
+      document.getElementById("divCardList").style.display = (m==='card') ? 'block' : 'none';
+    }
+    function togglePayFields() {
+      const a = document.getElementById("payAction").value;
+      document.getElementById("pCC").style.display = (a==='cc') ? 'block' : 'none';
+      document.getElementById("pLoan").style.display = (a==='emi') ? 'block' : 'none';
+    }
+
+    async function saveExpense() {
+      const mode = document.getElementById("payMode").value;
+      const amt = parseFloat(document.getElementById("expAmount").value);
+      if(!amt) return alert("रकम दर्ज करें");
+      const payload = {
+        action: "save",
+        type: mode,
+        name: (mode==='cash')?'Cash':(mode==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value,
+        amount: amt,
+        category: document.getElementById("expCategory").value,
+        remark: document.getElementById("expRemark").value
+      };
+      btnLoad("btnSaveExp", true);
+      const res = await fetch(API_URL, { method:"POST", body:JSON.stringify(payload) }).then(r=>r.json());
+      btnLoad("btnSaveExp", false);
+      if(res.ok) { showToast("सफलतापूर्वक सेव हुआ ✅"); showPage("dashboard"); }
+    }
+
+    async function processDeposit() {
+      const amt = parseFloat(document.getElementById("fundAmount").value);
+      if(!amt) return alert("रकम दर्ज करें");
+      btnLoad("btnSaveFund", true);
+      const res = await fetch(API_URL, { method:"POST", body:JSON.stringify({action:"processFund", fundAction:"addfund", amount:amt, bankName:document.getElementById("targetBank").value}) }).then(r=>r.json());
+      btnLoad("btnSaveFund", false);
+      if(res.ok) { showToast("फंड जुड़ गया ✅"); showPage("dashboard"); }
+    }
+
+    async function processBillPay() {
+      const amt = parseFloat(document.getElementById("payAmount").value);
+      if(!amt) return alert("रकम दर्ज करें");
+      const payload = {
+        action: "processFund",
+        fundAction: document.getElementById("payAction").value,
+        amount: amt,
+        bankName: document.getElementById("payFromBank").value,
+        ccName: document.getElementById("payTargetCC").value,
+        loanName: document.getElementById("payTargetLoan").value
+      };
+      btnLoad("btnSavePay", true);
+      const res = await fetch(API_URL, { method:"POST", body:JSON.stringify(payload) }).then(r=>r.json());
+      btnLoad("btnSavePay", false);
+      if(res.ok) { showToast("भुगतान सफल ✅"); showPage("dashboard"); }
+    }
+
+    function showToast(m) { 
+      const t = document.getElementById("toast"); t.innerText = m; t.style.display="block"; 
+      setTimeout(()=>t.style.display="none", 2500); 
+    }
+    function btnLoad(id, l) { const b = document.getElementById(id); b.disabled = l; b.innerText = l ? "Wait..." : "Submit"; }
+    document.getElementById("drawerOverlay").onclick = (e) => { if(e.target.id==='drawerOverlay') e.target.style.display='none'; };
+  </script>
 </body>
 </html>
