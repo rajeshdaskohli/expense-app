@@ -5,18 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Expense App</title>
 
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 *{box-sizing:border-box;font-family:Poppins}
 body{
   background:#f4f6fb;
-  padding:20px;
-  max-width:420px;
+  padding:15px;
+  max-width:450px;
   margin:auto;
 }
 
+/* डैशबोर्ड कार्ड्स के लिए ग्रिड */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.mini-card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border-left: 5px solid #7b2ff7; /* डेकोरेटिव बॉर्डर */
+}
+
+.mini-card h4 { margin: 0; font-size: 12px; color: #666; text-transform: uppercase; }
+.mini-card p { margin: 5px 0 0; font-size: 18px; font-weight: 600; color: #333; }
+
+/* फॉर्म कार्ड */
 .card{
   background:#fff;
   border-radius:16px;
@@ -30,7 +49,7 @@ body{
   to{opacity:1;transform:translateY(0)}
 }
 
-h2{text-align:center;margin-bottom:20px}
+h2{text-align:center;margin-top:0; color: #333;}
 
 input,select{
   width:100%;
@@ -38,6 +57,7 @@ input,select{
   margin-bottom:12px;
   border-radius:10px;
   border:1px solid #ddd;
+  outline: none;
 }
 
 button{
@@ -51,6 +71,7 @@ button{
   border-radius:12px;
   font-size:16px;
   cursor:pointer;
+  font-weight: 600;
 }
 
 button span{
@@ -65,22 +86,41 @@ button span{
   to{transform:scale(4);opacity:0}
 }
 
-#msg{text-align:center;margin-top:10px}
+#msg{text-align:center;margin-top:15px; font-weight: 600; color: #2ecc71;}
 </style>
 </head>
 
 <body>
 
+<div class="dashboard-grid">
+  <div class="mini-card" style="border-left-color: #ff9f43;">
+    <h4>Today</h4>
+    <p id="today-total">₹0</p>
+  </div>
+  <div class="mini-card" style="border-left-color: #ee5253;">
+    <h4>Month</h4>
+    <p id="month-total">₹0</p>
+  </div>
+  <div class="mini-card" style="border-left-color: #10ac84;">
+    <h4>Bank</h4>
+    <p id="bank-total">₹0</p>
+  </div>
+  <div class="mini-card" style="border-left-color: #2e86de;">
+    <h4>Credit Card</h4>
+    <p id="cc-total">₹0</p>
+  </div>
+</div>
+
 <div class="card">
-  <h2>Expense App</h2>
+  <h2>Add Expense</h2>
 
   <select id="type">
-    <option>Cash</option>
-    <option>Bank</option>
-    <option>Credit Card</option>
+    <option value="Cash">Cash</option>
+    <option value="Bank">Bank</option>
+    <option value="Credit Card">Credit Card</option>
   </select>
 
-  <input type="number" id="amount" placeholder="Amount ₹">
+  <input type="number" id="amount" placeholder="Amount ₹" step="0.01">
   <input type="text" id="note" placeholder="Note (optional)">
 
   <button onclick="saveExpense(event)">Save Expense</button>
@@ -91,8 +131,19 @@ button span{
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyUxy4omEAx6jP5dVGPUrM3-rqEHE7cznUhFHocuhEb61jKnWAXzQ6VRO5vl6YkeT9R/exec";
 
+// लंबी संख्या को फिक्स करने के लिए हेल्पर फंक्शन
+function formatCurrency(num) {
+  return "₹" + parseFloat(num).toLocaleString('en-IN', {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2
+  });
+}
+
 function saveExpense(e){
+  if(!amount.value) { alert("Please enter amount"); return; }
+  
   ripple(e);
+  msg.innerText = "Saving...";
 
   const data={
     type:type.value,
@@ -102,13 +153,21 @@ function saveExpense(e){
 
   fetch(API_URL,{
     method:"POST",
+    mode: 'no-cors', // Google Apps Script के लिए अक्सर इसकी जरूरत होती है
     body:JSON.stringify(data)
   })
-  .then(r=>r.text())
-  .then(res=>{
+  .then(() => {
     msg.innerText="Saved Successfully ✅";
+    
+    // UI अपडेट (डेमो के लिए)
+    // असल में ये डेटा आपके डेटाबेस से फेच होना चाहिए
     amount.value="";
     note.value="";
+    setTimeout(()=> { msg.innerText=""; }, 3000);
+  })
+  .catch(err => {
+    msg.innerText="Error Saving ❌";
+    console.error(err);
   });
 }
 
