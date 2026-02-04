@@ -1,319 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="theme-color" content="#111">
-  <title>Smart Expense Manager</title>
-  <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Roboto, sans-serif; }
-    body { margin: 0; background: #f0f2f5; color: #1a1a1a; }
-    
-    /* Navigation */
-    .topbar { background: #111; color: #fff; padding: 15px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 1000; }
-    .menuBtn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
-    .titleBox b { font-size: 18px; display: block; }
-    .titleBox small { font-size: 10px; opacity: 0.6; text-transform: uppercase; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expense App</title>
 
-    .container { max-width: 500px; margin: 0 auto; padding: 15px; }
-    .page { display: none; }
-    .page.active { display: block; }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-    /* Summary Cards */
-    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .sum-card { background: #fff; padding: 15px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid #111; }
-    .sum-card h4 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
-    .sum-card p { margin: 5px 0 0; font-size: 20px; font-weight: 800; }
-    .exp-today { border-left-color: #ff9800; }
-    .exp-month { border-left-color: #e91e63; }
-    .fund-month { border-left-color: #4caf50; }
+<style>
+*{box-sizing:border-box;font-family:Poppins}
+body{
+  background:#f4f6fb;
+  padding:15px;
+  max-width:450px;
+  margin:auto;
+}
 
-    /* List Items */
-    .box { background: #fff; border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .box-title { font-size: 16px; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-    .statRow { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
-    .statRow:last-child { border: none; }
-    
-    /* Transaction History */
-    .hist-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #eee; }
-    .hist-meta { display: flex; flex-direction: column; }
-    .hist-name { font-weight: 700; font-size: 15px; }
-    .hist-date { font-size: 11px; color: #888; margin-top: 2px; }
-    .hist-tag { font-size: 9px; padding: 2px 6px; background: #f0f0f0; border-radius: 4px; width: fit-content; margin-top: 5px; font-weight: 700; color: #555; }
+/* डैशबोर्ड कार्ड्स के लिए ग्रिड */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
 
-    /* UI Elements */
-    .inp { width: 100%; height: 52px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 12px; padding: 0 15px; margin-bottom: 15px; font-size: 16px; outline: none; }
-    .lbl { font-size: 13px; font-weight: 700; color: #444; margin-bottom: 6px; display: block; }
-    .btn { width: 100%; height: 54px; background: #111; color: #fff; border: none; border-radius: 15px; font-size: 17px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-    .btn:active { transform: scale(0.97); }
-    
-    .val-pos { color: #2e7d32; }
-    .val-neg { color: #c62828; }
+.mini-card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border-left: 5px solid #7b2ff7; /* डेकोरेटिव बॉर्डर */
+}
 
-    /* Drawer */
-    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; }
-    .drawer { width: 280px; height: 100%; background: #fff; padding: 25px; position: relative; }
-    .menu-link { display: block; padding: 15px; background: #f5f5f5; margin-bottom: 10px; border-radius: 10px; text-decoration: none; color: #111; font-weight: 700; }
+.mini-card h4 { margin: 0; font-size: 12px; color: #666; text-transform: uppercase; }
+.mini-card p { margin: 5px 0 0; font-size: 18px; font-weight: 600; color: #333; }
 
-    .toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); background: #111; color: #fff; padding: 12px 25px; border-radius: 50px; display: none; font-size: 14px; z-index: 3000; }
+/* फॉर्म कार्ड */
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.1);
+  animation:fadeIn .6s ease;
+}
 
-    .card-btn { background: #fff; border-radius: 18px; padding: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-    .card-btn:active { background: #f5f5f5; }
-  </style>
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+h2{text-align:center;margin-top:0; color: #333;}
+
+input,select{
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  outline: none;
+}
+
+button{
+  position:relative;
+  overflow:hidden;
+  width:100%;
+  padding:14px;
+  background:linear-gradient(135deg,#7b2ff7,#f107a3);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  cursor:pointer;
+  font-weight: 600;
+}
+
+button span{
+  position:absolute;
+  border-radius:50%;
+  transform:scale(0);
+  animation:ripple .6s linear;
+  background:rgba(255,255,255,.6);
+}
+
+@keyframes ripple{
+  to{transform:scale(4);opacity:0}
+}
+
+#msg{text-align:center;margin-top:15px; font-weight: 600; color: #2ecc71;}
+</style>
 </head>
+
 <body>
 
-  <div class="topbar">
-    <button class="menuBtn" id="leftBtn">☰</button>
-    <div class="titleBox">
-      <b id="pageTitle">Home</b>
-      <small>Expense Seva</small>
-    </div>
+<div class="dashboard-grid">
+  <div class="mini-card" style="border-left-color: #ff9f43;">
+    <h4>Today</h4>
+    <p id="today-total">₹0</p>
   </div>
-
-  <div class="drawer-overlay" id="drawerOverlay">
-    <div class="drawer">
-      <h2 style="margin-top:0">Menu</h2>
-      <div class="menu-link" onclick="showPage('home')">🏠 Home</div>
-      <div class="menu-link" onclick="showPage('sm')">💰 Expense Seva</div>
-      <div class="menu-link" onclick="location.reload()">🔄 Refresh App</div>
-    </div>
+  <div class="mini-card" style="border-left-color: #ee5253;">
+    <h4>Month</h4>
+    <p id="month-total">₹0</p>
   </div>
-
-  <div class="container">
-    <div class="page active" id="pageHome">
-      <div class="card-btn" onclick="showPage('sm')">
-        <div style="font-size: 40px; margin-bottom: 10px;">💰</div>
-        <b>Open Expense Seva</b>
-      </div>
-    </div>
-
-    <div class="page" id="pageSm">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <div class="card-btn" onclick="showPage('dashboard')">📊 Dashboard</div>
-        <div class="card-btn" onclick="showPage('entry')">✍️ Entry</div>
-        <div class="card-btn" onclick="showPage('addfund')">🏦 Funds</div>
-      </div>
-    </div>
-
-    <div class="page" id="pageDashboard">
-      <div class="summary-grid">
-        <div class="sum-card exp-today"><h4>Today</h4><p id="sumToday">₹0</p></div>
-        <div class="sum-card exp-month"><h4>Month</h4><p id="sumMonth">₹0</p></div>
-        <div class="sum-card fund-month"><h4>Funds</h4><p id="sumFund">₹0</p></div>
-        <div class="sum-card" onclick="showPage('addfund')"><h4>Action</h4><p style="font-size:14px">Manage 🏦</p></div>
-      </div>
-
-      <div class="box">
-        <div class="box-title">🏦 Accounts & Cards</div>
-        <div id="bankList"></div>
-        <div id="cardList" style="margin-top:10px; border-top:1px solid #eee; padding-top:10px"></div>
-      </div>
-
-      <div class="box-title">🕒 Recent Activity</div>
-      <div id="historyList"></div>
-    </div>
-
-    <div class="page" id="pageEntry">
-      <div class="box">
-        <label class="lbl">Payment Mode</label>
-        <select class="inp" id="payMode" onchange="toggleEntryFields()">
-          <option value="cash">💵 Cash</option>
-          <option value="bank">🏦 Bank Transfer</option>
-          <option value="card">💳 Credit Card</option>
-        </select>
-
-        <div id="divBankList" style="display:none;">
-          <label class="lbl">Select Bank</label>
-          <select class="inp" id="expBank"></select>
-        </div>
-
-        <div id="divCardList" style="display:none;">
-          <label class="lbl">Select Card</label>
-          <select class="inp" id="expCard"></select>
-        </div>
-
-        <label class="lbl">Amount</label>
-        <input type="number" class="inp" id="expAmount" placeholder="0.00" inputmode="decimal">
-        
-        <button class="btn" id="btnSaveExp" onclick="saveExpense()">Submit Expense</button>
-      </div>
-    </div>
-
-    <div class="page" id="pageAddfund">
-      <div class="box">
-        <label class="lbl">I want to...</label>
-        <select class="inp" id="fundAction" onchange="toggleFundFields()">
-          <option value="addfund">➕ Deposit Fund</option>
-          <option value="cc">💳 Pay Card Bill</option>
-          <option value="emi">📉 Pay Loan EMI</option>
-        </select>
-
-        <label class="lbl">Select Bank</label>
-        <select class="inp" id="targetBank"></select>
-
-        <div id="fCC" style="display:none;">
-          <label class="lbl">Select Credit Card</label>
-          <select class="inp" id="targetCC"></select>
-        </div>
-
-        <div id="fLoan" style="display:none;">
-          <label class="lbl">Select Loan</label>
-          <select class="inp" id="targetLoan"></select>
-        </div>
-
-        <label class="lbl">Amount</label>
-        <input type="number" class="inp" id="fundAmount" placeholder="0.00" inputmode="decimal">
-        
-        <button class="btn" id="btnSaveFund" onclick="processFund()">Process Transaction</button>
-      </div>
-    </div>
+  <div class="mini-card" style="border-left-color: #10ac84;">
+    <h4>Bank</h4>
+    <p id="bank-total">₹0</p>
   </div>
+  <div class="mini-card" style="border-left-color: #2e86de;">
+    <h4>Credit Card</h4>
+    <p id="cc-total">₹0</p>
+  </div>
+</div>
 
-  <div class="toast" id="toast"></div>
+<div class="card">
+  <h2>Add Expense</h2>
 
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwXkJo6belMLPwHAEQLoA9VD1MNCArzuddtcqYRQSFsvTeuo0tjP8Ilut5ZU0Yf4HtA/exec"; 
-    let db = { banks: [], cards: [], loans: [], summary: {} };
+  <select id="type">
+    <option value="Cash">Cash</option>
+    <option value="Bank">Bank</option>
+    <option value="Credit Card">Credit Card</option>
+  </select>
 
-    // --- Navigation ---
-    window.onpopstate = () => {
-      const page = location.hash.replace('#','') || 'home';
-      renderPage(page);
-    };
+  <input type="number" id="amount" placeholder="Amount ₹" step="0.01">
+  <input type="text" id="note" placeholder="Note (optional)">
 
-    function showPage(name) {
-      location.hash = name;
-      renderPage(name);
-    }
+  <button onclick="saveExpense(event)">Save Expense</button>
 
-    async function renderPage(name) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      const target = document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1));
-      if(target) target.classList.add('active');
+  <div id="msg"></div>
+</div>
 
-      const isHome = (name === 'home');
-      document.getElementById("pageTitle").innerText = isHome ? "Home" : name.toUpperCase();
-      document.getElementById("leftBtn").innerText = isHome ? "☰" : "←";
-      document.getElementById("drawerOverlay").style.display = "none";
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzp58VdwStGxbBMWOc4UlrKR6qQdVrviza-EE9OnhLgqNrIn-751M0XIhw-munTRnXcXA/exec";
 
-      if(!isHome) await refreshData();
-    }
+// लंबी संख्या को फिक्स करने के लिए हेल्पर फंक्शन
+function formatCurrency(num) {
+  return "₹" + parseFloat(num).toLocaleString('en-IN', {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2
+  });
+}
 
-    document.getElementById("leftBtn").onclick = () => {
-      if(location.hash === "" || location.hash === "#home") {
-        document.getElementById("drawerOverlay").style.display = "block";
-      } else {
-        window.history.back();
-      }
-    };
+function saveExpense(e){
+  if(!amount.value) { alert("Please enter amount"); return; }
+  
+  ripple(e);
+  msg.innerText = "Saving...";
 
-    // --- UI Logic ---
-    function toggleEntryFields() {
-      const m = document.getElementById("payMode").value;
-      document.getElementById("divBankList").style.display = (m==='bank') ? 'block' : 'none';
-      document.getElementById("divCardList").style.display = (m==='card') ? 'block' : 'none';
-    }
+  const data={
+    type:type.value,
+    amount:amount.value,
+    note:note.value
+  };
 
-    function toggleFundFields() {
-      const a = document.getElementById("fundAction").value;
-      document.getElementById("fCC").style.display = (a==='cc') ? 'block' : 'none';
-      document.getElementById("fLoan").style.display = (a==='emi') ? 'block' : 'none';
-    }
-
-    async function refreshData() {
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
-      if(res.ok) {
-        db = res;
-        updateDropdowns();
-        if(location.hash === "#dashboard") updateDashboardUI();
-      }
-    }
-
-    function updateDropdowns() {
-      const bH = db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
-      const cH = db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
-      const lH = db.loans.map(l => `<option value="${l.name}">${l.name}</option>`).join("");
-
-      ["expBank", "targetBank"].forEach(id => document.getElementById(id).innerHTML = bH);
-      document.getElementById("expCard").innerHTML = cH;
-      document.getElementById("targetCC").innerHTML = cH;
-      document.getElementById("targetLoan").innerHTML = lH;
-    }
-
-    function updateDashboardUI() {
-      const s = db.summary;
-      document.getElementById("sumToday").innerText = "₹" + s.todayExp;
-      document.getElementById("sumMonth").innerText = "₹" + s.monthExp;
-      document.getElementById("sumFund").innerText = "₹" + s.monthFund;
-
-      document.getElementById("bankList").innerHTML = db.banks.map(b => `<div class="statRow"><span>${b.name}</span><b class="val-pos">₹${b.balance}</b></div>`).join("");
-      document.getElementById("cardList").innerHTML = db.cards.map(c => `<div class="statRow"><span>${c.name}</span><b class="val-neg">₹${c.due}</b></div>`).join("");
-      
-      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-        <div class="hist-item">
-          <div class="hist-meta">
-            <span class="hist-name">${t.name}</span>
-            <span class="hist-date">${t.date}</span>
-            <span class="hist-tag">${t.type}</span>
-          </div>
-          <b class="${(t.type==='Add Fund'?'val-pos':'val-neg')}">
-            ${(t.type==='Add Fund'?'+':'-')}₹${t.amount}
-          </b>
-        </div>
-      `).join("");
-    }
-
-    // --- Actions ---
-    async function saveExpense() {
-      const mode = document.getElementById("payMode").value;
-      const amt = parseFloat(document.getElementById("expAmount").value);
-      let name = "Cash";
-      if(mode==='bank') name = document.getElementById("expBank").value;
-      if(mode==='card') name = document.getElementById("expCard").value;
-
-      if(!amt) return alert("Enter amount");
-      
-      btnLoad("btnSaveExp", true);
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "save", type: mode, name: name, amount: amt}) }).then(r => r.json());
-      btnLoad("btnSaveExp", false);
-      
-      if(res.ok) { showToast("Success ✅"); showPage("dashboard"); }
-    }
-
-    async function processFund() {
-      const act = document.getElementById("fundAction").value;
-      const amt = parseFloat(document.getElementById("fundAmount").value);
-      if(!amt) return alert("Enter amount");
-
-      const payload = {
-        action: "processFund",
-        fundAction: act,
-        amount: amt,
-        bankName: document.getElementById("targetBank").value,
-        ccName: document.getElementById("targetCC").value,
-        loanName: document.getElementById("targetLoan").value
-      };
-
-      btnLoad("btnSaveFund", true);
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(r => r.json());
-      btnLoad("btnSaveFund", false);
-      
-      if(res.ok) { showToast("Updated ✅"); showPage("dashboard"); }
-    }
-
-    function showToast(m) { 
-      const t = document.getElementById("toast"); t.innerText = m; t.style.display="block"; 
-      setTimeout(()=>t.style.display="none", 2500); 
-    }
+  fetch(API_URL,{
+    method:"POST",
+    mode: 'no-cors', // Google Apps Script के लिए अक्सर इसकी जरूरत होती है
+    body:JSON.stringify(data)
+  })
+  .then(() => {
+    msg.innerText="Saved Successfully ✅";
     
-    function btnLoad(id, load) {
-      const b = document.getElementById(id);
-      b.disabled = load;
-      b.innerText = load ? "Processing..." : "Submit";
-    }
+    // UI अपडेट (डेमो के लिए)
+    // असल में ये डेटा आपके डेटाबेस से फेच होना चाहिए
+    amount.value="";
+    note.value="";
+    setTimeout(()=> { msg.innerText=""; }, 3000);
+  })
+  .catch(err => {
+    msg.innerText="Error Saving ❌";
+    console.error(err);
+  });
+}
 
-    document.getElementById("drawerOverlay").onclick = (e) => { if(e.target.id==='drawerOverlay') e.target.style.display='none'; };
-  </script>
+function ripple(e){
+  const btn=e.currentTarget;
+  const circle=document.createElement("span");
+  const size=Math.max(btn.clientWidth,btn.clientHeight);
+  circle.style.width=circle.style.height=size+"px";
+  circle.style.left=e.offsetX-size/2+"px";
+  circle.style.top=e.offsetY-size/2+"px";
+  btn.appendChild(circle);
+  setTimeout(()=>circle.remove(),600);
+}
+</script>
+
 </body>
 </html>
