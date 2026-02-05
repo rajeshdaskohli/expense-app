@@ -1,125 +1,309 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="hi" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Pro App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
-        .glass-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .active-tab { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
-        .tap-active:active { transform: scale(0.95); transition: 0.1s; }
-        .loader { border-top-color: #3b82f6; animation: spinner 0.6s linear infinite; }
-        @keyframes spinner { to { transform: rotate(360deg); } }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <style>
+    /* CSS Variables for Themes */
+    :root {
+      --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --text-dim: #64748b;
+      --primary: #2563eb; --green: #10b981; --red: #ef4444; --border: rgba(0,0,0,0.05);
+    }
+    [data-theme="dark"] {
+      --bg: #070b14; --card: #121826; --text: #f8fafc; --text-dim: #94a3b8;
+      --primary: #38bdf8; --border: rgba(255,255,255,0.05);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.3s; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
+
+    /* Header & Controls */
+    .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; }
+    .header h1 { font-size: 18px; margin: 0; font-weight: 800; }
+    .controls i { cursor: pointer; margin-left: 15px; color: var(--text-dim); }
+    .spinning { animation: spin 1s linear infinite; color: var(--primary) !important; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* Page & Swipe */
+    .container { max-width: 500px; margin: 0 auto; padding: 0 16px; }
+    .page { display: none; min-height: 70vh; animation: fadeIn 0.4s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Professional UI Elements */
+    .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; scrollbar-width: none; }
+    .hero-card { min-width: 140px; background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .hero-card span { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
+    .hero-card p { margin: 8px 0 0; font-size: 16px; font-weight: 800; }
+
+    .list-container { background: var(--card); border-radius: 28px; padding: 10px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .row:last-child { border: none; }
+    .meta b { display: block; font-size: 14px; margin-bottom: 2px; }
+    .meta small { color: var(--text-dim); font-size: 11px; }
+
+    /* Labels & Subtotals */
+    .label-row { display: flex; justify-content: space-between; align-items: center; margin: 25px 5px 10px; }
+    .label-row h3 { font-size: 12px; font-weight: 800; color: var(--text-dim); margin: 0; letter-spacing: 1px; }
+    .subtotal { font-size: 12px; font-weight: 800; }
+
+    /* Category Grid */
+    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .cat-item { background: var(--card); padding: 15px 5px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
+    .cat-item div { font-size: 18px; margin-bottom: 5px; }
+    .cat-item b { font-size: 11px; display: block; }
+
+    /* Floating Navigation */
+    .nav-wrapper { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; }
+    .nav-bar { background: var(--card); display: flex; padding: 8px; border-radius: 24px; border: 1px solid var(--border); width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .nav-item { flex: 1; padding: 10px; border-radius: 18px; text-align: center; color: var(--text-dim); cursor: pointer; }
+    .nav-item.active { background: var(--primary); color: #fff; }
+    .nav-item i { display: block; font-size: 22px; margin-bottom: 2px; }
+    .nav-item span { font-size: 10px; font-weight: 700; }
+
+    /* Professional Modal */
+    #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal-box { background: var(--card); padding: 30px; border-radius: 32px; width: 80%; max-width: 320px; text-align: center; transform: scale(0.9); transition: 0.3s; }
+    .modal-box.show { transform: scale(1); }
+    .modal-btn { width: 100%; background: var(--primary); color: #fff; border: none; padding: 15px; border-radius: 16px; font-weight: 800; margin-top: 20px; }
+
+    /* Form Fields */
+    .inp { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; color: var(--text); font-size: 15px; outline: none; margin-bottom: 15px; }
+    .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+
+    .val-pos { color: var(--green); } .val-neg { color: var(--red); }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-900 dark:bg-slate-950 dark:text-gray-100">
+<body>
 
-    <header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b dark:border-slate-800 px-4 py-3 flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-tight">Finance<span class="text-blue-500">Pro</span></h1>
-        <div class="flex gap-4">
-            <button onclick="fetchData()" class="tap-active text-gray-500 hover:text-blue-500"><i class="fas fa-sync-alt text-lg"></i></button>
-            <button onclick="toggleDarkMode()" class="tap-active text-gray-500"><i class="fas fa-moon text-lg dark:fa-sun"></i></button>
-        </div>
-    </header>
+  <div id="modal">
+    <div class="modal-box" id="mBox">
+      <i class="material-icons-round" id="mIcon" style="font-size: 50px; color: var(--green);">check_circle</i>
+      <h2 id="mTitle" style="margin: 15px 0 5px;">Success</h2>
+      <p id="mText" style="color: var(--text-dim);">Data saved successfully!</p>
+      <button class="modal-btn" onclick="closeModal()">OK</button>
+    </div>
+  </div>
 
-    <main id="app-content" class="pt-20 pb-24 px-4 max-w-md mx-auto">
-        <div id="loading" class="flex flex-col items-center justify-center h-64">
-            <div class="loader w-10 h-10 border-4 border-gray-200 rounded-full mb-4"></div>
-            <p class="text-sm opacity-60">शीट से डेटा सिंक हो रहा है...</p>
-        </div>
+  <div class="header">
+    <h1>EXPENSE SEVA</h1>
+    <div class="controls">
+      <i class="material-icons-round" onclick="toggleTheme()" id="tBtn">light_mode</i>
+      <i class="material-icons-round" onclick="refreshData()" id="sBtn">sync</i>
+    </div>
+  </div>
 
-        <section id="dashboard" class="space-y-4">
-            <div class="bg-blue-600 p-6 rounded-3xl text-white shadow-xl shadow-blue-500/20">
-                <p class="text-sm opacity-80">कुल नेट वर्थ</p>
-                <h2 id="net-worth" class="text-3xl font-bold mt-1">₹ 0.00</h2>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4" id="stat-cards">
-                </div>
-        </section>
+  <div class="container" id="swipeArea">
+    
+    <div class="page active" id="pageDashboard">
+      <div class="hero-scroll">
+        <div class="hero-card"><span>Today</span><p id="sumToday">₹0</p></div>
+        <div class="hero-card"><span>Month</span><p id="sumMonth">₹0</p></div>
+        <div class="hero-card"><span>Funds</span><p id="sumFund">₹0</p></div>
+      </div>
 
-        <section id="list-section" class="mt-8">
-            <h3 class="font-semibold mb-4 text-lg">मुख्य विवरण</h3>
-            <div id="data-list" class="space-y-3">
-                </div>
-        </section>
-    </main>
+      <div class="label-row"><h3>CATEGORY SPEND</h3></div>
+      <div class="cat-grid" id="catGrid"></div>
 
-    <nav class="fixed bottom-0 w-full bg-white dark:bg-slate-900 border-t dark:border-slate-800 px-6 py-3 flex justify-between items-center z-50">
-        <button onclick="showTab('dashboard')" class="flex flex-col items-center gap-1 tap-active text-blue-500">
-            <i class="fas fa-th-large text-xl"></i><span class="text-[10px]">Dashboard</span>
-        </button>
-        <button onclick="showTab('banks')" class="flex flex-col items-center gap-1 tap-active opacity-50">
-            <i class="fas fa-university text-xl"></i><span class="text-[10px]">Banks</span>
-        </button>
-        <button onclick="showTab('cards')" class="flex flex-col items-center gap-1 tap-active opacity-50">
-            <i class="fas fa-credit-card text-xl"></i><span class="text-[10px]">Cards</span>
-        </button>
-        <button onclick="showTab('loans')" class="flex flex-col items-center gap-1 tap-active opacity-50">
-            <i class="fas fa-hand-holding-usd text-xl"></i><span class="text-[10px]">Loans</span>
-        </button>
-    </nav>
+      <div class="label-row"><h3>BANKS</h3><span id="bankSub" class="subtotal">₹0</span></div>
+      <div class="list-container" id="bankList"></div>
 
-    <script>
-        const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE"; // अपना URL यहाँ डालें
+      <div class="label-row"><h3>CREDIT CARDS</h3><span id="cardSub" class="subtotal">₹0</span></div>
+      <div class="list-container" id="cardList"></div>
 
-        async function fetchData() {
-            document.getElementById('loading').classList.remove('hidden');
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=getAppData`);
-                const data = await response.json();
-                renderApp(data);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                alert("डेटा लोड करने में समस्या हुई। कृपया URL चेक करें।");
-            }
-            document.getElementById('loading').classList.add('hidden');
-        }
+      <div class="label-row"><h3>LOANS & EMI</h3><span id="loanSub" class="subtotal">₹0</span></div>
+      <div class="list-container" id="loanList"></div>
 
-        function renderApp(data) {
-            // गणना (Calculations)
-            let totalBank = data.banks.slice(1).reduce((sum, row) => sum + (parseFloat(row[1]) || 0), 0);
-            let totalCC = data.cards.slice(1).reduce((sum, row) => sum + (parseFloat(row[3]) || 0), 0);
-            
-            document.getElementById('net-worth').innerText = `₹ ${(totalBank - totalCC).toLocaleString('hi-IN')}`;
+      <div class="label-row"><h3>1 MONTH HISTORY</h3></div>
+      <div class="list-container" id="historyList"></div>
+    </div>
 
-            const listContainer = document.getElementById('data-list');
-            listContainer.innerHTML = ''; // Clear old data
+    <div class="page" id="pageEntry">
+      <div class="list-container" style="padding: 25px; margin-top: 20px;">
+        <select class="inp" id="payMode" onchange="toggleFields()">
+          <option value="cash">💵 Cash</option>
+          <option value="bank">🏦 Bank</option>
+          <option value="card">💳 Credit Card</option>
+        </select>
+        <div id="divBank" style="display:none;"><select class="inp" id="expBank"></select></div>
+        <div id="divCard" style="display:none;"><select class="inp" id="expCard"></select></div>
+        <select class="inp" id="expCat"></select>
+        <input type="number" class="inp" id="expAmt" placeholder="0.00">
+        <input type="text" class="inp" id="expRem" placeholder="Remark (Optional)">
+        <button class="btn-main" onclick="saveTrans('entry')">SAVE EXPENSE</button>
+      </div>
+    </div>
 
-            // बैंकों की लिस्ट दिखाना
-            data.banks.slice(1).forEach(bank => {
-                listContainer.innerHTML += `
-                    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl flex justify-between items-center shadow-sm border dark:border-slate-800">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center">
-                                <i class="fas fa-university"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium">${bank[0]}</p>
-                                <p class="text-xs opacity-50">बैलेंस</p>
-                            </div>
-                        </div>
-                        <p class="font-bold text-green-500">₹ ${parseFloat(bank[1]).toLocaleString('hi-IN')}</p>
-                    </div>
-                `;
-            });
-        }
+    <div class="page" id="pageFund">
+      <div class="list-container" style="padding: 25px; margin-top: 20px;">
+        <select class="inp" id="targetBank"></select>
+        <input type="number" class="inp" id="fundAmt" placeholder="Deposit Amount">
+        <button class="btn-main" onclick="saveTrans('fund')">DEPOSIT FUND</button>
+      </div>
+    </div>
 
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
+    <div class="page" id="pageBills">
+      <div class="list-container" style="padding: 25px; margin-top: 20px;">
+        <select class="inp" id="payFrom"></select>
+        <select class="inp" id="payTo"></select>
+        <input type="number" class="inp" id="payAmt" placeholder="Payment Amount">
+        <button class="btn-main" onclick="saveTrans('pay')">PAY BILL</button>
+      </div>
+    </div>
 
-        // Initialize Theme
-        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
-        
-        // Load Data on Start
-        fetchData();
-    </script>
+  </div>
+
+  <div class="nav-wrapper">
+    <div class="nav-bar">
+      <div class="nav-item active" onclick="showPage(0)"><i class="material-icons-round">home</i><span>Home</span></div>
+      <div class="nav-item" onclick="showPage(1)"><i class="material-icons-round">add_circle</i><span>Entry</span></div>
+      <div class="nav-item" onclick="showPage(2)"><i class="material-icons-round">wallet</i><span>Fund</span></div>
+      <div class="nav-item" onclick="showPage(3)"><i class="material-icons-round">receipt</i><span>Bills</span></div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "आपका_URL_यहाँ";
+    let db = null;
+    let pageNames = ['Dashboard', 'Entry', 'Fund', 'Bills'];
+    let curPage = 0;
+
+    // --- Swipe Support ---
+    let startX = 0;
+    const swipeArea = document.getElementById('swipeArea');
+    swipeArea.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    swipeArea.addEventListener('touchend', e => {
+      let diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 100) movePage(diff > 0 ? 1 : -1);
+    });
+    function movePage(dir) {
+      let newP = curPage + dir;
+      if (newP >= 0 && newP < 4) showPage(newP);
+    }
+
+    // --- Theme & Page ---
+    function toggleTheme() {
+      let h = document.documentElement;
+      let isD = h.getAttribute('data-theme') === 'dark';
+      h.setAttribute('data-theme', isD ? 'light' : 'dark');
+      document.getElementById('tBtn').innerText = isD ? 'dark_mode' : 'light_mode';
+    }
+
+    async function showPage(idx) {
+      curPage = idx;
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page' + pageNames[idx]).classList.add('active');
+      document.querySelectorAll('.nav-item')[idx].classList.add('active');
+      if(idx === 0) await refreshData();
+    }
+
+    // --- Modal Popup ---
+    function notify(title, text, icon='check_circle', color='#10b981') {
+      document.getElementById('mTitle').innerText = title;
+      document.getElementById('mText').innerText = text;
+      document.getElementById('mIcon').innerText = icon;
+      document.getElementById('mIcon').style.color = color;
+      document.getElementById('modal').style.display = 'flex';
+      setTimeout(() => document.getElementById('mBox').classList.add('show'), 10);
+    }
+    function closeModal() {
+      document.getElementById('mBox').classList.remove('show');
+      setTimeout(() => document.getElementById('modal').style.display = 'none', 300);
+    }
+
+    // --- Data Management ---
+    const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
+
+    async function refreshData() {
+      let sBtn = document.getElementById('sBtn');
+      sBtn.classList.add('spinning');
+      try {
+        let res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
+        if(res.ok) { db = res; updateUI(); }
+      } catch(e) { notify('Error', 'Connection Failed', 'error', '#ef4444'); }
+      sBtn.classList.remove('spinning');
+    }
+
+    function updateUI() {
+      const s = db.summary;
+      document.getElementById("sumToday").innerText = fmt(s.todayExp);
+      document.getElementById("sumMonth").innerText = fmt(s.monthExp);
+      document.getElementById("sumFund").innerText = fmt(s.monthFund);
+
+      // Category Grid with Icons
+      document.getElementById("catGrid").innerHTML = db.categories.map(c => `
+        <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small>${fmt(s.catTotals[c.name.toLowerCase()] || 0)}</small></div>
+      `).join("");
+
+      // Bank Subtotal & List
+      let bTotal = 0;
+      document.getElementById("bankList").innerHTML = db.banks.map(b => {
+        bTotal += b.val;
+        return `<div class="row"><div class="meta"><b>${b.name}</b><small>Bank A/c</small></div><b class="${b.val<0?'val-neg':'val-pos'}">${fmt(b.val)}</b></div>`
+      }).join("");
+      document.getElementById("bankSub").innerText = fmt(bTotal);
+
+      // Card Subtotal & List
+      let cTotal = 0;
+      document.getElementById("cardList").innerHTML = db.cards.map(c => {
+        cTotal += c.val;
+        return `<div class="row"><div class="meta"><b>${c.name}</b><small>Credit Card</small></div><b class="${c.val==0?'val-pos':'val-neg'}">${fmt(c.val)}</b></div>`
+      }).join("");
+      document.getElementById("cardSub").innerText = fmt(cTotal);
+
+      // Loan Subtotal & List
+      let lTotal = 0;
+      document.getElementById("loanList").innerHTML = db.loans.map(l => {
+        lTotal += l.emi;
+        return `<div class="row"><div class="meta"><b>${l.name}</b><small>Due: ${l.dueDate}</small></div><b class="val-neg">${fmt(l.emi)}</b></div>`
+      }).join("");
+      document.getElementById("loanSub").innerText = fmt(lTotal);
+
+      // History
+      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
+        <div class="row"><div class="meta"><b>${t.name}</b><small>${t.date}</small></div><b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b></div>
+      `).join("");
+
+      fillDropdowns();
+    }
+
+    function fillDropdowns() {
+      const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
+      document.getElementById("expBank").innerHTML = opt(db.banks, "name");
+      document.getElementById("targetBank").innerHTML = opt(db.banks, "name");
+      document.getElementById("payFrom").innerHTML = opt(db.banks, "name");
+      document.getElementById("expCard").innerHTML = opt(db.cards, "name");
+      document.getElementById("payTo").innerHTML = opt(db.cards, "name") + opt(db.loans, "name");
+      document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
+    }
+
+    async function saveTrans(type) {
+      let p = { action: "save" };
+      if(type==='entry') {
+        let m = document.getElementById("payMode").value;
+        p.type = m; p.name = (m==='cash')?'Cash':(m==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
+        p.amount = document.getElementById("expAmt").value; p.category = document.getElementById("expCat").value; p.remark = document.getElementById("expRem").value;
+      } else if(type==='fund') {
+        p.type="Add Fund"; p.name=document.getElementById("targetBank").value; p.amount=document.getElementById("fundAmt").value;
+      } else if(type==='pay') {
+        p.type="Bill Pay"; p.name=document.getElementById("payTo").value; p.amount=document.getElementById("payAmt").value; p.remark="From "+document.getElementById("payFrom").value;
+      }
+      if(!p.amount || !p.name) return notify('Error', 'Please fill all details', 'warning', '#f59e0b');
+      
+      let res = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) }).then(r=>r.json());
+      if(res.ok) { notify('Success', 'Data saved successfully!'); showPage(0); }
+    }
+
+    function toggleFields() {
+      let m = document.getElementById("payMode").value;
+      document.getElementById("divBank").style.display = (m==='bank') ? 'block' : 'none';
+      document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
+    }
+
+    window.onload = () => showPage(0);
+  </script>
 </body>
 </html>
