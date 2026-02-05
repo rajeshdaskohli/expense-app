@@ -6,68 +6,43 @@
   <meta name="theme-color" content="#111">
   <title>Smart Expense Manager</title>
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Roboto, sans-serif; }
-    body { margin: 0; background: #f0f2f5; color: #1a1a1a; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', sans-serif; }
+    body { margin: 0; background: #f0f2f5; color: #1a1a1a; padding-bottom: 20px; }
     .topbar { background: #111; color: #fff; padding: 15px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 1000; }
-    .menuBtn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
-    .titleBox b { font-size: 18px; display: block; }
-    .titleBox small { font-size: 10px; opacity: 0.6; text-transform: uppercase; }
     .container { max-width: 500px; margin: 0 auto; padding: 15px; }
-    .page { display: none; }
-    .page.active { display: block; }
+    .page { display: none; } .page.active { display: block; }
     
-    /* Summary Grid Style */
-    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-    .sum-card { background: #fff; padding: 15px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid #111; }
-    .sum-card h4 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
-    .sum-card p { margin: 5px 0 0; font-size: 16px; font-weight: 800; }
-    .exp-today { border-left-color: #ff9800; }
-    .exp-month { border-left-color: #e91e63; }
-    .fund-month { border-left-color: #4caf50; }
-    .action-card { border-left-color: #2196f3; }
+    /* Grid for 3 Cards */
+    .summary-grid, .cat-grid { display: grid; gap: 10px; margin-bottom: 20px; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .cat-grid { grid-template-columns: repeat(3, 1fr); }
 
-    /* Category Cards (Summary look) */
-    .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-    .cat-box { background: #fff; padding: 12px; border-radius: 14px; border-left: 4px solid #111; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-    .cat-box h5 { margin: 0; font-size: 10px; color: #888; text-transform: uppercase; }
-    .cat-box p { margin: 3px 0 0; font-size: 14px; font-weight: 700; }
-
-    /* Box & Separators */
-    .box { background: #fff; border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .box-title { font-size: 15px; font-weight: 800; margin: 15px 0 8px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 6px; }
-    .statRow { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
-    .statRow:last-child { border-bottom: none; }
-
-    /* Inputs & Buttons */
-    .inp { width: 100%; height: 50px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 12px; padding: 0 15px; margin-bottom: 15px; font-size: 16px; outline: none; }
-    .lbl { font-size: 13px; font-weight: 700; color: #444; margin-bottom: 5px; display: block; }
-    .btn { width: 100%; height: 54px; background: #111; color: #fff; border: none; border-radius: 15px; font-size: 17px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-    .card-btn { background: #fff; border-radius: 18px; padding: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; margin-bottom: 10px; font-weight: 700; }
+    .sum-card, .cat-box { background: #fff; padding: 12px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid #111; }
+    .sum-card h4, .cat-box h5 { margin: 0; font-size: 10px; color: #666; text-transform: uppercase; }
+    .sum-card p, .cat-box p { margin: 5px 0 0; font-size: 14px; font-weight: 800; }
     
-    .val-pos { color: #2e7d32; }
-    .val-neg { color: #c62828; }
-    .status-tag { padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-    .tag-paid { background: #e8f5e9; color: #2e7d32; }
-    .tag-unpaid { background: #ffebee; color: #c62828; }
+    /* Dynamic Colors */
+    .c1 { border-left-color: #ff9800; } .c2 { border-left-color: #e91e63; }
+    .c3 { border-left-color: #4caf50; } .c4 { border-left-color: #2196f3; }
+    .c5 { border-left-color: #9c27b0; } .c6 { border-left-color: #00bcd4; }
 
-    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; }
-    .drawer { width: 280px; height: 100%; background: #fff; padding: 25px; }
-    .toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); background: #111; color: #fff; padding: 12px 25px; border-radius: 50px; display: none; z-index: 3000; }
+    .box { background: #fff; border-radius: 20px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .box-title { font-size: 15px; font-weight: 800; margin: 15px 0 8px 0; display: flex; justify-content: space-between; border-bottom: 2px solid #eee; padding-bottom: 6px; }
+    .statRow { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
+    
+    .inp { width: 100%; height: 48px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 12px; padding: 0 15px; margin-bottom: 15px; font-size: 16px; outline: none; }
+    .btn { width: 100%; height: 50px; background: #111; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .card-btn { background: #fff; border-radius: 15px; padding: 18px; text-align: center; border: 1px solid #ddd; cursor: pointer; margin-bottom: 10px; font-weight: 700; }
+    .val-pos { color: #2e7d32; } .val-neg { color: #c62828; }
+    .status-tag { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+    .tag-paid { background: #e8f5e9; color: #2e7d32; } .tag-unpaid { background: #ffebee; color: #c62828; }
   </style>
 </head>
 <body>
 
   <div class="topbar">
-    <button class="menuBtn" id="leftBtn">☰</button>
-    <div class="titleBox"><b id="pageTitle">Home</b><small>Expense Seva</small></div>
-  </div>
-
-  <div class="drawer-overlay" id="drawerOverlay">
-    <div class="drawer">
-      <h2 style="margin-top:0">Menu</h2>
-      <div class="card-btn" onclick="showPage('home')">🏠 Home</div>
-      <div class="card-btn" onclick="showPage('sm')">💰 Expense Seva</div>
-    </div>
+    <button style="background:none; border:none; color:#fff; font-size:20px;" onclick="showPage('home')">☰</button>
+    <div><b id="pageTitle">DASHBOARD</b><br><small>EXPENSE SEVA</small></div>
   </div>
 
   <div class="container">
@@ -86,13 +61,13 @@
 
     <div class="page" id="pageDashboard">
       <div class="summary-grid">
-        <div class="sum-card exp-today"><h4>Today</h4><p id="sumToday">₹0</p></div>
-        <div class="sum-card exp-month"><h4>Month</h4><p id="sumMonth">₹0</p></div>
-        <div class="sum-card fund-month"><h4>Funds</h4><p id="sumFund">₹0</p></div>
-        <div class="sum-card action-card" onclick="showPage('addfund')"><h4>Action</h4><p style="font-size:12px">Deposit 🏦</p></div>
+        <div class="sum-card c1"><h4>Today</h4><p id="sumToday">₹0</p></div>
+        <div class="sum-card c2"><h4>Month</h4><p id="sumMonth">₹0</p></div>
+        <div class="sum-card c3"><h4>Funds</h4><p id="sumFund">₹0</p></div>
+        <div class="sum-card c4" onclick="showPage('addfund')"><h4>Action</h4><p style="font-size:12px">Deposit 🏦</p></div>
       </div>
 
-      <div class="box-title">🏷️ Categories</div>
+      <div class="box-title">🏷️ Category Summary</div>
       <div class="cat-grid" id="catSummaryGrid"></div>
 
       <div class="box-title"><span>🏦 Banks</span><span id="bankSubtotal" class="val-pos">₹0</span></div>
@@ -110,82 +85,59 @@
 
     <div class="page" id="pageEntry">
       <div class="box">
-        <label class="lbl">Mode</label><select class="inp" id="payMode" onchange="toggleEntryFields()"></select>
-        <div id="divBankList" style="display:none;"><label class="lbl">Select Bank</label><select class="inp" id="expBank"></select></div>
-        <div id="divCardList" style="display:none;"><label class="lbl">Select Card</label><select class="inp" id="expCard"></select></div>
-        <label class="lbl">Category</label><select class="inp" id="expCategory"></select>
-        <label class="lbl">Amount</label><input type="number" class="inp" id="expAmount" placeholder="0.00" inputmode="decimal">
-        <label class="lbl">Remark</label><input type="text" class="inp" id="expRemark">
-        <button class="btn" id="btnSaveExp" onclick="saveTransaction('entry')">Submit</button>
+        <select class="inp" id="payMode" onchange="toggleFields()"></select>
+        <div id="divBank" style="display:none;"><select class="inp" id="expBank"></select></div>
+        <div id="divCard" style="display:none;"><select class="inp" id="expCard"></select></div>
+        <select class="inp" id="expCategory"></select>
+        <input type="number" class="inp" id="expAmount" placeholder="Amount 0.00">
+        <button class="btn" onclick="saveTrans('entry')">Submit</button>
       </div>
     </div>
 
     <div class="page" id="pageAddfund">
       <div class="box">
-        <label class="lbl">Target Bank</label><select class="inp" id="targetBank"></select>
-        <label class="lbl">Amount</label><input type="number" class="inp" id="fundAmount" placeholder="0.00">
-        <button class="btn" onclick="saveTransaction('fund')">Add Deposit</button>
+        <select class="inp" id="targetBank"></select>
+        <input type="number" class="inp" id="fundAmount" placeholder="Amount">
+        <button class="btn" onclick="saveTrans('fund')">Deposit</button>
       </div>
     </div>
 
     <div class="page" id="pagePayments">
       <div class="box">
-        <label class="lbl">Pay From</label><select class="inp" id="payFromBank"></select>
-        <label class="lbl">Pay To (Card/Loan)</label><select class="inp" id="payTargetCC"></select>
-        <label class="lbl">Amount</label><input type="number" class="inp" id="payAmount" placeholder="0.00">
-        <button class="btn" onclick="saveTransaction('pay')">Process Payment</button>
+        <select class="inp" id="payFrom"></select>
+        <select class="inp" id="payTo"></select>
+        <input type="number" class="inp" id="payAmt" placeholder="Amount">
+        <button class="btn" onclick="saveTrans('pay')">Pay Bill</button>
       </div>
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
-
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycby6YHkPyiT4X_8_IQgx8NZC0szoC0ar3wYnzEjJfWdrnatKO40t6tUblcXMzdlxPJaGgA/exec"; 
     let db = null;
+    const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
 
-    const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(n);
-
-    window.onpopstate = () => renderPage(location.hash.replace('#','') || 'home');
-    async function showPage(name) { location.hash = name; renderPage(name); }
-    
-    async function renderPage(name) {
+    async function showPage(name) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1))?.classList.add('active');
       document.getElementById("pageTitle").innerText = name.toUpperCase();
-      document.getElementById("drawerOverlay").style.display = "none";
-      await refreshData();
+      if(name !== 'home') await refreshData();
     }
 
     async function refreshData() {
-      try {
-        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
-        if(res.ok) { db = res; updateDropdowns(); updateDashboardUI(); }
-      } catch(e) { console.error(e); }
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
+      if(res.ok) { db = res; updateUI(); }
     }
 
-    function updateDropdowns() {
-      const sel = `<option value="" disabled selected>Select...</option>`;
-      const bH = sel + db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
-      const cH = sel + db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
-      
-      document.getElementById("expBank").innerHTML = bH;
-      document.getElementById("targetBank").innerHTML = bH;
-      document.getElementById("payFromBank").innerHTML = bH;
-      document.getElementById("expCard").innerHTML = cH;
-      document.getElementById("payTargetCC").innerHTML = cH + db.loans.map(l => `<option value="${l.name}">${l.name}</option>`).join("");
-      document.getElementById("expCategory").innerHTML = sel + db.categories.map(c => `<option value="${c}">${c}</option>`).join("");
-      document.getElementById("payMode").innerHTML = `${sel}<option value="cash">💵 Cash</option><option value="bank">🏦 Bank</option><option value="card">💳 Card</option>`;
-    }
-
-    function updateDashboardUI() {
+    function updateUI() {
       const s = db.summary;
       document.getElementById("sumToday").innerText = fmt(s.todayExp);
       document.getElementById("sumMonth").innerText = fmt(s.monthExp);
       document.getElementById("sumFund").innerText = fmt(s.monthFund);
 
-      document.getElementById("catSummaryGrid").innerHTML = Object.entries(s.catTotals).map(([cat, val]) => `
-        <div class="cat-box"><h5>${cat.toUpperCase()}</h5><p>${fmt(val)}</p></div>`).join("");
+      const colors = ['c1','c2','c3','c4','c5','c6'];
+      document.getElementById("catSummaryGrid").innerHTML = Object.entries(s.catTotals).map(([cat, val], i) => `
+        <div class="cat-box ${colors[i%6]}"><h5>${cat}</h5><p>${fmt(val)}</p></div>`).join("");
 
       let bSum = 0;
       document.getElementById("bankList").innerHTML = db.banks.map(b => { bSum += b.val; return `<div class="statRow"><span>${b.name}</span><b class="val-pos">${fmt(b.val)}</b></div>` }).join("");
@@ -196,39 +148,50 @@
       document.getElementById("cardSubtotal").innerText = fmt(cSum);
 
       document.getElementById("loanList").innerHTML = db.loans.map(l => `
-        <div class="statRow"><div><b>${l.name}</b><br><small>EMI: ${fmt(l.emi)}</small></div>
+        <div class="statRow"><div><b>${l.name}</b><br><small>${fmt(l.emi)}</small></div>
         <span class="status-tag ${l.status.toLowerCase()==='paid'?'tag-paid':'tag-unpaid'}">${l.status}</span></div>`).join("");
 
       document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
         <div class="statRow"><div><b>${t.name}</b><br><small>${t.date} • ${t.category}</small></div>
         <b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${fmt(t.amount)}</b></div>`).join("");
+
+      fillDropdowns();
     }
 
-    async function saveTransaction(type) {
+    function fillDropdowns() {
+      const sel = `<option value="" disabled selected>Select...</option>`;
+      const bH = sel + db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
+      const cH = sel + db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+      document.getElementById("expBank").innerHTML = bH;
+      document.getElementById("targetBank").innerHTML = bH;
+      document.getElementById("payFrom").innerHTML = bH;
+      document.getElementById("expCard").innerHTML = cH;
+      document.getElementById("payTo").innerHTML = cH + db.loans.map(l => `<option value="${l.name}">${l.name}</option>`).join("");
+      document.getElementById("expCategory").innerHTML = sel + db.categories.map(c => `<option value="${c}">${c}</option>`).join("");
+      document.getElementById("payMode").innerHTML = `${sel}<option value="cash">Cash</option><option value="bank">Bank</option><option value="card">Card</option>`;
+    }
+
+    async function saveTrans(type) {
       let p = { action: "save" };
       if(type==='entry') {
         let m = document.getElementById("payMode").value;
         p.type = m; p.name = (m==='cash')?'Cash':(m==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
-        p.amount = document.getElementById("expAmount").value; p.category = document.getElementById("expCategory").value; p.remark = document.getElementById("expRemark").value;
+        p.amount = document.getElementById("expAmount").value; p.category = document.getElementById("expCategory").value;
       } else if(type==='fund') {
         p.type="Add Fund"; p.name=document.getElementById("targetBank").value; p.amount=document.getElementById("fundAmount").value;
       } else if(type==='pay') {
-        p.type="Bill Pay"; p.name=document.getElementById("payTargetCC").value; p.amount=document.getElementById("payAmount").value; p.remark="From "+document.getElementById("payFromBank").value;
+        p.type="Bill Pay"; p.name=document.getElementById("payTo").value; p.amount=document.getElementById("payAmt").value; p.remark="Paid from "+document.getElementById("payFrom").value;
       }
       if(!p.amount || !p.name) return alert("Fill all fields");
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) }).then(r=>r.json());
-      if(res.ok) { showToast("Saved ✅"); showPage("dashboard"); }
+      if(res.ok) { alert("Saved ✅"); showPage("dashboard"); }
     }
 
-    function toggleEntryFields() {
+    function toggleFields() {
       const m = document.getElementById("payMode").value;
-      document.getElementById("divBankList").style.display = (m==='bank') ? 'block' : 'none';
-      document.getElementById("divCardList").style.display = (m==='card') ? 'block' : 'none';
+      document.getElementById("divBank").style.display = (m==='bank') ? 'block' : 'none';
+      document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
     }
-
-    function showToast(m) { const t = document.getElementById("toast"); t.innerText = m; t.style.display="block"; setTimeout(()=>t.style.display="none", 2500); }
-    document.getElementById("leftBtn").onclick = () => { if(!location.hash || location.hash==="#home") document.getElementById("drawerOverlay").style.display="block"; else window.history.back(); };
-    document.getElementById("drawerOverlay").onclick = (e) => { if(e.target.id==='drawerOverlay') e.target.style.display='none'; };
   </script>
 </body>
 </html>
