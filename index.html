@@ -15,30 +15,39 @@
     .container { max-width: 500px; margin: 0 auto; padding: 15px; }
     .page { display: none; }
     .page.active { display: block; }
-    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-    .sum-card { background: #fff; padding: 15px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid #111; }
-    .sum-card h4 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
-    .sum-card p { margin: 5px 0 0; font-size: 18px; font-weight: 800; }
+    
+    /* Summary Cards & New Category Cards Style */
+    .summary-grid, .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .cat-grid { grid-template-columns: repeat(2, 1fr); }
+    .sum-card, .cat-card { background: #fff; padding: 15px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid #111; position: relative; }
+    .sum-card h4, .cat-card h4 { margin: 0; font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sum-card p, .cat-card p { margin: 5px 0 0; font-size: 16px; font-weight: 800; color: #111; }
+    
     .exp-today { border-left-color: #ff9800; }
     .exp-month { border-left-color: #e91e63; }
     .fund-month { border-left-color: #4caf50; }
-    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
-    .cat-mini-card { background: #fff; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #eee; }
-    .cat-mini-card h5 { margin: 0; font-size: 9px; color: #888; text-transform: uppercase; overflow: hidden; white-space: nowrap; }
-    .cat-mini-card p { margin: 3px 0 0; font-size: 12px; font-weight: 700; }
-    .box { background: #fff; border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .box-title { font-size: 15px; font-weight: 800; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-    .subtotal { font-size: 14px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+    .action-card { border-left-color: #2196f3; cursor: pointer; }
+    
+    /* Headings with Separator */
+    .box-title { font-size: 15px; font-weight: 800; margin: 20px 0 10px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+    .subtotal { font-size: 14px; font-weight: 800; }
+    
+    .box { background: #fff; border-radius: 20px; padding: 10px 18px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
     .statRow { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+    .statRow:last-child { border-bottom: none; }
+    
     .inp { width: 100%; height: 50px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 12px; padding: 0 15px; margin-bottom: 15px; font-size: 16px; outline: none; }
     .lbl { font-size: 13px; font-weight: 700; color: #444; margin-bottom: 5px; display: block; }
     .btn { width: 100%; height: 54px; background: #111; color: #fff; border: none; border-radius: 15px; font-size: 17px; font-weight: 700; cursor: pointer; }
-    .card-btn { background: #fff; border-radius: 18px; padding: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; margin-bottom: 10px; }
+    .card-btn { background: #fff; border-radius: 18px; padding: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; margin-bottom: 10px; font-weight: 700; }
+    
     .val-pos { color: #2e7d32; }
     .val-neg { color: #c62828; }
+    .status-paid { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 5px; font-size: 11px; }
+    .status-unpaid { background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 5px; font-size: 11px; }
+    
     .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; }
     .drawer { width: 280px; height: 100%; background: #fff; padding: 25px; }
-    .toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); background: #111; color: #fff; padding: 12px 25px; border-radius: 50px; display: none; z-index: 3000; }
   </style>
 </head>
 <body>
@@ -51,13 +60,15 @@
   <div class="drawer-overlay" id="drawerOverlay">
     <div class="drawer">
       <h2 style="margin-top:0">Menu</h2>
-      <div style="cursor:pointer; padding:15px; background:#f5f5f5; border-radius:10px; margin-bottom:10px;" onclick="showPage('home')">🏠 Home</div>
-      <div style="cursor:pointer; padding:15px; background:#f5f5f5; border-radius:10px; margin-bottom:10px;" onclick="showPage('sm')">💰 Expense Seva</div>
+      <div class="card-btn" onclick="showPage('home')">🏠 Home</div>
+      <div class="card-btn" onclick="showPage('sm')">💰 Expense Seva</div>
     </div>
   </div>
 
   <div class="container">
-    <div class="page active" id="pageHome"><div class="card-btn" onclick="showPage('sm')">💰 Open Expense Seva</div></div>
+    <div class="page active" id="pageHome">
+      <div class="card-btn" style="padding:40px" onclick="showPage('sm')">💰 Open Expense Seva</div>
+    </div>
 
     <div class="page" id="pageSm">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -73,55 +84,42 @@
         <div class="sum-card exp-today"><h4>Today</h4><p id="sumToday">₹0</p></div>
         <div class="sum-card exp-month"><h4>Month</h4><p id="sumMonth">₹0</p></div>
         <div class="sum-card fund-month"><h4>Funds</h4><p id="sumFund">₹0</p></div>
-        <div class="sum-card" onclick="showPage('addfund')"><h4>Action</h4><p style="font-size:13px">Deposit 🏦</p></div>
+        <div class="sum-card action-card" onclick="showPage('addfund')"><h4>Action</h4><p style="font-size:13px">Deposit 🏦</p></div>
       </div>
+
       <div class="box-title">🏷️ Category Summary</div>
       <div class="cat-grid" id="catSummaryGrid"></div>
-      <div class="box"><div class="box-title"><span>🏦 Banks</span><span id="bankSubtotal" class="subtotal val-pos">₹0</span></div><div id="bankList"></div></div>
-      <div class="box"><div class="box-title"><span>💳 Cards</span><span id="cardSubtotal" class="subtotal val-neg">₹0</span></div><div id="cardList"></div></div>
-      <div class="box"><div class="box-title">🕒 Recent Activity</div><div id="historyList"></div></div>
+      
+      <div class="box-title"><span>🏦 Banks</span><span id="bankSubtotal" class="subtotal val-pos">₹0</span></div>
+      <div class="box" id="bankList"></div>
+
+      <div class="box-title"><span>💳 Credit Cards</span><span id="cardSubtotal" class="subtotal val-neg">₹0</span></div>
+      <div class="box" id="cardList"></div>
+
+      <div class="box-title"><span>📉 Loans (EMI Status)</span></div>
+      <div class="box" id="loanList"></div>
+
+      <div class="box-title">🕒 Recent Activity</div>
+      <div class="box" id="historyList"></div>
     </div>
 
-    <div class="page" id="pageEntry">
-      <div class="box">
-        <label class="lbl">Payment Mode</label><select class="inp" id="payMode" onchange="toggleEntryFields()"></select>
-        <div id="divBankList" style="display:none;"><label class="lbl">Select Bank</label><select class="inp" id="expBank"></select></div>
-        <div id="divCardList" style="display:none;"><label class="lbl">Select Card</label><select class="inp" id="expCard"></select></div>
-        <label class="lbl">Category</label><select class="inp" id="expCategory"></select>
-        <label class="lbl">Amount</label><input type="number" class="inp" id="expAmount" placeholder="0.00">
-        <label class="lbl">Remark</label><input type="text" class="inp" id="expRemark" placeholder="Optional">
-        <button class="btn" id="btnSaveExp" onclick="saveTransaction('entry')">Submit Expense</button>
-      </div>
     </div>
-
-    <div class="page" id="pageAddfund">
-      <div class="box">
-        <label class="lbl">Target Bank</label><select class="inp" id="targetBank"></select>
-        <label class="lbl">Amount</label><input type="number" class="inp" id="fundAmount" placeholder="0.00">
-        <button class="btn" id="btnSaveFund" onclick="saveTransaction('fund')">Add Funds</button>
-      </div>
-    </div>
-
-    <div class="page" id="pagePayments">
-      <div class="box">
-        <label class="lbl">Pay From (Bank)</label><select class="inp" id="payFromBank"></select>
-        <label class="lbl">Pay To (Card)</label><select class="inp" id="payTargetCC"></select>
-        <label class="lbl">Amount</label><input type="number" class="inp" id="payAmount" placeholder="0.00">
-        <button class="btn" id="btnSavePay" onclick="saveTransaction('pay')">Process Payment</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycby6YHkPyiT4X_8_IQgx8NZC0szoC0ar3wYnzEjJfWdrnatKO40t6tUblcXMzdlxPJaGgA/exec"; 
     let db = null;
 
-    window.onpopstate = () => renderPage(location.hash.replace('#','') || 'home');
-    function showPage(name) { location.hash = name; renderPage(name); }
-    
-    async function renderPage(name) {
+    // करेंसी फॉर्मेटिंग फंक्शन (₹1,23,456.56)
+    const fmt = (num) => {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2
+      }).format(num);
+    };
+
+    async function showPage(name) {
+      location.hash = name;
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       const target = document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1));
       if(target) target.classList.add('active');
@@ -135,95 +133,52 @@
         const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
         if(res.ok) {
           db = res;
-          updateDropdowns();
           updateDashboardUI();
         }
       } catch(e) { console.error(e); }
     }
 
-    function updateDropdowns() {
-      if(document.getElementById("payMode").innerHTML !== "") return;
-      const sel = `<option value="" disabled selected>Select...</option>`;
-      const bH = sel + db.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join("");
-      const cH = sel + db.cards.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
-      
-      document.getElementById("expBank").innerHTML = bH;
-      document.getElementById("targetBank").innerHTML = bH;
-      document.getElementById("payFromBank").innerHTML = bH;
-      document.getElementById("expCard").innerHTML = cH;
-      document.getElementById("payTargetCC").innerHTML = cH;
-      document.getElementById("expCategory").innerHTML = sel + db.categories.map(c => `<option value="${c}">${c}</option>`).join("");
-      document.getElementById("payMode").innerHTML = `${sel}<option value="cash">💵 Cash</option><option value="bank">🏦 Bank</option><option value="card">💳 Card</option>`;
-    }
-
     function updateDashboardUI() {
       const s = db.summary;
-      document.getElementById("sumToday").innerText = "₹" + s.todayExp;
-      document.getElementById("sumMonth").innerText = "₹" + s.monthExp;
-      document.getElementById("sumFund").innerText = "₹" + s.monthFund;
+      document.getElementById("sumToday").innerText = fmt(s.todayExp);
+      document.getElementById("sumMonth").innerText = fmt(s.monthExp);
+      document.getElementById("sumFund").innerText = fmt(s.monthFund);
 
-      // Category Cards
+      // Category Cards (Style like Sum-Cards)
       document.getElementById("catSummaryGrid").innerHTML = Object.entries(s.catTotals).map(([cat, val]) => `
-        <div class="cat-mini-card"><h5>${cat.toUpperCase()}</h5><p>₹${val}</p></div>`).join("");
+        <div class="cat-card"><h4>${cat.toUpperCase()}</h4><p>${fmt(val)}</p></div>`).join("");
 
       // Bank List & Subtotal
       let bSum = 0;
       document.getElementById("bankList").innerHTML = db.banks.map(b => {
-        bSum += b.balance;
-        return `<div class="statRow"><span>${b.name}</span><b class="val-pos">₹${b.balance}</b></div>`;
+        bSum += b.val;
+        return `<div class="statRow"><span>${b.name}</span><b class="val-pos">${fmt(b.val)}</b></div>`;
       }).join("");
-      document.getElementById("bankSubtotal").innerText = "₹" + bSum.toFixed(2);
+      document.getElementById("bankSubtotal").innerText = fmt(bSum);
 
       // Card List & Subtotal
       let cSum = 0;
       document.getElementById("cardList").innerHTML = db.cards.map(c => {
-        cSum += c.due;
-        return `<div class="statRow"><span>${c.name}</span><b class="val-neg">₹${c.due}</b></div>`;
+        cSum += c.val;
+        return `<div class="statRow"><span>${c.name}</span><b class="val-neg">${fmt(c.val)}</b></div>`;
       }).join("");
-      document.getElementById("cardSubtotal").innerText = "₹" + cSum.toFixed(2);
+      document.getElementById("cardSubtotal").innerText = fmt(cSum);
+
+      // Loan List (Paid/Unpaid Status)
+      document.getElementById("loanList").innerHTML = db.loans.map(l => `
+        <div class="statRow">
+          <div><b>${l.name}</b><br><small>EMI: ${fmt(l.emi)}</small></div>
+          <span class="${l.status.toLowerCase()==='paid'?'status-paid':'status-unpaid'}">${l.status.toUpperCase()}</span>
+        </div>`).join("");
 
       // History
       document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-        <div class="statRow"><div><b>${t.name}</b><br><small>${t.date} • ${t.category}</small></div>
-        <b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">₹${t.amount}</b></div>`).join("");
+        <div class="statRow">
+          <div><b>${t.name}</b><br><small>${t.date} • ${t.category}</small></div>
+          <b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${fmt(t.amount)}</b>
+        </div>`).join("");
     }
 
-    async function saveTransaction(type) {
-      let payload = { action: "save" };
-      if(type === 'entry') {
-        const mode = document.getElementById("payMode").value;
-        payload.type = mode;
-        payload.name = (mode==='cash')?'Cash':(mode==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
-        payload.amount = document.getElementById("expAmount").value;
-        payload.category = document.getElementById("expCategory").value;
-        payload.remark = document.getElementById("expRemark").value;
-      } else if(type === 'fund') {
-        payload.type = "Add Fund";
-        payload.name = document.getElementById("targetBank").value;
-        payload.amount = document.getElementById("fundAmount").value;
-      } else if(type === 'pay') {
-        payload.type = "Bill Pay";
-        payload.name = document.getElementById("payTargetCC").value;
-        payload.amount = document.getElementById("payAmount").value;
-        payload.remark = "Paid from " + document.getElementById("payFromBank").value;
-      }
-
-      if(!payload.amount || !payload.name) return alert("Please fill all fields");
-      
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(r => r.json());
-      if(res.ok) { showToast("Saved ✅"); showPage("dashboard"); }
-    }
-
-    function toggleEntryFields() {
-      const m = document.getElementById("payMode").value;
-      document.getElementById("divBankList").style.display = (m==='bank') ? 'block' : 'none';
-      document.getElementById("divCardList").style.display = (m==='card') ? 'block' : 'none';
-    }
-
-    function showToast(m) { 
-      const t = document.getElementById("toast"); t.innerText = m; t.style.display="block"; 
-      setTimeout(()=>t.style.display="none", 2500); 
-    }
     document.getElementById("leftBtn").onclick = () => {
       if(!location.hash || location.hash === "#home") document.getElementById("drawerOverlay").style.display = "block";
       else window.history.back();
