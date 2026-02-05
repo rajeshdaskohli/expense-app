@@ -1,184 +1,383 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="https://i.ibb.co/v408GZJ/420535.png">
+  <title>Expense Seva Pro</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  
   <style>
-    :root { --bg: #0b1120; --card: #172033; --primary: #38bdf8; --text: #ffffff; }
-    body { margin:0; background:var(--bg); color:var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 100px; }
-    
-    .header { padding: 25px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(11, 17, 32, 0.9); position: sticky; top: 0; z-index: 100; }
-    .header h2 { margin:0; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
+    :root {
+      --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --text-dim: #64748b;
+      --primary: #2563eb; --green: #10b981; --red: #ef4444; --border: rgba(0,0,0,0.05);
+    }
+    [data-theme="dark"] {
+      --bg: #070b14; --card: #121826; --text: #f8fafc; --text-dim: #94a3b8;
+      --primary: #38bdf8; --border: rgba(255,255,255,0.05);
+    }
 
-    .page { display: none; padding: 0 20px; }
-    .page.active { display: block; animation: slideUp 0.3s ease-out; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
 
-    /* Premium Cards */
-    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-    .stat-card { padding: 20px; border-radius: 24px; position: relative; overflow: hidden; }
-    .stat-card h3 { margin:0; font-size: 10px; opacity: 0.8; text-transform: uppercase; }
-    .stat-card h1 { margin: 8px 0 0; font-size: 22px; font-weight: 800; }
+    /* Animations & Button Feel */
+    .btn-main:active { transform: scale(0.96); opacity: 0.9; }
+    .loading-btn { pointer-events: none; opacity: 0.6; filter: grayscale(1); }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .spinning { animation: spin 1s linear infinite; color: var(--primary) !important; }
 
-    .list-card { background: var(--card); border-radius: 28px; padding: 10px 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
-    .row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    /* Header */
+    .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
+    .header h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px; }
+    .controls i { cursor: pointer; margin-left: 15px; color: var(--text-dim); }
+
+    .container { max-width: 500px; margin: 0 auto; padding: 0 16px; }
+    .page { display: none; min-height: 70vh; animation: fadeIn 0.4s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Hero Cards */
+    .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 0; scrollbar-width: none; }
+    .hero-card { min-width: 140px; background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .hero-card span { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
+    .hero-card p { margin: 8px 0 0; font-size: 16px; font-weight: 800; }
+    .wallet-card { background: linear-gradient(135deg, #6366f1, #a855f7) !important; color: white !important; }
+    .wallet-card span { color: rgba(255,255,255,0.7) !important; }
+
+    /* Grid & Lists */
+    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .cat-item { background: var(--card); padding: 15px 5px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
+    .cat-item div { font-size: 18px; margin-bottom: 5px; }
+    .cat-item b { font-size: 11px; display: block; }
+    .cat-item small { color: var(--primary); font-size: 10px; font-weight: 800; }
+
+    .list-container { background: var(--card); border-radius: 28px; padding: 10px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
     .row:last-child { border: none; }
+    .meta b { display: block; font-size: 14px; }
+    .meta small { color: var(--text-dim); font-size: 11px; }
 
-    /* Forms */
-    .form-box { background: var(--card); padding: 20px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.05); }
-    .inp { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 16px; color: white; margin: 10px 0; font-size: 16px; box-sizing: border-box; }
-    .btn { width: 100%; background: var(--primary); color: #000; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 15px; box-shadow: 0 10px 20px rgba(56,189,248,0.2); }
+    .label-row { display: flex; justify-content: space-between; align-items: center; margin: 25px 5px 10px; }
+    .label-row h3 { font-size: 11px; font-weight: 800; color: var(--text-dim); margin: 0; letter-spacing: 1px; }
 
     /* Navigation */
-    .nav-bar { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); display: flex; border-radius: 24px; padding: 8px; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
-    .nav-item { flex: 1; text-align: center; color: #64748b; font-size: 10px; padding: 10px 0; border-radius: 18px; }
-    .nav-item.active { color: var(--primary); background: rgba(56, 189, 248, 0.1); }
-    .nav-item i { display: block; font-size: 24px; margin-bottom: 4px; }
+    .nav-wrapper { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; }
+    .nav-bar { background: var(--card); display: flex; padding: 8px; border-radius: 24px; border: 1px solid var(--border); width: 92%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .nav-item { flex: 1; padding: 10px; border-radius: 18px; text-align: center; color: var(--text-dim); cursor: pointer; }
+    .nav-item.active { background: var(--primary); color: #fff; }
+    .nav-item i { display: block; font-size: 22px; margin-bottom: 2px; }
+    .nav-item span { font-size: 10px; font-weight: 700; }
+
+    /* Forms & Modal */
+    .inp-group { margin-bottom: 15px; }
+    .inp-group label { display: block; font-size: 10px; font-weight: 800; color: var(--primary); margin-left: 5px; margin-bottom: 5px; text-transform: uppercase; }
+    .inp { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; color: var(--text); font-size: 15px; outline: none; }
+    .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    
+    #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal-box { background: var(--card); padding: 30px; border-radius: 32px; width: 85%; max-width: 320px; text-align: center; transform: scale(0.9); transition: 0.3s; }
+    .modal-box.show { transform: scale(1); }
+    
+    .val-pos { color: var(--green); } .val-neg { color: var(--red); }
   </style>
 </head>
 <body>
 
+  <div id="modal">
+    <div class="modal-box" id="mBox">
+      <i class="material-icons-round" id="mIcon" style="font-size: 50px;">check_circle</i>
+      <h2 id="mTitle" style="margin: 15px 0 5px;">Success</h2>
+      <p id="mText" style="color: var(--text-dim);"></p>
+      <button class="btn-main" onclick="closeModal()">OK</button>
+    </div>
+  </div>
+
   <div class="header">
-    <div><h2>Expense Seva Pro</h2><small style="color:#10b981">● LIVE SYSTEM</small></div>
-    <i class="material-icons-round" onclick="refreshData()" style="color:var(--primary)">sync</i>
-  </div>
-
-  <div id="page-home" class="page active">
-    <div class="hero-grid">
-      <div class="stat-card" style="background:linear-gradient(135deg, #f59e0b, #d97706)"><h3>Today</h3><h1 id="d-today">₹0</h1></div>
-      <div class="stat-card" style="background:linear-gradient(135deg, #ec4899, #be185d)"><h3>Month Exp</h3><h1 id="d-month">₹0</h1></div>
-      <div class="stat-card" style="background:linear-gradient(135deg, #10b981, #059669)"><h3>Total Funds</h3><h1 id="d-funds">₹0</h1></div>
-      <div class="stat-card" style="background:linear-gradient(135deg, #3b82f6, #2563eb)"><h3>Wallet Bal</h3><h1 id="d-wallet">₹0</h1></div>
-    </div>
-    <div style="font-size:11px; color:#64748b; margin-bottom:12px; font-weight:800">RECENT ACTIVITY</div>
-    <div class="list-card" id="h-history"></div>
-  </div>
-
-  <div id="page-entry" class="page">
-    <div class="form-box">
-      <h3 style="margin-top:0">Add Expense</h3>
-      <select id="e-mode" class="inp" onchange="toggleEntryBank()">
-        <option value="cash">💵 Cash</option>
-        <option value="bank">🏦 Bank Transfer</option>
-      </select>
-      <div id="e-bank-div" style="display:none"><select id="e-bank" class="inp"></select></div>
-      <select id="e-cat" class="inp"></select>
-      <input type="number" id="e-amt" class="inp" placeholder="0.00">
-      <button class="btn" onclick="saveData('entry')">RECORD EXPENSE</button>
+    <h1>EXPENSE SEVA PRO</h1>
+    <div class="controls">
+      <i class="material-icons-round" onclick="toggleTheme()" id="tBtn">light_mode</i>
+      <i class="material-icons-round" onclick="refreshData()" id="sBtn">sync</i>
     </div>
   </div>
 
-  <div id="page-fund" class="page">
-    <div class="form-box">
-      <h3 style="margin-top:0">Money Transfer</h3>
-      <label style="font-size:11px; color:var(--primary); font-weight:800">DEPOSIT TO</label>
-      <select id="f-to" class="inp" onchange="updateFundLogic()">
-        <option value="Wallet">Wallet</option>
-        <option value="Bank">Bank Account</option>
-      </select>
-      <div id="f-bank-div" style="display:none"><select id="f-bank" class="inp"></select></div>
-      <label style="font-size:11px; color:var(--primary); font-weight:800; margin-top:15px; display:block">SOURCE (FROM)</label>
-      <select id="f-src" class="inp"></select>
-      <input type="number" id="f-amt" class="inp" placeholder="0.00">
-      <button class="btn" onclick="saveData('fund')">CONFIRM TRANSFER</button>
+  <div class="container" id="swipeArea">
+    
+    <div class="page active" id="pageDashboard">
+      <div class="hero-scroll">
+        <div class="hero-card"><span>Today Exp</span><p id="sumToday">₹0</p></div>
+        <div class="hero-card"><span>Month Exp</span><p id="sumMonth">₹0</p></div>
+        <div class="hero-card"><span>Month Fund</span><p id="sumFund">₹0</p></div>
+        <div class="hero-card wallet-card"><span>Wallet Bal</span><p id="sumWallet">₹0</p></div>
+      </div>
+
+      <div class="label-row"><h3>SPENDING BY CATEGORY</h3></div>
+      <div class="cat-grid" id="catGrid"></div>
+
+      <div class="label-row"><h3>BANKS</h3><span id="bankSub" class="subtotal" style="font-weight:800; font-size:12px;"></span></div>
+      <div class="list-container" id="bankList"></div>
+
+      <div class="label-row"><h3>CREDIT CARDS</h3><span id="cardSub" class="subtotal" style="font-weight:800; font-size:12px;"></span></div>
+      <div class="list-container" id="cardList"></div>
+
+      <div class="label-row"><h3>LOANS & EMI</h3><span id="loanSub" class="subtotal" style="font-weight:800; font-size:12px;"></span></div>
+      <div class="list-container" id="loanList"></div>
+
+      <div class="label-row"><h3>RECENT ACTIVITY</h3></div>
+      <div class="list-container" id="historyList"></div>
     </div>
+
+    <div class="page" id="pageEntry">
+      <div class="list-container" style="padding: 25px; margin-top: 20px;">
+        <div class="inp-group">
+          <label>Payment Method</label>
+          <select class="inp" id="payMode" onchange="toggleFields()">
+            <option value="cash">💵 Cash on Hand</option>
+            <option value="bank">🏦 Bank Transfer</option>
+            <option value="card">💳 Credit Card</option>
+          </select>
+        </div>
+        <div id="divBank" style="display:none;" class="inp-group">
+          <label>Select Bank</label><select class="inp" id="expBank"></select>
+        </div>
+        <div id="divCard" style="display:none;" class="inp-group">
+          <label>Select Card</label><select class="inp" id="expCard"></select>
+        </div>
+        <div class="inp-group">
+          <label>Category</label><select class="inp" id="expCat"></select>
+        </div>
+        <div class="inp-group">
+          <label>Amount</label><input type="number" class="inp" id="expAmt" placeholder="0.00">
+        </div>
+        <div class="inp-group">
+          <label>Remark</label><input type="text" class="inp" id="expRem" placeholder="What for?">
+        </div>
+        <button class="btn-main" id="btnSaveExp" onclick="saveTrans('entry')">SAVE EXPENSE</button>
+      </div>
+    </div>
+
+    <div class="page" id="pageFund">
+      <div class="list-container" style="padding: 25px; margin-top: 20px;">
+        <div class="inp-group">
+          <label>Deposit To (Destination)</label>
+          <select class="inp" id="targetType" onchange="updateFundSources()">
+            <option value="Wallet">👛 Digital Wallet</option>
+            <option value="Bank">🏦 Bank Account</option>
+          </select>
+        </div>
+        <div id="divTargetBank" style="display:none;" class="inp-group">
+          <label>Target Bank</label><select class="inp" id="targetBankName"></select>
+        </div>
+        <div class="inp-group">
+          <label>From (Source)</label>
+          <select class="inp" id="fundSource"></select>
+        </div>
+        <div class="inp-group">
+          <label>Amount</label><input type="number" class="inp" id="fundAmt" placeholder="0.00">
+        </div>
+        <div class="inp-group">
+          <label>Remark</label><input type="text" class="inp" id="fundRem" placeholder="Add Note">
+        </div>
+        <button class="btn-main" id="btnSaveFund" onclick="saveTrans('fund')">CONFIRM TRANSFER</button>
+      </div>
+    </div>
+
+    <div class="page" id="pageBills">
+      <div class="list-container" style="padding: 25px; margin-top: 20px;">
+        <div class="inp-group">
+          <label>Pay From</label><select class="inp" id="payFrom"></select>
+        </div>
+        <div class="inp-group">
+          <label>Pay To (Card/Loan)</label><select class="inp" id="payTo"></select>
+        </div>
+        <div class="inp-group">
+          <label>Amount</label><input type="number" class="inp" id="payAmt" placeholder="0.00">
+        </div>
+        <button class="btn-main" id="btnSaveBill" onclick="saveTrans('pay')">PAY NOW</button>
+      </div>
+    </div>
+
   </div>
 
-  <div class="nav-bar">
-    <div class="nav-item active" onclick="nav(0)"><i class="material-icons-round">grid_view</i>Home</div>
-    <div class="nav-item" onclick="nav(1)"><i class="material-icons-round">add_circle</i>Entry</div>
-    <div class="nav-item" onclick="nav(2)"><i class="material-icons-round">sync_alt</i>Transfer</div>
-    <div class="nav-item" onclick="nav(3)"><i class="material-icons-round">receipt_long</i>Bills</div>
+  <div class="nav-wrapper">
+    <div class="nav-bar">
+      <div class="nav-item active" onclick="showPage(0)"><i class="material-icons-round">grid_view</i><span>Home</span></div>
+      <div class="nav-item" onclick="showPage(1)"><i class="material-icons-round">add_circle</i><span>Entry</span></div>
+      <div class="nav-item" onclick="showPage(2)"><i class="material-icons-round">sync_alt</i><span>Transfer</span></div>
+      <div class="nav-item" onclick="showPage(3)"><i class="material-icons-round">receipt_long</i><span>Bills</span></div>
+    </div>
   </div>
 
   <script>
-    const SCRIPT_URL = "आपका_APPS_SCRIPT_URL_यहाँ"; // <--- अपना URL यहाँ डालें
-    let database = null;
+    const API_URL = "https://script.google.com/macros/s/AKfycbwFVuX0o61fJOnnAe87o0W4eNx3fEdsKrtD-PyWW-Xym7lAwEaRJHXYhEq4BqWmK_ZJGQ/exec";
+    let db = null;
+    let curPage = 0;
+    const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
 
-    function nav(idx) {
-      const pages = ['page-home', 'page-entry', 'page-fund', 'page-home']; // 4th for Bills
+    // 1. SMART AUTO-REFRESH & PWA
+    setInterval(() => { if (curPage === 0) refreshData(); }, 30000);
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === 'visible') refreshData(); });
+    
+    // PWA Manifest Injection
+    const manifest = { "name": "Expense Seva", "short_name": "ExpSeva", "start_url": ".", "display": "standalone", "background_color": "#070b14", "theme_color": "#070b14", "icons": [{ "src": "https://i.ibb.co/v408GZJ/420535.png", "sizes": "512x512", "type": "image/png" }] };
+    const link = document.createElement('link'); link.rel = 'manifest'; link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'}));
+    document.head.appendChild(link);
+
+    // 2. CORE FUNCTIONS
+    async function showPage(idx) {
+      curPage = idx;
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      
-      const targetPage = document.getElementById(pages[idx]);
-      if(targetPage) targetPage.classList.add('active');
+      document.getElementById(['pageDashboard','pageEntry','pageFund','pageBills'][idx]).classList.add('active');
       document.querySelectorAll('.nav-item')[idx].classList.add('active');
-
-      if(idx === 0) refreshData();
-      if(idx === 2) updateFundLogic();
+      if(idx === 0) await refreshData();
+      if(idx === 2) updateFundSources();
     }
 
     async function refreshData() {
+      const sBtn = document.getElementById('sBtn');
+      sBtn.classList.add('spinning');
       try {
-        let res = await fetch(SCRIPT_URL, {method:"POST", body: JSON.stringify({action:"getDashboard"})}).then(r=>r.json());
-        if(res.ok) {
-          database = res;
-          document.getElementById('d-today').innerText = "₹" + res.summary.todayExp;
-          document.getElementById('d-month').innerText = "₹" + res.summary.monthExp;
-          document.getElementById('d-funds').innerText = "₹" + res.summary.monthFund;
-          const wallet = res.banks.find(b=>b.name=='Wallet');
-          document.getElementById('d-wallet').innerText = "₹" + (wallet ? wallet.val : 0);
-          
-          document.getElementById('h-history').innerHTML = res.summary.recentTrans.map(t=>`
-            <div class="row"><div><b>${t.name}</b><br><small style="color:#64748b">${t.date}</small></div>
-            <b style="color:${t.amount < 0 ? '#ef4444' : '#10b981'}">${t.amount < 0 ? '-' : '+'}₹${Math.abs(t.amount)}</b></div>
-          `).join("");
-
-          document.getElementById('e-bank').innerHTML = res.banks.filter(b=>b.name!='Wallet').map(b=>`<option value="${b.name}">${b.name}</option>`).join("");
-          document.getElementById('e-cat').innerHTML = res.categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join("");
-        }
-      } catch(e) { console.error(e); }
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
+        if(res.ok) { db = res; updateUI(); }
+      } catch(e) { console.error("Sync Error"); }
+      sBtn.classList.remove('spinning');
     }
 
-    function toggleEntryBank() {
-      document.getElementById('e-bank-div').style.display = (document.getElementById('e-mode').value === 'bank' ? 'block' : 'none');
-    }
-
-    function updateFundLogic() {
-      if(!database) return;
-      const to = document.getElementById('f-to').value;
-      const bDiv = document.getElementById('f-bank-div');
-      const srcSelect = document.getElementById('f-src');
+    function updateUI() {
+      const s = db.summary;
+      document.getElementById("sumToday").innerText = fmt(s.todayExp);
+      document.getElementById("sumMonth").innerText = fmt(s.monthExp);
+      document.getElementById("sumFund").innerText = fmt(s.monthFund);
       
-      if(to === 'Wallet') {
-        bDiv.style.display = 'none';
-        srcSelect.innerHTML = '<option value="Others">Salary / External</option>' + 
-          database.banks.filter(b=>b.name!='Wallet').map(b=>`<option value="${b.name}">${b.name}</option>`).join("");
-      } else {
-        bDiv.style.display = 'block';
-        document.getElementById('f-bank').innerHTML = database.banks.filter(b=>b.name!='Wallet').map(b=>`<option value="${b.name}">${b.name}</option>`).join("");
-        srcSelect.innerHTML = '<option value="Wallet">From Wallet</option>';
-      }
+      const wallet = db.banks.find(b => b.name === 'Wallet');
+      document.getElementById("sumWallet").innerText = fmt(wallet ? wallet.val : 0);
+
+      document.getElementById("catGrid").innerHTML = db.categories.map(c => `
+        <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small>${fmt(s.catTotals[c.name.toLowerCase()] || 0)}</small></div>
+      `).join("");
+
+      let bTotal = 0;
+      document.getElementById("bankList").innerHTML = db.banks.map(b => {
+        bTotal += b.val;
+        return `<div class="row"><div class="meta"><b>${b.name}</b><small>A/c Balance</small></div><b class="${b.val<0?'val-neg':'val-pos'}">${fmt(b.val)}</b></div>`;
+      }).join("");
+      document.getElementById("bankSub").innerText = fmt(bTotal);
+
+      let cTotal = 0;
+      document.getElementById("cardList").innerHTML = db.cards.map(c => {
+        cTotal += c.val;
+        return `<div class="row"><div class="meta"><b>${c.name}</b><small>Total Due</small></div><b class="${c.val==0?'val-pos':'val-neg'}">${fmt(c.val)}</b></div>`;
+      }).join("");
+      document.getElementById("cardSub").innerText = fmt(cTotal);
+
+      let lTotal = 0;
+      document.getElementById("loanList").innerHTML = db.loans.map(l => {
+        lTotal += l.emi;
+        return `<div class="row"><div class="meta"><b>${l.name}</b><small>Next EMI: ${l.dueDate}</small></div><b class="val-neg">${fmt(l.emi)}</b></div>`;
+      }).join("");
+      document.getElementById("loanSub").innerText = fmt(lTotal);
+
+      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
+        <div class="row"><div class="meta"><b>${t.name}</b><small>${t.date}</small></div><b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b></div>
+      `).join("");
+
+      fillDropdowns();
     }
 
-    async function saveData(type) {
+    function fillDropdowns() {
+      const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
+      document.getElementById("expBank").innerHTML = opt(db.banks.filter(b=>b.name!=='Wallet'), "name");
+      document.getElementById("expCard").innerHTML = opt(db.cards, "name");
+      document.getElementById("payFrom").innerHTML = opt(db.banks, "name");
+      document.getElementById("payTo").innerHTML = opt(db.cards, "name") + opt(db.loans, "name");
+      document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
+    }
+
+    function updateFundSources() {
+      const dest = document.getElementById("targetType").value;
+      const targetBankDiv = document.getElementById("divTargetBank");
+      let options = '<option value="Others">💳 Other/Salary Source</option>';
+      
+      if(dest === 'Wallet') {
+        targetBankDiv.style.display = "none";
+        options += db.banks.filter(b=>b.name!=='Wallet' && b.name!=='Cash').map(b=>`<option value="${b.name}">🏦 From ${b.name}</option>`).join("");
+      } else {
+        targetBankDiv.style.display = "block";
+        document.getElementById("targetBankName").innerHTML = db.banks.filter(b=>b.name!=='Wallet' && b.name!=='Cash').map(b=>`<option value="${b.name}">${b.name}</option>`).join("");
+        options += '<option value="Wallet">👛 From Digital Wallet</option>';
+        options += '<option value="Cash">💵 From Cash Hand</option>';
+      }
+      document.getElementById("fundSource").innerHTML = options;
+    }
+
+    function checkBalance(amt, name) {
+      const acc = db.banks.find(b => b.name === name);
+      if(acc && acc.val < amt) {
+        notify('Warning', 'Insufficient Balance in ' + name, 'warning', '#f59e0b');
+        return false;
+      }
+      return true;
+    }
+
+    async function saveTrans(type) {
       const btn = event.target;
-      btn.innerText = "Saving...";
-      btn.disabled = true;
+      const originalText = btn.innerText;
+      let p = { action: "save" };
 
-      let payload = { action: "save" };
-      if(type === 'entry') {
-        payload.type = document.getElementById('e-mode').value;
-        payload.name = (payload.type === 'cash') ? 'Cash' : document.getElementById('e-bank').value;
-        payload.amount = -Math.abs(document.getElementById('e-amt').value);
-        payload.category = document.getElementById('e-cat').value;
-      } else {
-        payload.type = "Add Fund";
-        payload.amount = document.getElementById('f-amt').value;
-        payload.source = document.getElementById('f-src').value;
-        payload.name = (document.getElementById('f-to').value === 'Wallet') ? 'Wallet' : document.getElementById('f-bank').value;
+      if(type==='entry') {
+        let m = document.getElementById("payMode").value;
+        p.type = m; p.name = (m==='cash')?'Cash':(m==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
+        p.amount = document.getElementById("expAmt").value; p.category = document.getElementById("expCat").value; p.remark = document.getElementById("expRem").value;
+        if(m==='bank' && !checkBalance(p.amount, p.name)) return;
+      } else if(type==='fund') {
+        p.type="Add Fund"; p.amount=document.getElementById("fundAmt").value; p.source=document.getElementById("fundSource").value;
+        p.name = (document.getElementById("targetType").value==='Wallet')?'Wallet':document.getElementById("targetBankName").value;
+        p.remark = "Transfer from " + p.source;
+        if(p.source !== "Others" && !checkBalance(p.amount, p.source)) return;
+      } else if(type==='pay') {
+        p.type="Bill Pay"; p.name=document.getElementById("payTo").value; p.amount=document.getElementById("payAmt").value;
+        let fromAcc = document.getElementById("payFrom").value;
+        if(!checkBalance(p.amount, fromAcc)) return;
+        p.remark = "Paid from " + fromAcc;
       }
 
-      await fetch(SCRIPT_URL, {method:"POST", body: JSON.stringify(payload)});
-      alert("Recorded Successfully!");
-      btn.innerText = "Recorded!";
-      btn.disabled = false;
-      nav(0);
+      if(!p.amount || !p.name) return notify('Alert', 'Please fill all details', 'warning', '#f59e0b');
+
+      btn.classList.add('loading-btn'); btn.innerText = "PROCESSING...";
+
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) }).then(r=>r.json());
+        if(res.ok) {
+          notify('Success', 'Transaction recorded successfully!');
+          document.querySelectorAll('.inp').forEach(i => { if(i.type==='number' || i.type==='text') i.value = ""; });
+          showPage(0);
+        }
+      } catch(e) { notify('Error', 'Network Error', 'error', '#ef4444'); }
+      btn.classList.remove('loading-btn'); btn.innerText = originalText;
     }
 
-    window.onload = refreshData;
+    function notify(title, text, icon='check_circle', color='#10b981') {
+      document.getElementById('mTitle').innerText = title; document.getElementById('mText').innerText = text;
+      const ic = document.getElementById('mIcon'); ic.innerText = icon; ic.style.color = color;
+      document.getElementById('modal').style.display = 'flex';
+      setTimeout(() => document.getElementById('mBox').classList.add('show'), 10);
+    }
+    function closeModal() { document.getElementById('mBox').classList.remove('show'); setTimeout(() => document.getElementById('modal').style.display = 'none', 300); }
+    function toggleTheme() {
+      let h = document.documentElement; let isD = h.getAttribute('data-theme') === 'dark';
+      h.setAttribute('data-theme', isD ? 'light' : 'dark');
+      document.getElementById('tBtn').innerText = isD ? 'dark_mode' : 'light_mode';
+    }
+    function toggleFields() {
+      let m = document.getElementById("payMode").value;
+      document.getElementById("divBank").style.display = (m==='bank') ? 'block' : 'none';
+      document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
+    }
+
+    window.onload = () => showPage(0);
   </script>
 </body>
 </html>
