@@ -45,10 +45,7 @@
 
   <div class="topbar">
     <button class="menuBtn" id="leftBtn">☰</button>
-    <div class="titleBox">
-      <b id="pageTitle">Home</b>
-      <small>Expense Seva</small>
-    </div>
+    <div class="titleBox"><b id="pageTitle">Home</b><small>Expense Seva</small></div>
   </div>
 
   <div class="drawer-overlay" id="drawerOverlay">
@@ -60,9 +57,7 @@
   </div>
 
   <div class="container">
-    <div class="page active" id="pageHome">
-      <div class="card-btn" onclick="showPage('sm')">💰 Open Expense Seva</div>
-    </div>
+    <div class="page active" id="pageHome"><div class="card-btn" onclick="showPage('sm')">💰 Open Expense Seva</div></div>
 
     <div class="page" id="pageSm">
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -82,46 +77,37 @@
       </div>
       <div class="box-title">🏷️ Category Summary</div>
       <div class="cat-grid" id="catSummaryGrid"></div>
-      <div class="box"><div class="box-title">🏦 Bank Accounts</div><div id="bankList"></div></div>
-      <div class="box"><div class="box-title">💳 Credit Cards</div><div id="cardList"></div></div>
-      <div class="box"><div class="box-title">🕒 Recent Activity (1 Month)</div><div id="historyList"></div></div>
+      <div class="box"><div class="box-title"><span>🏦 Banks</span><span id="bankSubtotal" class="subtotal val-pos">₹0</span></div><div id="bankList"></div></div>
+      <div class="box"><div class="box-title"><span>💳 Cards</span><span id="cardSubtotal" class="subtotal val-neg">₹0</span></div><div id="cardList"></div></div>
+      <div class="box"><div class="box-title">🕒 Recent Activity</div><div id="historyList"></div></div>
     </div>
 
     <div class="page" id="pageEntry">
       <div class="box">
-        <label class="lbl">Payment Mode</label>
-        <select class="inp" id="payMode" onchange="toggleEntryFields()"></select>
+        <label class="lbl">Payment Mode</label><select class="inp" id="payMode" onchange="toggleEntryFields()"></select>
         <div id="divBankList" style="display:none;"><label class="lbl">Select Bank</label><select class="inp" id="expBank"></select></div>
         <div id="divCardList" style="display:none;"><label class="lbl">Select Card</label><select class="inp" id="expCard"></select></div>
-        <label class="lbl">Category</label>
-        <select class="inp" id="expCategory"></select>
-        <label class="lbl">Amount</label>
-        <input type="number" class="inp" id="expAmount" placeholder="0.00">
-        <button class="btn" id="btnSaveExp" onclick="saveExpense()">Submit</button>
+        <label class="lbl">Category</label><select class="inp" id="expCategory"></select>
+        <label class="lbl">Amount</label><input type="number" class="inp" id="expAmount" placeholder="0.00">
+        <label class="lbl">Remark</label><input type="text" class="inp" id="expRemark" placeholder="Optional">
+        <button class="btn" id="btnSaveExp" onclick="saveTransaction('entry')">Submit Expense</button>
       </div>
     </div>
 
     <div class="page" id="pageAddfund">
       <div class="box">
-        <div class="box-title">➕ Add Deposit</div>
-        <label class="lbl">Target Bank</label>
-        <select class="inp" id="targetBank"></select>
-        <label class="lbl">Amount</label>
-        <input type="number" class="inp" id="fundAmount" placeholder="0.00">
-        <button class="btn" onclick="processDeposit()">Add Funds</button>
+        <label class="lbl">Target Bank</label><select class="inp" id="targetBank"></select>
+        <label class="lbl">Amount</label><input type="number" class="inp" id="fundAmount" placeholder="0.00">
+        <button class="btn" id="btnSaveFund" onclick="saveTransaction('fund')">Add Funds</button>
       </div>
     </div>
 
     <div class="page" id="pagePayments">
       <div class="box">
-        <div class="box-title">💳 Bill/EMI Payment</div>
-        <label class="lbl">Pay From (Bank)</label>
-        <select class="inp" id="payFromBank"></select>
-        <label class="lbl">Select Card/EMI</label>
-        <select class="inp" id="payTargetCC"></select>
-        <label class="lbl">Amount</label>
-        <input type="number" class="inp" id="payAmount" placeholder="0.00">
-        <button class="btn" onclick="processBillPay()">Pay Bill</button>
+        <label class="lbl">Pay From (Bank)</label><select class="inp" id="payFromBank"></select>
+        <label class="lbl">Pay To (Card)</label><select class="inp" id="payTargetCC"></select>
+        <label class="lbl">Amount</label><input type="number" class="inp" id="payAmount" placeholder="0.00">
+        <button class="btn" id="btnSavePay" onclick="saveTransaction('pay')">Process Payment</button>
       </div>
     </div>
   </div>
@@ -129,7 +115,7 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycby6YHkPyiT4X_8_IQgx8NZC0szoC0ar3wYnzEjJfWdrnatKO40t6tUblcXMzdlxPJaGgA/exec"; 
+    const API_URL = "आपका_WEB_APP_URL_यहाँ_डालें"; 
     let db = null;
 
     window.onpopstate = () => renderPage(location.hash.replace('#','') || 'home');
@@ -141,17 +127,16 @@
       if(target) target.classList.add('active');
       document.getElementById("pageTitle").innerText = name.toUpperCase();
       document.getElementById("drawerOverlay").style.display = "none";
-      if(name !== 'home') await refreshData(name === 'dashboard');
+      if(name !== 'home') await refreshData();
     }
 
-    async function refreshData(force = false) {
-      if(db && !force) return;
+    async function refreshData() {
       try {
         const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
         if(res.ok) {
           db = res;
           updateDropdowns();
-          if(location.hash === "#dashboard") updateDashboardUI();
+          updateDashboardUI();
         }
       } catch(e) { console.error(e); }
     }
@@ -177,14 +162,56 @@
       document.getElementById("sumMonth").innerText = "₹" + s.monthExp;
       document.getElementById("sumFund").innerText = "₹" + s.monthFund;
 
-      document.getElementById("bankList").innerHTML = db.banks.map(b => `<div class="statRow"><span>${b.name}</span><b class="val-pos">₹${b.balance}</b></div>`).join("");
-      document.getElementById("cardList").innerHTML = db.cards.map(c => `<div class="statRow"><span>${c.name}</span><b class="val-neg">₹${c.due}</b></div>`).join("");
+      // Category Cards
+      document.getElementById("catSummaryGrid").innerHTML = Object.entries(s.catTotals).map(([cat, val]) => `
+        <div class="cat-mini-card"><h5>${cat.toUpperCase()}</h5><p>₹${val}</p></div>`).join("");
 
+      // Bank List & Subtotal
+      let bSum = 0;
+      document.getElementById("bankList").innerHTML = db.banks.map(b => {
+        bSum += b.balance;
+        return `<div class="statRow"><span>${b.name}</span><b class="val-pos">₹${b.balance}</b></div>`;
+      }).join("");
+      document.getElementById("bankSubtotal").innerText = "₹" + bSum.toFixed(2);
+
+      // Card List & Subtotal
+      let cSum = 0;
+      document.getElementById("cardList").innerHTML = db.cards.map(c => {
+        cSum += c.due;
+        return `<div class="statRow"><span>${c.name}</span><b class="val-neg">₹${c.due}</b></div>`;
+      }).join("");
+      document.getElementById("cardSubtotal").innerText = "₹" + cSum.toFixed(2);
+
+      // History
       document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-        <div class="statRow">
-          <div><b>${t.name}</b><br><small>${t.date} • ${t.category}</small></div>
-          <b class="${t.type === 'Add Fund' ? 'val-pos' : 'val-neg'}">${t.type === 'Add Fund' ? '+' : '-'}₹${t.amount}</b>
-        </div>`).join("");
+        <div class="statRow"><div><b>${t.name}</b><br><small>${t.date} • ${t.category}</small></div>
+        <b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">₹${t.amount}</b></div>`).join("");
+    }
+
+    async function saveTransaction(type) {
+      let payload = { action: "save" };
+      if(type === 'entry') {
+        const mode = document.getElementById("payMode").value;
+        payload.type = mode;
+        payload.name = (mode==='cash')?'Cash':(mode==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
+        payload.amount = document.getElementById("expAmount").value;
+        payload.category = document.getElementById("expCategory").value;
+        payload.remark = document.getElementById("expRemark").value;
+      } else if(type === 'fund') {
+        payload.type = "Add Fund";
+        payload.name = document.getElementById("targetBank").value;
+        payload.amount = document.getElementById("fundAmount").value;
+      } else if(type === 'pay') {
+        payload.type = "Bill Pay";
+        payload.name = document.getElementById("payTargetCC").value;
+        payload.amount = document.getElementById("payAmount").value;
+        payload.remark = "Paid from " + document.getElementById("payFromBank").value;
+      }
+
+      if(!payload.amount || !payload.name) return alert("Please fill all fields");
+      
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) }).then(r => r.json());
+      if(res.ok) { showToast("Saved ✅"); showPage("dashboard"); }
     }
 
     function toggleEntryFields() {
@@ -193,15 +220,14 @@
       document.getElementById("divCardList").style.display = (m==='card') ? 'block' : 'none';
     }
 
-    document.getElementById("leftBtn").onclick = () => {
-      if(!location.hash || location.hash === "#home") document.getElementById("drawerOverlay").style.display = "block";
-      else window.history.back();
-    };
-
     function showToast(m) { 
       const t = document.getElementById("toast"); t.innerText = m; t.style.display="block"; 
       setTimeout(()=>t.style.display="none", 2500); 
     }
+    document.getElementById("leftBtn").onclick = () => {
+      if(!location.hash || location.hash === "#home") document.getElementById("drawerOverlay").style.display = "block";
+      else window.history.back();
+    };
     document.getElementById("drawerOverlay").onclick = (e) => { if(e.target.id==='drawerOverlay') e.target.style.display='none'; };
   </script>
 </body>
