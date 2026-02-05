@@ -3,141 +3,230 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="theme-color" content="#111">
-  <title>Smart Expense Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', sans-serif; }
-    body { margin: 0; background: #f0f2f5; color: #1a1a1a; padding-bottom: 20px; }
-    .topbar { background: #111; color: #fff; padding: 15px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 1000; }
-    .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+    :root {
+      --primary: #2563eb; --bg: #f8fafc; --text: #1e293b;
+      --card-bg: #ffffff; --accent: #6366f1;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { 
+      margin: 0; background: var(--bg); color: var(--text); 
+      font-family: 'Inter', sans-serif; padding-bottom: 80px; 
+    }
+    
+    /* Header */
+    .header {
+      background: var(--card-bg); padding: 20px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .header h1 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+    .header small { color: var(--primary); font-weight: 600; text-transform: uppercase; font-size: 10px; }
+
+    .container { max-width: 500px; margin: 0 auto; padding: 16px; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
     .page { display: none; } .page.active { display: block; }
-    
-    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
 
-    .sum-card, .cat-box { background: #fff; padding: 12px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid #111; }
-    .sum-card h4, .cat-box h5 { margin: 0; font-size: 9px; color: #666; text-transform: uppercase; }
-    .sum-card p, .cat-box p { margin: 5px 0 0; font-size: 13px; font-weight: 800; }
-    
-    .c0 { border-left-color: #673ab7; } .c1 { border-left-color: #ff9800; } .c2 { border-left-color: #e91e63; }
-    .c3 { border-left-color: #2196f3; } .c4 { border-left-color: #4caf50; } .c5 { border-left-color: #9c27b0; }
+    /* Summary Dashboard */
+    .dashboard-hero {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;
+    }
+    .hero-card {
+      background: var(--card-bg); padding: 16px; border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9;
+    }
+    .hero-card .icon { font-size: 20px; margin-bottom: 8px; display: block; }
+    .hero-card span { font-size: 11px; color: #64748b; font-weight: 600; }
+    .hero-card p { margin: 4px 0 0; font-size: 16px; font-weight: 800; }
 
-    .box { background: #fff; border-radius: 20px; padding: 10px 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-    .box-title { font-size: 14px; font-weight: 800; margin: 15px 0 8px 0; display: flex; justify-content: space-between; border-bottom: 2px solid #eee; padding-bottom: 6px; align-items: center; }
-    .statRow { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f5f5f5; align-items: center; }
-    
-    .inp { width: 100%; height: 48px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 12px; padding: 0 15px; margin-bottom: 12px; font-size: 16px; outline: none; }
-    .btn { width: 100%; height: 50px; background: #111; color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
-    .card-btn { background: #fff; border-radius: 15px; padding: 15px; text-align: center; border: 1px solid #ddd; cursor: pointer; margin-bottom: 10px; font-weight: 700; }
-    
-    .val-pos { color: #2e7d32; } .val-neg { color: #c62828; }
-    .status-tag { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; }
-    .tag-paid { background: #e8f5e9; color: #2e7d32; } .tag-unpaid { background: #ffebee; color: #c62828; }
-    .loader { text-align: center; padding: 20px; display: none; }
+    /* Category 3-Column Grid */
+    .section-title { font-size: 14px; font-weight: 800; margin: 20px 0 12px; display: flex; justify-content: space-between; }
+    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .cat-item {
+      background: var(--card-bg); padding: 12px; border-radius: 16px; text-align: center;
+      border: 1px solid #f1f5f9; transition: 0.2s;
+    }
+    .cat-item small { font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 4px; }
+    .cat-item b { font-size: 12px; font-weight: 700; color: var(--text); }
+
+    /* List Items */
+    .list-box { background: var(--card-bg); border-radius: 24px; padding: 8px 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+    .list-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .list-item:last-child { border: none; }
+    .list-item .info b { font-size: 14px; display: block; margin-bottom: 2px; }
+    .list-item .info small { color: #94a3b8; font-size: 11px; }
+    .list-item .amt { font-weight: 800; font-size: 14px; }
+
+    /* Bottom Nav */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg);
+      display: flex; justify-content: space-around; padding: 12px 0;
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.05); border-radius: 24px 24px 0 0;
+    }
+    .nav-item { 
+      text-align: center; color: #94a3b8; cursor: pointer; flex: 1;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-item .material-icons-round { font-size: 24px; }
+    .nav-item span { font-size: 10px; font-weight: 700; }
+
+    /* Forms */
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #64748b; }
+    .inp {
+      width: 100%; padding: 14px; border-radius: 14px; border: 1.5px solid #e2e8f0;
+      background: #fff; font-size: 15px; font-family: inherit; outline: none;
+    }
+    .inp:focus { border-color: var(--primary); }
+    .btn {
+      width: 100%; padding: 16px; border-radius: 16px; background: var(--primary);
+      color: #fff; border: none; font-size: 16px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .val-pos { color: #10b981; } .val-neg { color: #ef4444; }
+    .tag { padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .tag-unpaid { background: #fee2e2; color: #ef4444; }
+    .tag-paid { background: #dcfce7; color: #10b981; }
   </style>
 </head>
 <body>
 
-  <div class="topbar">
-    <button style="background:none; border:none; color:#fff; font-size:24px;" onclick="showPage('sm')">☰</button>
-    <div><b id="pageTitle">DASHBOARD</b><br><small>EXPENSE SEVA</small></div>
+  <div class="header">
+    <div>
+      <small>Expense Seva</small>
+      <h1 id="pageTitle">DASHBOARD</h1>
+    </div>
+    <span class="material-icons-round" style="color:var(--primary)">account_balance_wallet</span>
   </div>
 
   <div class="container">
-    <div id="mainLoader" class="loader">Loading Data... ⏳</div>
-
-    <div class="page active" id="pageHome">
-      <div class="card-btn" style="padding:40px; font-size:20px;" onclick="showPage('sm')">💰 Open Expense Seva</div>
-    </div>
-
-    <div class="page" id="pageSm">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <div class="card-btn" onclick="showPage('dashboard')">📊 Dashboard</div>
-        <div class="card-btn" onclick="showPage('entry')">✍️ Entry</div>
-        <div class="card-btn" onclick="showPage('addfund')">🏦 Add Funds</div>
-        <div class="card-btn" onclick="showPage('payments')">💳 Bills/EMI</div>
+    <div class="page active" id="pageDashboard">
+      <div class="dashboard-hero">
+        <div class="hero-card">
+          <span class="material-icons-round val-neg icon">trending_down</span>
+          <span>TODAY</span>
+          <p id="sumToday">₹0</p>
+        </div>
+        <div class="hero-card">
+          <span class="material-icons-round val-pos icon">account_balance</span>
+          <span>MONTH</span>
+          <p id="sumMonth">₹0</p>
+        </div>
+        <div class="hero-card">
+          <span class="material-icons-round icon" style="color:#6366f1">savings</span>
+          <span>FUNDS</span>
+          <p id="sumFund">₹0</p>
+        </div>
+        <div class="hero-card" onclick="showPage('addfund')">
+          <span class="material-icons-round icon" style="color:#f59e0b">add_circle</span>
+          <span>ACTION</span>
+          <p style="font-size:12px">Deposit Now</p>
+        </div>
       </div>
-      <div class="card-btn" onclick="showPage('home')">🏠 Back to Home</div>
-    </div>
 
-    <div class="page" id="pageDashboard">
-      <div class="summary-grid">
-        <div class="sum-card" style="border-left-color:#ff9800"><h4>Today</h4><p id="sumToday">₹0</p></div>
-        <div class="sum-card" style="border-left-color:#e91e63"><h4>Month</h4><p id="sumMonth">₹0</p></div>
-        <div class="sum-card" style="border-left-color:#4caf50"><h4>Funds</h4><p id="sumFund">₹0</p></div>
-        <div class="sum-card" style="border-left-color:#2196f3" onclick="showPage('addfund')"><h4>Action</h4><p style="font-size:11px">Deposit 🏦</p></div>
-      </div>
-
-      <div class="box-title">🏷️ Category Summary</div>
+      <div class="section-title">CATEGORY SUMMARY</div>
       <div class="cat-grid" id="catSummaryGrid"></div>
 
-      <div class="box-title"><span>🏦 Banks</span><span id="bankSubtotal" class="val-pos">₹0</span></div>
-      <div class="box" id="bankList"></div>
+      <div class="section-title">BANKS <span id="bankSubtotal" class="val-pos">₹0</span></div>
+      <div class="list-box" id="bankList"></div>
 
-      <div class="box-title"><span>💳 Cards</span><span id="cardSubtotal" class="val-neg">₹0</span></div>
-      <div class="box" id="cardList"></div>
+      <div class="section-title">CREDIT CARDS <span id="cardSubtotal" class="val-neg">₹0</span></div>
+      <div class="list-box" id="cardList"></div>
 
-      <div class="box-title">📉 Loans</div>
-      <div class="box" id="loanList"></div>
+      <div class="section-title">LOANS & EMI</div>
+      <div class="list-box" id="loanList"></div>
 
-      <div class="box-title">🕒 Recent Activity</div>
-      <div class="box" id="historyList"></div>
+      <div class="section-title">RECENT ACTIVITY</div>
+      <div class="list-box" id="historyList"></div>
     </div>
 
     <div class="page" id="pageEntry">
-      <div class="box">
-        <label>Mode</label>
-        <select class="inp" id="payMode" onchange="toggleFields()">
-          <option value="cash">💵 Cash</option>
-          <option value="bank">🏦 Bank</option>
-          <option value="card">💳 Card</option>
-        </select>
-        <div id="divBank" style="display:none;"><label>Bank</label><select class="inp" id="expBank"></select></div>
-        <div id="divCard" style="display:none;"><label>Card</label><select class="inp" id="expCard"></select></div>
-        <label>Category</label><select class="inp" id="expCategory"></select>
-        <label>Amount</label><input type="number" class="inp" id="expAmount" placeholder="0.00" inputmode="decimal">
-        <label>Remark</label><input type="text" class="inp" id="expRemark" placeholder="Optional">
-        <button class="btn" id="btnEntry" onclick="saveTrans('entry')">Submit Expense</button>
+      <div class="list-box" style="padding:20px;">
+        <div class="form-group">
+          <label>PAYMENT MODE</label>
+          <select class="inp" id="payMode" onchange="toggleFields()">
+            <option value="cash">💵 Cash</option>
+            <option value="bank">🏦 Bank</option>
+            <option value="card">💳 Credit Card</option>
+          </select>
+        </div>
+        <div id="divBank" style="display:none;" class="form-group"><label>SELECT BANK</label><select class="inp" id="expBank"></select></div>
+        <div id="divCard" style="display:none;" class="form-group"><label>SELECT CARD</label><select class="inp" id="expCard"></select></div>
+        <div class="form-group"><label>CATEGORY</label><select class="inp" id="expCategory"></select></div>
+        <div class="form-group"><label>AMOUNT</label><input type="number" class="inp" id="expAmount" placeholder="0.00"></div>
+        <div class="form-group"><label>REMARK</label><input type="text" class="inp" id="expRemark" placeholder="Optional"></div>
+        <button class="btn" onclick="saveTrans('entry')">Save Expense</button>
       </div>
     </div>
 
     <div class="page" id="pageAddfund">
-      <div class="box">
-        <label>Target Bank</label><select class="inp" id="targetBank"></select>
-        <label>Deposit Amount</label><input type="number" class="inp" id="fundAmount" placeholder="0.00">
-        <button class="btn" id="btnFund" onclick="saveTrans('fund')">Add Deposit</button>
+      <div class="list-box" style="padding:20px;">
+        <div class="form-group"><label>TARGET BANK</label><select class="inp" id="targetBank"></select></div>
+        <div class="form-group"><label>DEPOSIT AMOUNT</label><input type="number" class="inp" id="fundAmount" placeholder="0.00"></div>
+        <button class="btn" onclick="saveTrans('fund')">Add Funds</button>
       </div>
     </div>
 
     <div class="page" id="pagePayments">
-      <div class="box">
-        <label>Pay From (Bank)</label><select class="inp" id="payFrom"></select>
-        <label>Pay To (Card/Loan)</label><select class="inp" id="payTo"></select>
-        <label>Amount</label><input type="number" class="inp" id="payAmt" placeholder="0.00">
-        <button class="btn" id="btnPay" onclick="saveTrans('pay')">Process Payment</button>
+      <div class="list-box" style="padding:20px;">
+        <div class="form-group"><label>PAY FROM (BANK)</label><select class="inp" id="payFrom"></select></div>
+        <div class="form-group"><label>PAY TO (CARD/LOAN)</label><select class="inp" id="payTo"></select></div>
+        <div class="form-group"><label>AMOUNT</label><input type="number" class="inp" id="payAmt" placeholder="0.00"></div>
+        <button class="btn" onclick="saveTrans('pay')">Process Bill</button>
       </div>
     </div>
   </div>
 
+  <div class="nav-bar">
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="material-icons-round">dashboard</span><span>Home</span>
+    </div>
+    <div class="nav-item" onclick="showPage('entry')">
+      <span class="material-icons-round">edit_note</span><span>Entry</span>
+    </div>
+    <div class="nav-item" onclick="showPage('addfund')">
+      <span class="material-icons-round">account_balance_wallet</span><span>Fund</span>
+    </div>
+    <div class="nav-item" onclick="showPage('payments')">
+      <span class="material-icons-round">payments</span><span>Bills</span>
+    </div>
+  </div>
+
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzhwZ5flrdFMOkb7lpaAaDebkQd2EE2cMVh0lDddr-w_crhKpn4AI3vgroenwD0x-6ljA/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbx3HxULVRrEqfprI2FUcaA9_PDJLJrksD4PyCjTbS2pXQzazxrgPcld4C1DCKHBu5owdA/exec"; 
     let db = null;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
 
     async function showPage(name) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1))?.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      const page = document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1));
+      if(page) page.classList.add('active');
+      
+      const navItems = document.querySelectorAll('.nav-item');
+      if(name === 'dashboard') navItems[0].classList.add('active');
+      else if(name === 'entry') navItems[1].classList.add('active');
+      else if(name === 'addfund') navItems[2].classList.add('active');
+      else if(name === 'payments') navItems[3].classList.add('active');
+
       document.getElementById("pageTitle").innerText = name.toUpperCase();
-      if(name !== 'home' && name !== 'sm') await refreshData();
+      await refreshData();
     }
 
     async function refreshData() {
-      document.getElementById("mainLoader").style.display = "block";
       try {
         const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
         if(res.ok) { db = res; updateUI(); }
-      } catch(e) { alert("Error connecting to sheet!"); }
-      document.getElementById("mainLoader").style.display = "none";
+      } catch(e) { console.error(e); }
     }
 
     function updateUI() {
@@ -146,42 +235,41 @@
       document.getElementById("sumMonth").innerText = fmt(s.monthExp);
       document.getElementById("sumFund").innerText = fmt(s.monthFund);
 
-      document.getElementById("catSummaryGrid").innerHTML = Object.entries(s.catTotals).map(([cat, val], i) => `
-        <div class="cat-box c${i%6}"><h5>${cat}</h5><p>${fmt(val)}</p></div>`).join("");
+      document.getElementById("catSummaryGrid").innerHTML = Object.entries(s.catTotals).map(([cat, val]) => `
+        <div class="cat-item"><small>${cat}</small><b>${fmt(val)}</b></div>`).join("");
 
       let bSum = 0;
-      document.getElementById("bankList").innerHTML = db.banks.map(b => { bSum += b.val; return `<div class="statRow"><span>${b.name}</span><b class="val-pos">${fmt(b.val)}</b></div>` }).join("");
+      document.getElementById("bankList").innerHTML = db.banks.map(b => { bSum += b.val; return `
+        <div class="list-item"><div class="info"><b>${b.name}</b><small>Current Balance</small></div><div class="amt val-pos">${fmt(b.val)}</div></div>` }).join("");
       document.getElementById("bankSubtotal").innerText = fmt(bSum);
 
       let cSum = 0;
-      document.getElementById("cardList").innerHTML = db.cards.map(c => { cSum += c.val; return `<div class="statRow"><span>${c.name}</span><b class="val-neg">${fmt(c.val)}</b></div>` }).join("");
+      document.getElementById("cardList").innerHTML = db.cards.map(c => { cSum += c.val; return `
+        <div class="list-item"><div class="info"><b>${c.name}</b><small>Outstanding</small></div><div class="amt val-neg">${fmt(c.val)}</div></div>` }).join("");
       document.getElementById("cardSubtotal").innerText = fmt(cSum);
 
       document.getElementById("loanList").innerHTML = db.loans.map(l => `
-        <div class="statRow"><div><b>${l.name}</b><br><small>EMI: ${fmt(l.emi)}</small></div>
-        <span class="status-tag ${l.status.toLowerCase()==='paid'?'tag-paid':'tag-unpaid'}">${l.status}</span></div>`).join("");
+        <div class="list-item"><div class="info"><b>${l.name}</b><small>Monthly EMI: ${fmt(l.emi)}</small></div>
+        <span class="tag ${l.status.toLowerCase()==='paid'?'tag-paid':'tag-unpaid'}">${l.status}</span></div>`).join("");
 
       document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-        <div class="statRow"><div><b>${t.name}</b><br><small>${t.date} • ${t.category}</small></div>
-        <b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${fmt(t.amount)}</b></div>`).join("");
+        <div class="list-item"><div class="info"><b>${t.name}</b><small>${t.date} • ${t.category}</small></div>
+        <div class="amt ${t.type==='Add Fund'?'val-pos':'val-neg'}">${fmt(t.amount)}</div></div>`).join("");
 
       fillDropdowns();
     }
 
     function fillDropdowns() {
       const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
-      const bH = opt(db.banks, "name");
-      const cH = opt(db.cards, "name");
-      document.getElementById("expBank").innerHTML = bH;
-      document.getElementById("targetBank").innerHTML = bH;
-      document.getElementById("payFrom").innerHTML = bH;
-      document.getElementById("expCard").innerHTML = cH;
-      document.getElementById("payTo").innerHTML = cH + opt(db.loans, "name");
+      document.getElementById("expBank").innerHTML = opt(db.banks, "name");
+      document.getElementById("targetBank").innerHTML = opt(db.banks, "name");
+      document.getElementById("payFrom").innerHTML = opt(db.banks, "name");
+      document.getElementById("expCard").innerHTML = opt(db.cards, "name");
+      document.getElementById("payTo").innerHTML = opt(db.cards, "name") + opt(db.loans, "name");
       document.getElementById("expCategory").innerHTML = db.categories.map(c => `<option value="${c}">${c}</option>`).join("");
     }
 
     async function saveTrans(type) {
-      const btn = event.target; btn.disabled = true; btn.innerText = "Saving...";
       let p = { action: "save" };
       if(type==='entry') {
         let m = document.getElementById("payMode").value;
@@ -192,12 +280,9 @@
       } else if(type==='pay') {
         p.type="Bill Pay"; p.name=document.getElementById("payTo").value; p.amount=document.getElementById("payAmt").value; p.remark="From "+document.getElementById("payFrom").value;
       }
-      
-      try {
-        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) }).then(r=>r.json());
-        if(res.ok) { alert("Saved ✅"); showPage("dashboard"); }
-      } catch(e) { alert("Failed to save!"); }
-      btn.disabled = false; btn.innerText = "Submit";
+      if(!p.amount || !p.name) return alert("Please fill details");
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) }).then(r=>r.json());
+      if(res.ok) { alert("Data Saved! ✅"); showPage("dashboard"); }
     }
 
     function toggleFields() {
@@ -205,6 +290,9 @@
       document.getElementById("divBank").style.display = (m==='bank') ? 'block' : 'none';
       document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
     }
+    
+    // Initial Load
+    window.onload = () => showPage('dashboard');
   </script>
 </body>
 </html>
