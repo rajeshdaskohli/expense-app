@@ -211,7 +211,7 @@
   </div>
 
   <script>
-    const API_URL = "आपका_APPS_SCRIPT_URL_यहाँ";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzfPP-BBZ2acNtHUJjHyBmvHxEIgMCX7BYKC340UbWCRzPJsyNToJt4oDXEFMQYSLRlGw/exec";
     let db = null;
     let curPage = 0;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
@@ -252,42 +252,35 @@
   document.getElementById("sumMonth").innerText = fmt(s.monthExp);
   document.getElementById("sumFund").innerText = fmt(s.monthFund);
   
-  // वॉलेट को अलग से दिखाने के लिए
+  // वॉलेट कार्ड में बैलेंस दिखाएं
   document.getElementById("sumWallet").innerText = fmt(db.walletBal);
 
-  // कैटेगरी ग्रिड अपडेट
+  // कैटेगिरी ग्रिड
   document.getElementById("catGrid").innerHTML = db.categories.map(c => `
     <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small>${fmt(s.catTotals[c.name.toLowerCase().trim()] || 0)}</small></div>
   `).join("");
 
-  // बैंक लिस्ट से वॉलेट हटाना
+  // बैंक लिस्ट (वॉलेट अलग है इसलिए यहाँ सिर्फ बैंक दिखेंगे)
   document.getElementById("bankList").innerHTML = db.banks.map(b => `
-    <div class="row"><div class="meta"><b>${b.name}</b><small>Balance</small></div><b class="${b.val<0?'val-neg':'val-pos'}">${fmt(b.val)}</b></div>
+    <div class="row"><div class="meta"><b>${b.name}</b><small>A/c Balance</small></div><b class="${b.val<0?'val-neg':'val-pos'}">${fmt(b.val)}</b></div>
   `).join("");
 
-  // एक्टिविटी में टाइम और कैटेगरी जोड़ना
+  // हिस्ट्री
   document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-    <div class="row">
-      <div class="meta">
-        <b>${t.name} <span style="font-size:9px; opacity:0.6; background:var(--border); padding:2px 5px; border-radius:5px;">${t.cat}</span></b>
-        <small>${t.date} • ${t.time}</small>
-      </div>
-      <b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b>
-    </div>
+    <div class="row"><div class="meta"><b>${t.name} <span style="font-size:9px; opacity:0.5;">${t.category}</span></b><small>${t.date}</small></div><b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b></div>
   `).join("");
 
   fillDropdowns();
 }
 
-    function fillDropdowns() {
-      const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
-      document.getElementById("expBank").innerHTML = opt(db.banks.filter(b=>b.name!=='Wallet'), "name");
-      document.getElementById("expCard").innerHTML = opt(db.cards, "name");
-      document.getElementById("payFrom").innerHTML = opt(db.banks, "name");
-      document.getElementById("payTo").innerHTML = opt(db.cards, "name") + opt(db.loans, "name");
-      document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
-    }
-
+function fillDropdowns() {
+  const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
+  document.getElementById("expBank").innerHTML = opt(db.banks, "name");
+  document.getElementById("expCard").innerHTML = opt(db.cards, "name");
+  document.getElementById("payFrom").innerHTML = `<option value="Wallet">Wallet</option>` + opt(db.banks, "name");
+  document.getElementById("payTo").innerHTML = opt(db.cards, "name") + opt(db.loans, "name");
+  document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
+}
     function updateFundSources() {
       const dest = document.getElementById("targetType").value;
       const targetBankDiv = document.getElementById("divTargetBank");
