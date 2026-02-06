@@ -247,45 +247,37 @@
     }
 
     function updateUI() {
-      const s = db.summary;
-      document.getElementById("sumToday").innerText = fmt(s.todayExp);
-      document.getElementById("sumMonth").innerText = fmt(s.monthExp);
-      document.getElementById("sumFund").innerText = fmt(s.monthFund);
-      
-      const wallet = db.banks.find(b => b.name === 'Wallet');
-      document.getElementById("sumWallet").innerText = fmt(wallet ? wallet.val : 0);
+  const s = db.summary;
+  document.getElementById("sumToday").innerText = fmt(s.todayExp);
+  document.getElementById("sumMonth").innerText = fmt(s.monthExp);
+  document.getElementById("sumFund").innerText = fmt(s.monthFund);
+  
+  // वॉलेट को अलग से दिखाने के लिए
+  document.getElementById("sumWallet").innerText = fmt(db.walletBal);
 
-      document.getElementById("catGrid").innerHTML = db.categories.map(c => `
-        <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small>${fmt(s.catTotals[c.name.toLowerCase()] || 0)}</small></div>
-      `).join("");
+  // कैटेगरी ग्रिड अपडेट
+  document.getElementById("catGrid").innerHTML = db.categories.map(c => `
+    <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small>${fmt(s.catTotals[c.name.toLowerCase().trim()] || 0)}</small></div>
+  `).join("");
 
-      let bTotal = 0;
-      document.getElementById("bankList").innerHTML = db.banks.map(b => {
-        bTotal += b.val;
-        return `<div class="row"><div class="meta"><b>${b.name}</b><small>A/c Balance</small></div><b class="${b.val<0?'val-neg':'val-pos'}">${fmt(b.val)}</b></div>`;
-      }).join("");
-      document.getElementById("bankSub").innerText = fmt(bTotal);
+  // बैंक लिस्ट से वॉलेट हटाना
+  document.getElementById("bankList").innerHTML = db.banks.map(b => `
+    <div class="row"><div class="meta"><b>${b.name}</b><small>Balance</small></div><b class="${b.val<0?'val-neg':'val-pos'}">${fmt(b.val)}</b></div>
+  `).join("");
 
-      let cTotal = 0;
-      document.getElementById("cardList").innerHTML = db.cards.map(c => {
-        cTotal += c.val;
-        return `<div class="row"><div class="meta"><b>${c.name}</b><small>Total Due</small></div><b class="${c.val==0?'val-pos':'val-neg'}">${fmt(c.val)}</b></div>`;
-      }).join("");
-      document.getElementById("cardSub").innerText = fmt(cTotal);
+  // एक्टिविटी में टाइम और कैटेगरी जोड़ना
+  document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
+    <div class="row">
+      <div class="meta">
+        <b>${t.name} <span style="font-size:9px; opacity:0.6; background:var(--border); padding:2px 5px; border-radius:5px;">${t.cat}</span></b>
+        <small>${t.date} • ${t.time}</small>
+      </div>
+      <b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b>
+    </div>
+  `).join("");
 
-      let lTotal = 0;
-      document.getElementById("loanList").innerHTML = db.loans.map(l => {
-        lTotal += l.emi;
-        return `<div class="row"><div class="meta"><b>${l.name}</b><small>Next EMI: ${l.dueDate}</small></div><b class="val-neg">${fmt(l.emi)}</b></div>`;
-      }).join("");
-      document.getElementById("loanSub").innerText = fmt(lTotal);
-
-      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-        <div class="row"><div class="meta"><b>${t.name}</b><small>${t.date}</small></div><b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b></div>
-      `).join("");
-
-      fillDropdowns();
-    }
+  fillDropdowns();
+}
 
     function fillDropdowns() {
       const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
@@ -323,26 +315,15 @@
     }
 
     async function saveTrans(type) {
-      const btn = event.target;
-      const originalText = btn.innerText;
-      let p = { action: "save" };
-
-      if(type==='entry') {
-        let m = document.getElementById("payMode").value;
-        p.type = m; p.name = (m==='cash')?'Cash':(m==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
-        p.amount = document.getElementById("expAmt").value; p.category = document.getElementById("expCat").value; p.remark = document.getElementById("expRem").value;
-        if(m==='bank' && !checkBalance(p.amount, p.name)) return;
-      } else if(type==='fund') {
-        p.type="Add Fund"; p.amount=document.getElementById("fundAmt").value; p.source=document.getElementById("fundSource").value;
-        p.name = (document.getElementById("targetType").value==='Wallet')?'Wallet':document.getElementById("targetBankName").value;
-        p.remark = "Transfer from " + p.source;
-        if(p.source !== "Others" && !checkBalance(p.amount, p.source)) return;
-      } else if(type==='pay') {
-        p.type="Bill Pay"; p.name=document.getElementById("payTo").value; p.amount=document.getElementById("payAmt").value;
-        let fromAcc = document.getElementById("payFrom").value;
-        if(!checkBalance(p.amount, fromAcc)) return;
-        p.remark = "Paid from " + fromAcc;
-      }
+  let p = { action: "save" };
+  if(type==='entry') {
+    let m = document.getElementById("payMode").value;
+    p.type = m; 
+    p.name = (m==='cash')?'Wallet':(m==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
+    p.amount = document.getElementById("expAmt").value; 
+    p.category = document.getElementById("expCat").value; 
+    p.remark = document.getElementById("expRem").value;
+  }
 
       if(!p.amount || !p.name) return notify('Alert', 'Please fill all details', 'warning', '#f59e0b');
 
