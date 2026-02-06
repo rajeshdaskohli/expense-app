@@ -1,3 +1,108 @@
+const SS = SpreadsheetApp.getActiveSpreadsheet();
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    
+    if (data.action === "getDashboard") {
+      return ContentService.createTextOutput(JSON.stringify(getDashboardData())).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    if (data.action === "save") {
+      const sh = SS.getSheetByName("Transactions");
+      
+      // Feature: Internal Transfer (Bank to Wallet or vice-versa)
+      if (data.type === "Add Fund" && data.source && data.source !== "Others") {
+        // 1. सोर्स से पैसा घटाना (Negative Entry)
+        sh.appendRow([new Date(), data.source, -Number(data.amount), "Transfer Out", "Internal", "To " + data.name]);
+        // 2. डेस्टिनेशन में पैसा जोड़ना (Positive Entry)
+        sh.appendRow([new Date(), data.name, Number(data.amount), "Add Fund", "Internal", "From " + data.source]);
+      } else {
+        // सामान्य एंट्री (Expense, Bill Pay, or External Fund)
+        sh.appendRow([new Date(), data.name, Number(data.amount) || 0, data.type, data.category || "Other", data.remark || ""]);
+      }
+      return ContentService.createTextOutput(JSON.stringify({ ok: true })).setMimeType(ContentService.MimeType.JSON);
+    }
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ ok: false, error: err.toString() })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function getDashboardData() {
+  const shTrans = SS.getSheetByName("Transactions");
+  const data = (shTrans && shTrans.getLastRow() > 1) ? shTrans.getDataRange().getValues() : [];
+  const now = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(now.getDate() - 30);
+  
+  let today = 0, month = 0, funds = 0;
+  let history = [];
+
+  // Category Logic: Row 2 से उठाना
+  const catData = getCategoriesWithIcons();
+  let catTotals = {};
+  catData.forEach(c => catTotals[c.name.toLowerCase()] = 0);
+
+  for (let i = data.length - 1; i >= 1; i--) {
+    let d = new Date(data[i][0]);
+    let amt = Number(data[i][2]) || 0;
+    let type = String(data[i][3]);
+    let cat = String(data[i][4]).toLowerCase().trim();
+
+    if (!isNaN(d.getTime())) {
+      if (d.toDateString() === now.toDateString() && type !== "Add Fund" && type !== "Transfer Out") today += amt;
+      if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+        if (type === "Add Fund") funds += amt;
+        else if (type !== "Transfer Out") {
+          month += amt;
+          if (catTotals.hasOwnProperty(cat)) catTotals[cat] += amt;
+        }
+      }
+      if (d >= thirtyDaysAgo) {
+        history.push({
+          date: Utilities.formatDate(d, "GMT+5:30", "dd MMM, hh:mm a"),
+          name: data[i][1], amount: amt, type: type, category: data[i][4]
+        });
+      }
+    }
+  }
+
+  return {
+    "ok": true,
+    "summary": { todayExp: today, monthExp: month, monthFund: funds, catTotals: catTotals, recentTrans: history },
+    "banks": getAccountData("Banks"),
+    "cards": getAccountData("Cards"),
+    "loans": getLoanData(),
+    "categories": catData
+  };
+}
+
+function getCategoriesWithIcons() {
+  const sh = SS.getSheetByName("Categories");
+  if (!sh || sh.getLastRow() < 2) return [{name: "Other", icon: "📦"}];
+  // Row 2 से डेटा उठाना (Row 1 Header है)
+  return sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().map(r => ({
+    name: String(r[0]), icon: String(r[1] || "🔹")
+  }));
+}
+
+function getAccountData(sheetName) {
+  const sh = SS.getSheetByName(sheetName);
+  if (!sh || sh.getLastRow() < 2) return [];
+  return sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().map(r => ({ "name": String(r[0]), "val": Number(r[1]) || 0 }));
+}
+
+function getLoanData() {
+  const sh = SS.getSheetByName("Loans");
+  if (!sh || sh.getLastRow() < 2) return [];
+  return sh.getRange(2, 1, sh.getLastRow() - 1, 4).getValues().map(r => ({ 
+    "name": String(r[0]), "emi": Number(r[1]) || 0, "status": String(r[2]), "dueDate": String(r[3] || "N/A")
+  }));
+}
+
+
+
+
 <!DOCTYPE html>
 <html lang="hi" data-theme="dark">
 <head>
@@ -247,51 +352,55 @@
     }
 
     function updateUI() {
-  const s = db.summary;
-  document.getElementById("sumToday").innerText = fmt(s.todayExp);
-  document.getElementById("sumMonth").innerText = fmt(s.monthExp);
-  document.getElementById("sumFund").innerText = fmt(s.monthFund);
-  
-  // वॉलेट कार्ड में बैलेंस दिखाएं
-  document.getElementById("sumWallet").innerText = fmt(db.walletBal);
+      const s = db.summary;
+      document.getElementById("sumToday").innerText = fmt(s.todayExp);
+      document.getElementById("sumMonth").innerText = fmt(s.monthExp);
+      document.getElementById("sumFund").innerText = fmt(s.monthFund);
+      
+      const wallet = db.banks.find(b => b.name === 'Wallet');
+      document.getElementById("sumWallet").innerText = fmt(wallet ? wallet.val : 0);
 
-  // कैटेगिरी ग्रिड
-  document.getElementById("catGrid").innerHTML = db.categories.map(c => `
-    <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small>${fmt(s.catTotals[c.name.toLowerCase().trim()] || 0)}</small></div>
-  `).join("");
+      document.getElementById("catGrid").innerHTML = db.categories.map(c => `
+        <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small>${fmt(s.catTotals[c.name.toLowerCase()] || 0)}</small></div>
+      `).join("");
 
-  // बैंक लिस्ट (वॉलेट अलग है इसलिए यहाँ सिर्फ बैंक दिखेंगे)
-  document.getElementById("bankList").innerHTML = db.banks.map(b => `
-    <div class="row"><div class="meta"><b>${b.name}</b><small>A/c Balance</small></div><b class="${b.val<0?'val-neg':'val-pos'}">${fmt(b.val)}</b></div>
-  `).join("");
+      let bTotal = 0;
+      document.getElementById("bankList").innerHTML = db.banks.map(b => {
+        bTotal += b.val;
+        return `<div class="row"><div class="meta"><b>${b.name}</b><small>A/c Balance</small></div><b class="${b.val<0?'val-neg':'val-pos'}">${fmt(b.val)}</b></div>`;
+      }).join("");
+      document.getElementById("bankSub").innerText = fmt(bTotal);
 
-  // हिस्ट्री
-  document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-    <div class="row"><div class="meta"><b>${t.name} <span style="font-size:9px; opacity:0.5;">${t.category}</span></b><small>${t.date}</small></div><b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b></div>
-  `).join("");
+      let cTotal = 0;
+      document.getElementById("cardList").innerHTML = db.cards.map(c => {
+        cTotal += c.val;
+        return `<div class="row"><div class="meta"><b>${c.name}</b><small>Total Due</small></div><b class="${c.val==0?'val-pos':'val-neg'}">${fmt(c.val)}</b></div>`;
+      }).join("");
+      document.getElementById("cardSub").innerText = fmt(cTotal);
 
-  fillDropdowns();
-}
+      let lTotal = 0;
+      document.getElementById("loanList").innerHTML = db.loans.map(l => {
+        lTotal += l.emi;
+        return `<div class="row"><div class="meta"><b>${l.name}</b><small>Next EMI: ${l.dueDate}</small></div><b class="val-neg">${fmt(l.emi)}</b></div>`;
+      }).join("");
+      document.getElementById("loanSub").innerText = fmt(lTotal);
 
-function fillDropdowns() {
-  const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
-  
-  // एंट्री पेज के पेमेंट मेथड में "Digital Wallet" ऐड करना
-  document.getElementById("payMode").innerHTML = `
-    <option value="Digital Wallet">👛 Digital Wallet</option>
-    <option value="bank">🏦 Bank Transfer</option>
-    <option value="card">💳 Credit Card</option>
-  `;
+      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
+        <div class="row"><div class="meta"><b>${t.name}</b><small>${t.date}</small></div><b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b></div>
+      `).join("");
 
-  document.getElementById("expBank").innerHTML = opt(db.banks, "name");
-  document.getElementById("expCard").innerHTML = opt(db.cards, "name");
-  
-  // बिल पेमेंट के लिए वॉलेट विकल्प
-  document.getElementById("payFrom").innerHTML = `<option value="Wallet">Digital Wallet</option>` + opt(db.banks, "name");
-  document.getElementById("payTo").innerHTML = opt(db.cards, "name") + opt(db.loans, "name");
-  
-  document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
-}
+      fillDropdowns();
+    }
+
+    function fillDropdowns() {
+      const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
+      document.getElementById("expBank").innerHTML = opt(db.banks.filter(b=>b.name!=='Wallet'), "name");
+      document.getElementById("expCard").innerHTML = opt(db.cards, "name");
+      document.getElementById("payFrom").innerHTML = opt(db.banks, "name");
+      document.getElementById("payTo").innerHTML = opt(db.cards, "name") + opt(db.loans, "name");
+      document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
+    }
+
     function updateFundSources() {
       const dest = document.getElementById("targetType").value;
       const targetBankDiv = document.getElementById("divTargetBank");
@@ -319,78 +428,42 @@ function fillDropdowns() {
     }
 
     async function saveTrans(type) {
-  const btn = event.target;
-  const originalText = btn.innerText;
-  let p = { action: "save" };
+      const btn = event.target;
+      const originalText = btn.innerText;
+      let p = { action: "save" };
 
-  // डेटा एकत्र करना (पुराने लॉजिक के अनुसार)
-  if (type === 'entry') {
-    let m = document.getElementById("payMode").value;
-    p.type = m; 
-    // "Digital Wallet" के लिए नाम "Wallet" सेट करना ताकि शीट में सही जगह अपडेट हो
-    p.name = (m === 'Digital Wallet') ? 'Wallet' : (m === 'bank' ? document.getElementById("expBank").value : document.getElementById("expCard").value);
-    p.amount = document.getElementById("expAmt").value; 
-    p.category = document.getElementById("expCat").value; 
-    p.remark = document.getElementById("expRem").value;
-  } 
-  else if (type === 'fund') {
-    p.type = "Add Fund"; 
-    p.amount = document.getElementById("fundAmt").value; 
-    p.source = document.getElementById("fundSource").value;
-    p.name = (document.getElementById("targetType").value === 'Wallet') ? 'Wallet' : document.getElementById("targetBankName").value;
-    p.remark = "Transfer from " + p.source;
-  } 
-  else if (type === 'pay') {
-    p.type = "Bill Pay"; 
-    p.name = document.getElementById("payTo").value; 
-    p.amount = document.getElementById("payAmt").value;
-    let fromAcc = document.getElementById("payFrom").value;
-    p.remark = "Paid from " + fromAcc;
-  }
+      if(type==='entry') {
+        let m = document.getElementById("payMode").value;
+        p.type = m; p.name = (m==='cash')?'Cash':(m==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
+        p.amount = document.getElementById("expAmt").value; p.category = document.getElementById("expCat").value; p.remark = document.getElementById("expRem").value;
+        if(m==='bank' && !checkBalance(p.amount, p.name)) return;
+      } else if(type==='fund') {
+        p.type="Add Fund"; p.amount=document.getElementById("fundAmt").value; p.source=document.getElementById("fundSource").value;
+        p.name = (document.getElementById("targetType").value==='Wallet')?'Wallet':document.getElementById("targetBankName").value;
+        p.remark = "Transfer from " + p.source;
+        if(p.source !== "Others" && !checkBalance(p.amount, p.source)) return;
+      } else if(type==='pay') {
+        p.type="Bill Pay"; p.name=document.getElementById("payTo").value; p.amount=document.getElementById("payAmt").value;
+        let fromAcc = document.getElementById("payFrom").value;
+        if(!checkBalance(p.amount, fromAcc)) return;
+        p.remark = "Paid from " + fromAcc;
+      }
 
-  // बेसिक वैलिडेशन
-  if (!p.amount || p.amount <= 0) {
-    return notify('Alert', 'Please enter a valid amount', 'warning', '#f59e0b');
-  }
+      if(!p.amount || !p.name) return notify('Alert', 'Please fill all details', 'warning', '#f59e0b');
 
-  // लोडिंग स्टेट शुरू
-  btn.classList.add('loading-btn'); 
-  btn.innerText = "PROCESSING...";
+      btn.classList.add('loading-btn'); btn.innerText = "PROCESSING...";
 
-  try {
-    const response = await fetch(API_URL, { 
-      method: "POST", 
-      body: JSON.stringify(p) 
-    });
-    
-    const res = await response.json();
-
-    if (res.ok) {
-      // सफलता का पॉप-अप
-      notify('Success', 'Transaction recorded successfully!', 'check_circle', '#10b981');
-      
-      // इनपुट फील्ड्स साफ़ करना
-      document.querySelectorAll('.inp').forEach(i => { 
-        if(i.type === 'number' || i.type === 'text') i.value = ""; 
-      });
-      
-      // डैशबोर्ड पर वापस जाना और डेटा रिफ्रेश करना
-      setTimeout(() => {
-        showPage(0);
-      }, 500);
-    } else {
-      // बैकएंड से आया "Insufficient Balance" या अन्य एरर यहाँ दिखेगा
-      notify('Transaction Failed', res.error, 'error_outline', '#ef4444');
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) }).then(r=>r.json());
+        if(res.ok) {
+          notify('Success', 'Transaction recorded successfully!');
+          document.querySelectorAll('.inp').forEach(i => { if(i.type==='number' || i.type==='text') i.value = ""; });
+          showPage(0);
+        }
+      } catch(e) { notify('Error', 'Network Error', 'error', '#ef4444'); }
+      btn.classList.remove('loading-btn'); btn.innerText = originalText;
     }
-  } catch (e) {
-    console.error(e);
-    notify('Error', 'Network connection failed!', 'error', '#ef4444');
-  } finally {
-    // बटन को वापस सामान्य करना
-    btn.classList.remove('loading-btn'); 
-    btn.innerText = originalText;
-  }
-}
+
     function notify(title, text, icon='check_circle', color='#10b981') {
       document.getElementById('mTitle').innerText = title; document.getElementById('mText').innerText = text;
       const ic = document.getElementById('mIcon'); ic.innerText = icon; ic.style.color = color;
