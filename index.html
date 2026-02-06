@@ -211,7 +211,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwVzYAHvpOxdn5EXwUi7Nv-PrB8toadZ1R4cqFLPvuLDcKYOuqkxSUWEmkBMjAhPfK7hA/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzJA4zSlYMujfD7tNlhehsP1i4ImpVPIUB_tBBY51frwQm8k8ol0WFqcU6K38yXd43Nug/exec";
     let db = null;
     let curPage = 0;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
@@ -319,42 +319,78 @@ function fillDropdowns() {
     }
 
     async function saveTrans(type) {
-      const btn = event.target;
-      const originalText = btn.innerText;
-      let p = { action: "save" };
+  const btn = event.target;
+  const originalText = btn.innerText;
+  let p = { action: "save" };
 
-      if(type==='entry') {
-        let m = document.getElementById("payMode").value;
-        p.type = m; p.name = (m==='cash')?'Cash':(m==='bank')?document.getElementById("expBank").value:document.getElementById("expCard").value;
-        p.amount = document.getElementById("expAmt").value; p.category = document.getElementById("expCat").value; p.remark = document.getElementById("expRem").value;
-        if(m==='bank' && !checkBalance(p.amount, p.name)) return;
-      } else if(type==='fund') {
-        p.type="Add Fund"; p.amount=document.getElementById("fundAmt").value; p.source=document.getElementById("fundSource").value;
-        p.name = (document.getElementById("targetType").value==='Wallet')?'Wallet':document.getElementById("targetBankName").value;
-        p.remark = "Transfer from " + p.source;
-        if(p.source !== "Others" && !checkBalance(p.amount, p.source)) return;
-      } else if(type==='pay') {
-        p.type="Bill Pay"; p.name=document.getElementById("payTo").value; p.amount=document.getElementById("payAmt").value;
-        let fromAcc = document.getElementById("payFrom").value;
-        if(!checkBalance(p.amount, fromAcc)) return;
-        p.remark = "Paid from " + fromAcc;
-      }
+  // डेटा एकत्र करना (पुराने लॉजिक के अनुसार)
+  if (type === 'entry') {
+    let m = document.getElementById("payMode").value;
+    p.type = m; 
+    // "Digital Wallet" के लिए नाम "Wallet" सेट करना ताकि शीट में सही जगह अपडेट हो
+    p.name = (m === 'Digital Wallet') ? 'Wallet' : (m === 'bank' ? document.getElementById("expBank").value : document.getElementById("expCard").value);
+    p.amount = document.getElementById("expAmt").value; 
+    p.category = document.getElementById("expCat").value; 
+    p.remark = document.getElementById("expRem").value;
+  } 
+  else if (type === 'fund') {
+    p.type = "Add Fund"; 
+    p.amount = document.getElementById("fundAmt").value; 
+    p.source = document.getElementById("fundSource").value;
+    p.name = (document.getElementById("targetType").value === 'Wallet') ? 'Wallet' : document.getElementById("targetBankName").value;
+    p.remark = "Transfer from " + p.source;
+  } 
+  else if (type === 'pay') {
+    p.type = "Bill Pay"; 
+    p.name = document.getElementById("payTo").value; 
+    p.amount = document.getElementById("payAmt").value;
+    let fromAcc = document.getElementById("payFrom").value;
+    p.remark = "Paid from " + fromAcc;
+  }
 
-      if(!p.amount || !p.name) return notify('Alert', 'Please fill all details', 'warning', '#f59e0b');
+  // बेसिक वैलिडेशन
+  if (!p.amount || p.amount <= 0) {
+    return notify('Alert', 'Please enter a valid amount', 'warning', '#f59e0b');
+  }
 
-      btn.classList.add('loading-btn'); btn.innerText = "PROCESSING...";
+  // लोडिंग स्टेट शुरू
+  btn.classList.add('loading-btn'); 
+  btn.innerText = "PROCESSING...";
 
-      try {
-        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) }).then(r=>r.json());
-        if(res.ok) {
-          notify('Success', 'Transaction recorded successfully!');
-          document.querySelectorAll('.inp').forEach(i => { if(i.type==='number' || i.type==='text') i.value = ""; });
-          showPage(0);
-        }
-      } catch(e) { notify('Error', 'Network Error', 'error', '#ef4444'); }
-      btn.classList.remove('loading-btn'); btn.innerText = originalText;
+  try {
+    const response = await fetch(API_URL, { 
+      method: "POST", 
+      body: JSON.stringify(p) 
+    });
+    
+    const res = await response.json();
+
+    if (res.ok) {
+      // सफलता का पॉप-अप
+      notify('Success', 'Transaction recorded successfully!', 'check_circle', '#10b981');
+      
+      // इनपुट फील्ड्स साफ़ करना
+      document.querySelectorAll('.inp').forEach(i => { 
+        if(i.type === 'number' || i.type === 'text') i.value = ""; 
+      });
+      
+      // डैशबोर्ड पर वापस जाना और डेटा रिफ्रेश करना
+      setTimeout(() => {
+        showPage(0);
+      }, 500);
+    } else {
+      // बैकएंड से आया "Insufficient Balance" या अन्य एरर यहाँ दिखेगा
+      notify('Transaction Failed', res.error, 'error_outline', '#ef4444');
     }
-
+  } catch (e) {
+    console.error(e);
+    notify('Error', 'Network connection failed!', 'error', '#ef4444');
+  } finally {
+    // बटन को वापस सामान्य करना
+    btn.classList.remove('loading-btn'); 
+    btn.innerText = originalText;
+  }
+}
     function notify(title, text, icon='check_circle', color='#10b981') {
       document.getElementById('mTitle').innerText = title; document.getElementById('mText').innerText = text;
       const ic = document.getElementById('mIcon'); ic.innerText = icon; ic.style.color = color;
