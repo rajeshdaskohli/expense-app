@@ -211,7 +211,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzqMDX_2QqjBeW48ELkWcGEtDc_MoYTw4V28S_WK1qEwQkUMlylEbD-nO1aRQvFa5324g/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwYwtjc_08sgCodmKxrCyUQxwrqhvLWzgt10Q2pB6kCLxLQbcJ41RLH4jryDmZAMwud_Q/exec";
     let db = null;
     let curPage = 0;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
@@ -247,45 +247,48 @@
     }
 
     function updateUI() {
-      const s = db.summary;
-      document.getElementById("sumToday").innerText = fmt(s.todayExp);
-      document.getElementById("sumMonth").innerText = fmt(s.monthExp);
-      document.getElementById("sumFund").innerText = fmt(s.monthFund);
-      
-      const wallet = db.banks.find(b => b.name === 'Wallet');
-      document.getElementById("sumWallet").innerText = fmt(wallet ? wallet.val : 0);
+  const s = db.summary;
+  document.getElementById("sumToday").innerText = fmt(s.todayExp);
+  document.getElementById("sumMonth").innerText = fmt(s.monthExp);
+  document.getElementById("sumFund").innerText = fmt(s.monthFund);
+  
+  // वॉलेट को सीधे db.walletBal से दिखाएं
+  document.getElementById("sumWallet").innerText = fmt(db.walletBal);
 
-      document.getElementById("catGrid").innerHTML = db.categories.map(c => `
-        <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small>${fmt(s.catTotals[c.name.toLowerCase()] || 0)}</small></div>
-      `).join("");
+  document.getElementById("catGrid").innerHTML = db.categories.map(c => `
+    <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small>${fmt(s.catTotals[c.name.toLowerCase()] || 0)}</small></div>
+  `).join("");
 
-      let bTotal = 0;
-      document.getElementById("bankList").innerHTML = db.banks.map(b => {
-        bTotal += b.val;
-        return `<div class="row"><div class="meta"><b>${b.name}</b><small>A/c Balance</small></div><b class="${b.val<0?'val-neg':'val-pos'}">${fmt(b.val)}</b></div>`;
-      }).join("");
-      document.getElementById("bankSub").innerText = fmt(bTotal);
+  let bTotal = 0;
+  // वॉलेट को बैंक लिस्ट से फ़िल्टर (हटा) दें
+  document.getElementById("bankList").innerHTML = db.banks
+    .filter(b => b.name.toLowerCase() !== 'wallet')
+    .map(b => {
+      bTotal += b.val;
+      return `<div class="row"><div class="meta"><b>${b.name}</b><small>A/c Balance</small></div><b class="${b.val<0?'val-neg':'val-pos'}">${fmt(b.val)}</b></div>`;
+    }).join("");
+  document.getElementById("bankSub").innerText = fmt(bTotal);
 
-      let cTotal = 0;
-      document.getElementById("cardList").innerHTML = db.cards.map(c => {
-        cTotal += c.val;
-        return `<div class="row"><div class="meta"><b>${c.name}</b><small>Total Due</small></div><b class="${c.val==0?'val-pos':'val-neg'}">${fmt(c.val)}</b></div>`;
-      }).join("");
-      document.getElementById("cardSub").innerText = fmt(cTotal);
+  let cTotal = 0;
+  document.getElementById("cardList").innerHTML = db.cards.map(c => {
+    cTotal += c.val;
+    return `<div class="row"><div class="meta"><b>${c.name}</b><small>Total Due</small></div><b class="${c.val==0?'val-pos':'val-neg'}">${fmt(c.val)}</b></div>`;
+  }).join("");
+  document.getElementById("cardSub").innerText = fmt(cTotal);
 
-      let lTotal = 0;
-      document.getElementById("loanList").innerHTML = db.loans.map(l => {
-        lTotal += l.emi;
-        return `<div class="row"><div class="meta"><b>${l.name}</b><small>Next EMI: ${l.dueDate}</small></div><b class="val-neg">${fmt(l.emi)}</b></div>`;
-      }).join("");
-      document.getElementById("loanSub").innerText = fmt(lTotal);
+  // रीसेंट एक्टिविटी अपडेट: नाम, कैटेगरी और टाइम के साथ
+  document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
+    <div class="row">
+      <div class="meta">
+        <b>${t.name} <span style="font-size:9px; opacity:0.6; background:var(--border); padding:2px 6px; border-radius:10px;">${t.cat}</span></b>
+        <small>${t.date} • ${t.time}</small>
+      </div>
+      <b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b>
+    </div>
+  `).join("");
 
-      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-        <div class="row"><div class="meta"><b>${t.name}</b><small>${t.date}</small></div><b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b></div>
-      `).join("");
-
-      fillDropdowns();
-    }
+  fillDropdowns();
+}
 
     function fillDropdowns() {
       const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
