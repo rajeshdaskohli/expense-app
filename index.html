@@ -211,7 +211,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzfPP-BBZ2acNtHUJjHyBmvHxEIgMCX7BYKC340UbWCRzPJsyNToJt4oDXEFMQYSLRlGw/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwVzYAHvpOxdn5EXwUi7Nv-PrB8toadZ1R4cqFLPvuLDcKYOuqkxSUWEmkBMjAhPfK7hA/exec";
     let db = null;
     let curPage = 0;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
@@ -275,10 +275,21 @@
 
 function fillDropdowns() {
   const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
+  
+  // एंट्री पेज के पेमेंट मेथड में "Digital Wallet" ऐड करना
+  document.getElementById("payMode").innerHTML = `
+    <option value="Digital Wallet">👛 Digital Wallet</option>
+    <option value="bank">🏦 Bank Transfer</option>
+    <option value="card">💳 Credit Card</option>
+  `;
+
   document.getElementById("expBank").innerHTML = opt(db.banks, "name");
   document.getElementById("expCard").innerHTML = opt(db.cards, "name");
-  document.getElementById("payFrom").innerHTML = `<option value="Wallet">Wallet</option>` + opt(db.banks, "name");
+  
+  // बिल पेमेंट के लिए वॉलेट विकल्प
+  document.getElementById("payFrom").innerHTML = `<option value="Wallet">Digital Wallet</option>` + opt(db.banks, "name");
   document.getElementById("payTo").innerHTML = opt(db.cards, "name") + opt(db.loans, "name");
+  
   document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
 }
     function updateFundSources() {
