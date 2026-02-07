@@ -23,13 +23,11 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
 
-    /* Animations & Button Feel */
     .btn-main:active { transform: scale(0.96); opacity: 0.9; }
     .loading-btn { pointer-events: none; opacity: 0.6; filter: grayscale(1); }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .spinning { animation: spin 1s linear infinite; color: var(--primary) !important; }
 
-    /* Header */
     .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
     .header h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px; }
     .controls i { cursor: pointer; margin-left: 15px; color: var(--text-dim); }
@@ -39,7 +37,6 @@
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Hero Cards */
     .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 0; scrollbar-width: none; }
     .hero-card { min-width: 140px; background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     .hero-card span { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
@@ -47,7 +44,6 @@
     .wallet-card { background: linear-gradient(135deg, #6366f1, #a855f7) !important; color: white !important; }
     .wallet-card span { color: rgba(255,255,255,0.7) !important; }
 
-    /* Grid & Lists */
     .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
     .cat-item { background: var(--card); padding: 15px 5px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
     .cat-item div { font-size: 18px; margin-bottom: 5px; }
@@ -55,6 +51,9 @@
     .cat-item small { color: var(--primary); font-size: 10px; font-weight: 800; }
 
     .list-container { background: var(--card); border-radius: 28px; padding: 10px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+    /* Fix 6: Recent Activity Scrollable Area */
+    .scroll-area { max-height: 350px; overflow-y: auto; scrollbar-width: none; padding-right: 5px; }
+    
     .row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
     .row:last-child { border: none; }
     .meta b { display: block; font-size: 14px; }
@@ -62,10 +61,8 @@
 
     .label-row { display: flex; justify-content: space-between; align-items: center; margin: 25px 5px 10px; }
     .label-row h3 { font-size: 11px; font-weight: 800; color: var(--text-dim); margin: 0; letter-spacing: 1px; }
-    /* Subtotal styling fix */
     .subtotal { font-weight: 800; font-size: 12px; color: var(--text); }
 
-    /* Navigation */
     .nav-wrapper { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; }
     .nav-bar { background: var(--card); display: flex; padding: 8px; border-radius: 24px; border: 1px solid var(--border); width: 92%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
     .nav-item { flex: 1; padding: 10px; border-radius: 18px; text-align: center; color: var(--text-dim); cursor: pointer; }
@@ -73,7 +70,6 @@
     .nav-item i { display: block; font-size: 22px; margin-bottom: 2px; }
     .nav-item span { font-size: 10px; font-weight: 700; }
 
-    /* Forms & Modal */
     .inp-group { margin-bottom: 15px; }
     .inp-group label { display: block; font-size: 10px; font-weight: 800; color: var(--primary); margin-left: 5px; margin-bottom: 5px; text-transform: uppercase; }
     .inp { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; color: var(--text); font-size: 15px; outline: none; }
@@ -84,6 +80,9 @@
     .modal-box.show { transform: scale(1); }
     
     .val-pos { color: var(--green); } .val-neg { color: var(--red); }
+    .status-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; margin-left: 5px; vertical-align: middle; font-weight: 800; }
+    .bg-red { background: rgba(239, 68, 68, 0.1); color: var(--red); }
+    .bg-green { background: rgba(16, 185, 129, 0.1); color: var(--green); }
   </style>
 </head>
 <body>
@@ -136,8 +135,10 @@
       </div>
       <div class="list-container" id="loanList"></div>
 
-      <div class="label-row"><h3>RECENT ACTIVITY</h3></div>
-      <div class="list-container" id="historyList"></div>
+      <div class="label-row"><h3>RECENT ACTIVITY (1 MONTH)</h3></div>
+      <div class="list-container">
+         <div class="scroll-area" id="historyList"></div>
+      </div>
     </div>
 
     <div class="page" id="pageEntry">
@@ -145,7 +146,7 @@
         <div class="inp-group">
           <label>Payment Method</label>
           <select class="inp" id="payMode" onchange="toggleFields()">
-            <option value="cash">💵 Cash on Hand</option>
+            <option value="Digital Wallet">👛 Digital Wallet</option>
             <option value="bank">🏦 Bank Transfer</option>
             <option value="card">💳 Credit Card</option>
           </select>
@@ -208,7 +209,7 @@
           <label>Pay From</label><select class="inp" id="payFrom"></select>
         </div>
         <div class="inp-group">
-          <label>Pay To (Select Account)</label><select class="inp" id="payTo"></select>
+          <label>Pay To (Select Account)</label><select class="inp" id="payTo" onchange="autoFillEmi()"></select>
         </div>
         <div class="inp-group">
           <label>Amount</label><input type="number" class="inp" id="payAmt" placeholder="0.00">
@@ -234,15 +235,9 @@
     let curPage = 0;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
 
-    // 1. SMART AUTO-REFRESH & PWA
     setInterval(() => { if (curPage === 0) refreshData(); }, 30000);
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === 'visible') refreshData(); });
-    
-    const manifest = { "name": "Expense Seva", "short_name": "ExpSeva", "start_url": ".", "display": "standalone", "background_color": "#070b14", "theme_color": "#070b14", "icons": [{ "src": "https://i.ibb.co/v408GZJ/420535.png", "sizes": "512x512", "type": "image/png" }] };
-    const link = document.createElement('link'); link.rel = 'manifest'; link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'}));
-    document.head.appendChild(link);
 
-    // 2. CORE FUNCTIONS
     async function showPage(idx) {
       curPage = idx;
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -274,33 +269,41 @@
         <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small>${fmt(s.catTotals[c.name.toLowerCase().trim()] || 0)}</small></div>
       `).join("");
 
-      // --- FIX 1: BANKS, CARDS, LOANS LIST & SUBTOTALS ---
-      
-      // Helper function to render a list row
-      const mkRow = (name, val, isDebt) => `
-        <div class="row">
-          <div class="meta"><b>${name}</b><small>${isDebt ? 'Outstanding' : 'Balance'}</small></div>
-          <b class="${val < 0 ? 'val-neg' : 'val-pos'}">${fmt(val)}</b>
-        </div>`;
-
-      // Helper function to sum values
       const getSum = (arr) => arr.reduce((acc, i) => acc + (Number(i.val) || 0), 0);
 
       // Banks
       document.getElementById("bankSub").innerText = fmt(getSum(db.banks));
-      document.getElementById("bankList").innerHTML = db.banks.map(b => mkRow(b.name, b.val, false)).join("");
+      document.getElementById("bankList").innerHTML = db.banks.map(b => `
+        <div class="row">
+          <div class="meta"><b>${b.name}</b><small>Balance</small></div>
+          <b class="${b.val < 0 ? 'val-neg' : 'val-pos'}">${fmt(b.val)}</b>
+        </div>`).join("");
 
-      // Cards
+      // Fix 3: Credit Card Color Coding (Red if > 0, Green if 0)
       document.getElementById("cardSub").innerText = fmt(getSum(db.cards));
-      document.getElementById("cardList").innerHTML = db.cards.map(c => mkRow(c.name, c.val, true)).join("");
+      document.getElementById("cardList").innerHTML = db.cards.map(c => `
+        <div class="row">
+          <div class="meta"><b>${c.name}</b><small>Outstanding</small></div>
+          <b class="${Number(c.val) > 0 ? 'val-neg' : 'val-pos'}">${fmt(c.val)}</b>
+        </div>`).join("");
 
-      // Loans
+      // Fix 5: Loans & EMI with Status
       document.getElementById("loanSub").innerText = fmt(getSum(db.loans));
-      document.getElementById("loanList").innerHTML = db.loans.map(l => mkRow(l.name, l.val, true)).join("");
+      document.getElementById("loanList").innerHTML = db.loans.map(l => {
+        const isPaid = l.status === 'Paid';
+        return `
+        <div class="row">
+          <div class="meta">
+            <b>${l.name} <span class="status-badge ${isPaid?'bg-green':'bg-red'}">${isPaid?'PAID':'UNPAID'}</span></b>
+            <small>Monthly EMI</small>
+          </div>
+          <b class="val-neg">${fmt(l.val)}</b>
+        </div>`;
+      }).join("");
 
       // Recent History
       document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-        <div class="row"><div class="meta"><b>${t.name} <span style="font-size:9px; opacity:0.5;">${t.category}</span></b><small>${t.date}</small></div><b class="${t.type==='Add Fund'?'val-pos':'val-neg'}">${t.type==='Add Fund'?'+':'-'}${fmt(t.amount)}</b></div>
+        <div class="row"><div class="meta"><b>${t.name} <span style="font-size:9px; opacity:0.5;">${t.category}</span></b><small>${t.date}</small></div><b class="${t.type==='Add Fund' || t.type==='Income' ?'val-pos':'val-neg'}">${t.type==='Add Fund' || t.type==='Income' ?'+':'-'}${fmt(t.amount)}</b></div>
       `).join("");
 
       fillDropdowns();
@@ -308,30 +311,30 @@
 
     function fillDropdowns() {
       const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
-      
-      // Entry Page
-      document.getElementById("payMode").innerHTML = `
-        <option value="Digital Wallet">👛 Digital Wallet</option>
-        <option value="bank">🏦 Bank Transfer</option>
-        <option value="card">💳 Credit Card</option>
-      `;
       document.getElementById("expBank").innerHTML = opt(db.banks, "name");
       document.getElementById("expCard").innerHTML = opt(db.cards, "name");
-      
-      // Bill Page - Pay From
       document.getElementById("payFrom").innerHTML = `<option value="Wallet">Digital Wallet</option>` + opt(db.banks, "name");
-      
-      // FIX 2: Initialize Bill Target Dropdown based on default selection
-      updateBillTarget();
-      
       document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
+      updateBillTarget();
     }
 
-    // --- FIX 2: BILL TYPE TOGGLE LOGIC ---
+    // Fix 5: Auto-fill EMI Amount
+    function autoFillEmi() {
+        const type = document.getElementById("billType").value;
+        const selectedName = document.getElementById("payTo").value;
+        if(type === 'loan') {
+            const loan = db.loans.find(l => l.name === selectedName);
+            if(loan) document.getElementById("payAmt").value = loan.val;
+        } else {
+            document.getElementById("payAmt").value = "";
+        }
+    }
+
     function updateBillTarget() {
       const type = document.getElementById("billType").value;
       const list = (type === 'card') ? db.cards : db.loans;
       document.getElementById("payTo").innerHTML = list.map(i => `<option value="${i.name}">${i.name}</option>`).join("");
+      autoFillEmi();
     }
 
     function updateFundSources() {
@@ -371,11 +374,8 @@
         p.name = (document.getElementById("targetType").value === 'Wallet') ? 'Wallet' : document.getElementById("targetBankName").value;
         p.remark = "Transfer from " + p.source;
 
-        // --- FIX 3: BYPASS INSUFFICIENT BALANCE FOR INCOME ---
-        // If source is 'Others', treat it as 'Income' to avoid wallet debit check
-        if(p.source === 'Others') {
-           p.type = 'Income'; 
-        }
+        // Fix 4: Bypass balance check for Income
+        if(p.source === 'Others') p.type = 'Income'; 
       } 
       else if (type === 'pay') {
         p.type = "Bill Pay"; 
@@ -383,6 +383,15 @@
         p.amount = document.getElementById("payAmt").value;
         let fromAcc = document.getElementById("payFrom").value;
         p.remark = "Paid from " + fromAcc;
+        p.billType = document.getElementById("billType").value;
+
+        // Fix 5: Already Paid Check
+        if(p.billType === 'loan') {
+            const loan = db.loans.find(l => l.name === p.name);
+            if(loan && loan.status === 'Paid') {
+                return notify('Already Paid', 'इस महीने की EMI पहले ही भरी जा चुकी है!', 'info', '#38bdf8');
+            }
+        }
       }
 
       if (!p.amount || p.amount <= 0) {
@@ -393,24 +402,16 @@
       btn.innerText = "PROCESSING...";
 
       try {
-        const response = await fetch(API_URL, { 
-          method: "POST", 
-          body: JSON.stringify(p) 
-        });
-        
+        const response = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) });
         const res = await response.json();
-
         if (res.ok) {
           notify('Success', 'Transaction recorded successfully!', 'check_circle', '#10b981');
-          document.querySelectorAll('.inp').forEach(i => { 
-            if(i.type === 'number' || i.type === 'text') i.value = ""; 
-          });
+          document.querySelectorAll('.inp').forEach(i => { if(i.type === 'number' || i.type === 'text') i.value = ""; });
           setTimeout(() => { showPage(0); }, 500);
         } else {
-          notify('Transaction Failed', res.error, 'error_outline', '#ef4444');
+          notify('Failed', res.error, 'error_outline', '#ef4444');
         }
       } catch (e) {
-        console.error(e);
         notify('Error', 'Network connection failed!', 'error', '#ef4444');
       } finally {
         btn.classList.remove('loading-btn'); 
@@ -430,6 +431,8 @@
       h.setAttribute('data-theme', isD ? 'light' : 'dark');
       document.getElementById('tBtn').innerText = isD ? 'dark_mode' : 'light_mode';
     }
+    
+    // Fix 1: Entry Tab Hide Card Option Logic
     function toggleFields() {
       let m = document.getElementById("payMode").value;
       document.getElementById("divBank").style.display = (m==='bank') ? 'block' : 'none';
