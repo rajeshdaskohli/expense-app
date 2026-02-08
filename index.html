@@ -404,30 +404,68 @@
     }
 
     async function saveTrans(type) {
+      const btn = event.target;
+      const originalText = btn.innerText;
       let p = { action: "save" };
+
       if (type === 'entry') {
         let m = document.getElementById("payMode").value;
-        p.type = m; p.name = (m === 'Digital Wallet') ? 'Wallet' : (m === 'bank' ? document.getElementById("expBank").value : document.getElementById("expCard").value);
-        p.amount = document.getElementById("expAmt").value; p.category = document.getElementById("expCat").value; p.remark = document.getElementById("expRem").value;
-      } else if (type === 'fund') {
-        p.type = "Add Fund"; p.amount = document.getElementById("fundAmt").value; p.source = document.getElementById("fundSource").value;
+        p.type = m; 
+        p.name = (m === 'Digital Wallet') ? 'Wallet' : (m === 'bank' ? document.getElementById("expBank").value : document.getElementById("expCard").value);
+        p.amount = document.getElementById("expAmt").value; 
+        p.category = document.getElementById("expCat").value; 
+        p.remark = document.getElementById("expRem").value;
+      } 
+      else if (type === 'fund') {
+        p.type = "Add Fund"; 
+        p.amount = document.getElementById("fundAmt").value; 
+        p.source = document.getElementById("fundSource").value;
         p.name = (document.getElementById("targetType").value === 'Wallet') ? 'Wallet' : document.getElementById("targetBankName").value;
         p.remark = "Transfer from " + p.source;
-        if(p.source === 'Others') p.type = 'Income';
-      } else if (type === 'pay') {
-        p.type = "Bill Pay"; p.name = document.getElementById("payTo").value; p.amount = document.getElementById("payAmt").value;
-        p.remark = "Paid from " + document.getElementById("payFrom").value;
+
+        // Fix 4: Bypass balance check for Income
+        if(p.source === 'Others') p.type = 'Income'; 
+      } 
+      else if (type === 'pay') {
+        p.type = "Bill Pay"; 
+        p.name = document.getElementById("payTo").value; 
+        p.amount = document.getElementById("payAmt").value;
+        let fromAcc = document.getElementById("payFrom").value;
+        p.remark = "Paid from " + fromAcc;
+        p.billType = document.getElementById("billType").value;
+
+        // Fix 5: Already Paid Check
+        if(p.billType === 'loan') {
+            const loan = db.loans.find(l => l.name === p.name);
+            if(loan && loan.status === 'Paid') {
+                return notify('Already Paid', 'इस महीने की EMI पहले ही भरी जा चुकी है!', 'info', '#38bdf8');
+            }
+        }
       }
 
-      if (!p.amount || p.amount <= 0) return notify('Alert', 'Valid amount is required', 'warning', '#f59e0b');
+      if (!p.amount || p.amount <= 0) {
+        return notify('Alert', 'Please enter a valid amount', 'warning', '#f59e0b');
+      }
+
+      btn.classList.add('loading-btn'); 
+      btn.innerText = "PROCESSING...";
 
       try {
-        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) }).then(r => r.json());
+        const response = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) });
+        const res = await response.json();
         if (res.ok) {
-          notify('Success', 'Transaction saved!', 'check_circle', '#10b981');
-          showPage(0);
-        } else notify('Failed', res.error, 'error', '#ef4444');
-      } catch (e) { notify('Error', 'Sync failed', 'error', '#ef4444'); }
+          notify('Success', 'Transaction recorded successfully!', 'check_circle', '#10b981');
+          document.querySelectorAll('.inp').forEach(i => { if(i.type === 'number' || i.type === 'text') i.value = ""; });
+          setTimeout(() => { showPage(0); }, 500);
+        } else {
+          notify('Failed', res.error, 'error_outline', '#ef4444');
+        }
+      } catch (e) {
+        notify('Error', 'Network connection failed!', 'error', '#ef4444');
+      } finally {
+        btn.classList.remove('loading-btn'); 
+        btn.innerText = originalText;
+      }
     }
 
     function notify(title, text, icon, color) {
