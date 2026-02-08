@@ -287,7 +287,7 @@
 
     async function showPage(idx) {
       curPage = idx;
-      const titles = ["EXPENSE SEVA PRO", "ENTRY", "TRANSFER", "BILLS"];
+      const titles = ["EXPENSE PRO", "ENTRY", "TRANSFER", "BILLS"];
       document.getElementById('headerTitle').innerText = titles[idx];
       
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -296,9 +296,6 @@
       document.querySelectorAll('.nav-item')[idx].classList.add('active');
       if(idx === 0) await refreshData();
     }
-    
-    setInterval(() => { if (curPage === 0) refreshData(); }, 30000);
-    document.addEventListener("visibilitychange", () => { if (document.visibilityState === 'visible') refreshData(); });
 
     async function refreshData() {
       const sBtn = document.getElementById('sBtn');
