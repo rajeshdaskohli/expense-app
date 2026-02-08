@@ -110,15 +110,25 @@
   </div>
 
   <div class="header">
-    <h1>EXPENSE SEVA PRO</h1>
+    <h1 id="headerTitle">EXPENSE SEVA PRO</h1>
     <div class="controls">
-      <i class="material-icons-round" onclick="toggleTheme()" id="tBtn">light_mode</i>
       <i class="material-icons-round" onclick="refreshData()" id="sBtn">sync</i>
+      <i class="material-icons-round" onclick="toggleMenu()">more_vert</i>
+      
+      <div class="menu-dropdown" id="settingsMenu">
+        <div class="menu-item" onclick="toggleTheme()">
+          <i class="material-icons-round" id="themeIcon">light_mode</i>
+          <span id="themeText">Light Mode</span>
+        </div>
+        <div class="menu-item" onclick="refreshData()">
+          <i class="material-icons-round">refresh</i>
+          <span>Force Sync</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="container" id="swipeArea">
-    
+  <div class="container">
     <div class="page active" id="pageDashboard">
       <div class="hero-scroll">
         <div class="hero-card"><span>Today Exp</span><p id="sumToday">₹0</p></div>
