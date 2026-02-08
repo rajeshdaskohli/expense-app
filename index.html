@@ -27,14 +27,23 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
 
-    .btn-main:active { transform: scale(0.96); opacity: 0.9; }
-    .loading-btn { pointer-events: none; opacity: 0.6; filter: grayscale(1); }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    /* Header & Menu */
+    .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
+    .header h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
+    .controls { display: flex; align-items: center; position: relative; }
+    .controls i { cursor: pointer; margin-left: 15px; color: var(--text-dim); }
+    
+    /* Rotation Fix for Sync Icon */
+    #sBtn { transform: scaleX(-1); } /* Arrow right side face logic */
+    @keyframes spin { from { transform: rotate(0deg) scaleX(-1); } to { transform: rotate(360deg) scaleX(-1); } }
     .spinning { animation: spin 1s linear infinite; color: var(--primary) !important; }
 
-    .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
-    .header h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px; }
-    .controls i { cursor: pointer; margin-left: 15px; color: var(--text-dim); }
+    /* Settings Dropdown */
+    .menu-dropdown { display: none; position: absolute; top: 40px; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 150px; z-index: 200; }
+    .menu-dropdown.show { display: block; }
+    .menu-item { display: flex; align-items: center; padding: 12px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 10px; }
+    .menu-item:hover { background: var(--border); }
+    .menu-item i { margin-right: 10px; font-size: 18px; margin-left: 0 !important; }
 
     .container { max-width: 500px; margin: 0 auto; padding: 0 16px; }
     .page { display: none; min-height: 70vh; animation: fadeIn 0.4s ease; }
