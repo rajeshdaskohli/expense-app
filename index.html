@@ -468,12 +468,14 @@
       }
     }
 
-    function notify(title, text, icon, color) {
+    function notify(title, text, icon='check_circle', color='#10b981') {
       document.getElementById('mTitle').innerText = title; document.getElementById('mText').innerText = text;
       const ic = document.getElementById('mIcon'); ic.innerText = icon; ic.style.color = color;
       document.getElementById('modal').style.display = 'flex';
+      setTimeout(() => document.getElementById('mBox').classList.add('show'), 10);
     }
-    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function closeModal() { document.getElementById('mBox').classList.remove('show'); setTimeout(() => document.getElementById('modal').style.display = 'none', 300); }
+
     function toggleFields() {
       let m = document.getElementById("payMode").value;
       document.getElementById("divBank").style.display = (m==='bank') ? 'block' : 'none';
