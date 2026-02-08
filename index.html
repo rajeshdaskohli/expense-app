@@ -287,6 +287,9 @@
 
     async function showPage(idx) {
       curPage = idx;
+      const titles = ["EXPENSE SEVA PRO", "ENTRY", "TRANSFER", "BILLS"];
+      document.getElementById('headerTitle').innerText = titles[idx];
+      
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       document.getElementById(['pageDashboard','pageEntry','pageFund','pageBills'][idx]).classList.add('active');
