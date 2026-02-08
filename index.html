@@ -427,20 +427,31 @@
         if(p.source === 'Others') p.type = 'Income'; 
       } 
       else if (type === 'pay') {
-        p.type = "Bill Pay"; 
-        p.name = document.getElementById("payTo").value; 
-        p.amount = document.getElementById("payAmt").value;
-        let fromAcc = document.getElementById("payFrom").value;
-        p.remark = "Paid from " + fromAcc;
-        p.billType = document.getElementById("billType").value;
+    p.type = "Bill Pay"; 
+    p.name = document.getElementById("payTo").value; 
+    p.amount = Number(document.getElementById("payAmt").value); // राशि को नंबर में बदलें
+    let fromAcc = document.getElementById("payFrom").value;
+    p.remark = "Paid from " + fromAcc;
+    p.billType = document.getElementById("billType").value;
 
-        // Fix 5: Already Paid Check
-        if(p.billType === 'loan') {
-            const loan = db.loans.find(l => l.name === p.name);
-            if(loan && loan.status === 'Paid') {
-                return notify('Already Paid', 'इस महीने की EMI पहले ही भरी जा चुकी है!', 'info', '#38bdf8');
-            }
-        }
+    // --- बैलेंस चेक करने का लॉजिक ---
+    let currentBalance = 0;
+
+    // 1. अगर वॉलेट से पेमेंट है
+    if (fromAcc === "Wallet" || fromAcc === "Digital Wallet") {
+        currentBalance = db.walletBal;
+    } 
+    // 2. अगर बैंक से पेमेंट है
+    else {
+        let bank = db.banks.find(b => b.name === fromAcc);
+        currentBalance = bank ? bank.val : 0;
+    }
+
+    // 3. अगर बैलेंस कम है, तो यहीं रोक दें (Return) और मैसेज दिखाएँ
+    if (currentBalance < p.amount) {
+        return notify('Transaction Failed', `Insufficient Balance in ${fromAcc}!`, 'error', '#ef4444');
+    }
+}
       }
 
       if (!p.amount || p.amount <= 0) {
