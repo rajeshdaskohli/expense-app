@@ -51,44 +51,49 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 0; scrollbar-width: none; }
-    .hero-card { min-width: 140px; background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
+    .hero-card { min-width: 140px; background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     .hero-card span { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
     .hero-card p { margin: 8px 0 0; font-size: 16px; font-weight: 800; }
     .wallet-card { background: linear-gradient(135deg, #6366f1, #a855f7) !important; color: white !important; }
+    .wallet-card span { color: rgba(255,255,255,0.7) !important; }
 
     .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
     .cat-item { background: var(--card); padding: 15px 5px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
+    .cat-item div { font-size: 18px; margin-bottom: 5px; }
     .cat-item b { font-size: 11px; display: block; }
+    .cat-item small { color: var(--primary); font-size: 10px; font-weight: 800; }
 
     .list-container { background: var(--card); border-radius: 28px; padding: 10px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-    .scroll-area { max-height: 350px; overflow-y: auto; scrollbar-width: none; }
+    /* Fix 6: Recent Activity Scrollable Area */
+    .scroll-area { max-height: 350px; overflow-y: auto; scrollbar-width: none; padding-right: 5px; }
     
     .row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
     .row:last-child { border: none; }
     .meta b { display: block; font-size: 14px; }
-    .meta small { color: var(--text-dim); font-size: 11px; display: block; }
-    .due-date { font-size: 9px; color: var(--primary); font-weight: 800; margin-top: 2px; }
+    .meta small { color: var(--text-dim); font-size: 11px; }
 
     .label-row { display: flex; justify-content: space-between; align-items: center; margin: 25px 5px 10px; }
     .label-row h3 { font-size: 11px; font-weight: 800; color: var(--text-dim); margin: 0; letter-spacing: 1px; }
+    .subtotal { font-weight: 800; font-size: 12px; color: var(--text); }
 
     .nav-wrapper { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; }
     .nav-bar { background: var(--card); display: flex; padding: 8px; border-radius: 24px; border: 1px solid var(--border); width: 92%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
     .nav-item { flex: 1; padding: 10px; border-radius: 18px; text-align: center; color: var(--text-dim); cursor: pointer; }
     .nav-item.active { background: var(--primary); color: #fff; }
-    .nav-item i { display: block; font-size: 22px; }
+    .nav-item i { display: block; font-size: 22px; margin-bottom: 2px; }
     .nav-item span { font-size: 10px; font-weight: 700; }
 
     .inp-group { margin-bottom: 15px; }
-    .inp-group label { display: block; font-size: 10px; font-weight: 800; color: var(--primary); margin-left: 5px; margin-bottom: 5px; }
-    .inp { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; color: var(--text); outline: none; }
-    .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; }
+    .inp-group label { display: block; font-size: 10px; font-weight: 800; color: var(--primary); margin-left: 5px; margin-bottom: 5px; text-transform: uppercase; }
+    .inp { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; color: var(--text); font-size: 15px; outline: none; }
+    .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
     
-    #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
-    .modal-box { background: var(--card); padding: 30px; border-radius: 32px; width: 85%; max-width: 320px; text-align: center; }
+    #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal-box { background: var(--card); padding: 30px; border-radius: 32px; width: 85%; max-width: 320px; text-align: center; transform: scale(0.9); transition: 0.3s; }
+    .modal-box.show { transform: scale(1); }
     
     .val-pos { color: var(--green); } .val-neg { color: var(--red); }
-    .status-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; margin-left: 5px; font-weight: 800; }
+    .status-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; margin-left: 5px; vertical-align: middle; font-weight: 800; }
     .bg-red { background: rgba(239, 68, 68, 0.1); color: var(--red); }
     .bg-green { background: rgba(16, 185, 129, 0.1); color: var(--green); }
   </style>
@@ -131,16 +136,32 @@
         <div class="hero-card"><span>Month Fund</span><p id="sumFund">₹0</p></div>
         <div class="hero-card wallet-card"><span>Wallet Bal</span><p id="sumWallet">₹0</p></div>
       </div>
+
       <div class="label-row"><h3>SPENDING BY CATEGORY</h3></div>
       <div class="cat-grid" id="catGrid"></div>
-      <div class="label-row"><h3>BANKS</h3><span id="bankSub" style="font-size:12px; font-weight:800;">₹0</span></div>
+
+      <div class="label-row">
+        <h3>BANKS</h3>
+        <span id="bankSub" class="subtotal">₹0</span>
+      </div>
       <div class="list-container" id="bankList"></div>
-      <div class="label-row"><h3>CREDIT CARDS</h3><span id="cardSub" style="font-size:12px; font-weight:800;">₹0</span></div>
+
+      <div class="label-row">
+        <h3>CREDIT CARDS</h3>
+        <span id="cardSub" class="subtotal">₹0</span>
+      </div>
       <div class="list-container" id="cardList"></div>
-      <div class="label-row"><h3>LOANS & EMI</h3><span id="loanSub" style="font-size:12px; font-weight:800;">₹0</span></div>
+
+      <div class="label-row">
+        <h3>LOANS & EMI</h3>
+        <span id="loanSub" class="subtotal">₹0</span>
+      </div>
       <div class="list-container" id="loanList"></div>
+
       <div class="label-row"><h3>RECENT ACTIVITY</h3></div>
-      <div class="list-container"><div class="scroll-area" id="historyList"></div></div>
+      <div class="list-container">
+         <div class="scroll-area" id="historyList"></div>
+      </div>
     </div>
 
     <div class="page" id="pageEntry">
@@ -148,7 +169,7 @@
         <div class="inp-group">
           <label>Payment Method</label>
           <select class="inp" id="payMode" onchange="toggleFields()">
-            <option value="Digital Wallet">👛 Digital Wallet</option>
+            <option value="Digital Wallet">👛 Wallet</option>
             <option value="bank">🏦 Bank Transfer</option>
             <option value="card">💳 Credit Card</option>
           </select>
@@ -159,29 +180,42 @@
         <div id="divCard" style="display:none;" class="inp-group">
           <label>Select Card</label><select class="inp" id="expCard"></select>
         </div>
-        <div class="inp-group"><label>Category</label><select class="inp" id="expCat"></select></div>
-        <div class="inp-group"><label>Amount</label><input type="number" class="inp" id="expAmt" placeholder="0.00"></div>
-        <div class="inp-group"><label>Remark</label><input type="text" class="inp" id="expRem" placeholder="What for?"></div>
-        <button class="btn-main" onclick="saveTrans('entry')">SAVE EXPENSE</button>
+        <div class="inp-group">
+          <label>Category</label><select class="inp" id="expCat"></select>
+        </div>
+        <div class="inp-group">
+          <label>Amount</label><input type="number" class="inp" id="expAmt" placeholder="0.00">
+        </div>
+        <div class="inp-group">
+          <label>Remark</label><input type="text" class="inp" id="expRem" placeholder="What for?">
+        </div>
+        <button class="btn-main" id="btnSaveExp" onclick="saveTrans('entry')">SAVE EXPENSE</button>
       </div>
     </div>
 
     <div class="page" id="pageFund">
       <div class="list-container" style="padding: 25px; margin-top: 20px;">
         <div class="inp-group">
-          <label>Deposit To</label>
+          <label>Deposit To (Destination)</label>
           <select class="inp" id="targetType" onchange="updateFundSources()">
-            <option value="Wallet">👛 Digital Wallet</option>
+            <option value="Wallet">👛 Wallet</option>
             <option value="Bank">🏦 Bank Account</option>
           </select>
         </div>
         <div id="divTargetBank" style="display:none;" class="inp-group">
           <label>Target Bank</label><select class="inp" id="targetBankName"></select>
         </div>
-        <div class="inp-group"><label>From (Source)</label><select class="inp" id="fundSource"></select></div>
-        <div class="inp-group"><label>Amount</label><input type="number" class="inp" id="fundAmt" placeholder="0.00"></div>
-        <div class="inp-group"><label>Remark</label><input type="text" class="inp" id="fundRem" placeholder="Add Note"></div>
-        <button class="btn-main" onclick="saveTrans('fund')">CONFIRM TRANSFER</button>
+        <div class="inp-group">
+          <label>From (Source)</label>
+          <select class="inp" id="fundSource"></select>
+        </div>
+        <div class="inp-group">
+          <label>Amount</label><input type="number" class="inp" id="fundAmt" placeholder="0.00">
+        </div>
+        <div class="inp-group">
+          <label>Remark</label><input type="text" class="inp" id="fundRem" placeholder="Add Note">
+        </div>
+        <button class="btn-main" id="btnSaveFund" onclick="saveTrans('fund')">CONFIRM TRANSFER</button>
       </div>
     </div>
 
@@ -194,12 +228,19 @@
             <option value="loan">📅 Loan / EMI</option>
           </select>
         </div>
-        <div class="inp-group"><label>Pay From</label><select class="inp" id="payFrom"></select></div>
-        <div class="inp-group"><label>Pay To</label><select class="inp" id="payTo" onchange="autoFillEmi()"></select></div>
-        <div class="inp-group"><label>Amount</label><input type="number" class="inp" id="payAmt" placeholder="0.00"></div>
-        <button class="btn-main" onclick="saveTrans('pay')">PAY NOW</button>
+        <div class="inp-group">
+          <label>Pay From</label><select class="inp" id="payFrom"></select>
+        </div>
+        <div class="inp-group">
+          <label>Pay To (Select Account)</label><select class="inp" id="payTo" onchange="autoFillEmi()"></select>
+        </div>
+        <div class="inp-group">
+          <label>Amount</label><input type="number" class="inp" id="payAmt" placeholder="0.00">
+        </div>
+        <button class="btn-main" id="btnSaveBill" onclick="saveTrans('pay')">PAY NOW</button>
       </div>
     </div>
+
   </div>
 
   <div class="nav-wrapper">
