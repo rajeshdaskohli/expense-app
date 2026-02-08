@@ -245,9 +245,9 @@
 
   <div class="nav-wrapper">
     <div class="nav-bar">
-      <div class="nav-item active" onclick="showPage(0)"><i class="material-icons-round">home</i><span>Home</span></div>
-      <div class="nav-item" onclick="showPage(1)"><i class="material-icons-round">add_shopping_cart</i><span>Entry</span></div>
-      <div class="nav-item" onclick="showPage(2)"><i class="material-icons-round">swap_horiz</i><span>Transfer</span></div>
+      <div class="nav-item active" onclick="showPage(0)"><i class="material-icons-round">grid_view</i><span>Home</span></div>
+      <div class="nav-item" onclick="showPage(1)"><i class="material-icons-round">add_circle</i><span>Entry</span></div>
+      <div class="nav-item" onclick="showPage(2)"><i class="material-icons-round">sync_alt</i><span>Transfer</span></div>
       <div class="nav-item" onclick="showPage(3)"><i class="material-icons-round">receipt_long</i><span>Bills</span></div>
     </div>
   </div>
@@ -258,43 +258,17 @@
     let curPage = 0;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
 
-    // Initialize Theme & Persistence
-     window.onload = () => {
-      const savedTheme = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', savedTheme);
-      updateThemeUI(savedTheme);
-      showPage(0);
-      registerSW();
-    };
-
-    function toggleMenu() { document.getElementById('settingsMenu').classList.toggle('show'); }
-    window.onclick = (e) => { if (!e.target.matches('.material-icons-round')) document.getElementById('settingsMenu').classList.remove('show'); };
-
-    function toggleTheme() {
-      let h = document.documentElement;
-      let newTheme = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      h.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      updateThemeUI(newTheme);
-    }
-
-    function updateThemeUI(theme) {
-      const icon = document.getElementById('themeIcon');
-      const text = document.getElementById('themeText');
-      icon.innerText = theme === 'dark' ? 'light_mode' : 'dark_mode';
-      text.innerText = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
-    }
+    setInterval(() => { if (curPage === 0) refreshData(); }, 30000);
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === 'visible') refreshData(); });
 
     async function showPage(idx) {
       curPage = idx;
-      const titles = ["EXPENSE PRO", "ENTRY", "TRANSFER", "BILLS"];
-      document.getElementById('headerTitle').innerText = titles[idx];
-      
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       document.getElementById(['pageDashboard','pageEntry','pageFund','pageBills'][idx]).classList.add('active');
       document.querySelectorAll('.nav-item')[idx].classList.add('active');
       if(idx === 0) await refreshData();
+      if(idx === 2) updateFundSources();
     }
 
     async function refreshData() {
