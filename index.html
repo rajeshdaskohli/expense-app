@@ -253,7 +253,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyPVoHKfSDncS2unglzONKoV_eHqd2Zp0iHvbhCVBL-g7feAJ1zgHAe0F3pvdymTZM1eg/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxGwFBHXOgUTwgconAWDF0qZXPJwxtHc-TFwv-2Q_wHcZcGJtNg_i5JdNydifhP3BFBBA/exec";
     let db = null;
     let curPage = 0;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
@@ -339,22 +339,17 @@
 
       // Fix 5: Loans & EMI with Status
       document.getElementById("loanSub").innerText = fmt(getSum(db.loans));
-      // इसे updateUI फंक्शन के अंदर लोन लिस्ट वाले हिस्से में बदलें
-document.getElementById("loanList").innerHTML = db.loans.map(l => {
-  const isPaid = (String(l.status).toLowerCase().trim() === 'paid');
-  return `
-    <div class="row">
-      <div class="meta">
-        <b>${l.name} 
-           <span class="status-badge ${isPaid ? 'bg-green' : 'bg-red'}">
-             ${isPaid ? 'PAID' : 'UNPAID'}
-           </span>
-        </b>
-        <small>EMI Amount</small>
-      </div>
-      <b class="val-neg">${fmt(l.val)}</b>
-    </div>`;
-}).join("");
+      document.getElementById("loanList").innerHTML = db.loans.map(l => {
+        const isPaid = l.status === 'Paid';
+        return `
+        <div class="row">
+          <div class="meta">
+            <b>${l.name} <span class="status-badge ${isPaid?'bg-green':'bg-red'}">${isPaid?'PAID':'UNPAID'}</span></b>
+            <small>Monthly EMI</small>
+          </div>
+          <b class="val-neg">${fmt(l.val)}</b>
+        </div>`;
+      }).join("");
 
       // Recent History
       document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
@@ -432,27 +427,21 @@ document.getElementById("loanList").innerHTML = db.loans.map(l => {
         if(p.source === 'Others') p.type = 'Income'; 
       } 
       else if (type === 'pay') {
-    p.type = "Bill Pay"; 
-    p.name = document.getElementById("payTo").value; 
-    p.amount = Number(document.getElementById("payAmt").value);
-    p.billType = document.getElementById("billType").value;
-    let fromAccount = document.getElementById("payFrom").value;
-    p.remark = "Paid from " + fromAccount;
+        p.type = "Bill Pay"; 
+        p.name = document.getElementById("payTo").value; 
+        p.amount = document.getElementById("payAmt").value;
+        let fromAcc = document.getElementById("payFrom").value;
+        p.remark = "Paid from " + fromAcc;
+        p.billType = document.getElementById("billType").value;
 
-    // --- EMI Already Paid Check ---
-    if (p.billType === 'loan') {
-      const selectedLoan = db.loans.find(l => l.name === p.name);
-      if (selectedLoan && String(selectedLoan.status).toLowerCase().trim() === 'paid') {
-        return notify('Already Paid', `${p.name} EMI is already paid for this month!`, 'info', '#3b82f6');
+        // Fix 5: Already Paid Check
+        if(p.billType === 'loan') {
+            const loan = db.loans.find(l => l.name === p.name);
+            if(loan && loan.status === 'Paid') {
+                return notify('Already Paid', 'इस महीने की EMI पहले ही भरी जा चुकी है!', 'info', '#38bdf8');
+            }
+        }
       }
-    }
-
-    // --- Insufficient Balance Check ---
-    let balance = (fromAccount === 'Wallet' || fromAccount === 'Digital Wallet') ? db.walletBal : db.banks.find(b => b.name === fromAccount).val;
-    if (balance < p.amount) {
-      return notify('Transaction Failed', `Insufficient Balance in ${fromAccount}!`, 'error', '#ef4444');
-    }
-  }
 
       if (!p.amount || p.amount <= 0) {
         return notify('Alert', 'Please enter a valid amount', 'warning', '#f59e0b');
