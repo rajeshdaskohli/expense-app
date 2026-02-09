@@ -493,12 +493,7 @@
       document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
     }
 
-    // PWA Registration
-    function registerSW() {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log("SW Fail:", err));
-      }
-    }
+window.onload = () => showPage(0);
   </script>
 </body>
 </html>
