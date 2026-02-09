@@ -1,10 +1,10 @@
 {
   "name": "Expense Seva Pro",
-  "short_name": "ExpSeva",
-  "start_url": ".",
+  "short_name": "ExpensePro",
+  "start_url": "/expense-app/",
   "display": "standalone",
   "background_color": "#070b14",
-  "theme_color": "#38bdf8",
+  "theme_color": "#070b14",
   "icons": [
     {
       "src": "https://i.ibb.co/6R0pT8q/449167.png",
