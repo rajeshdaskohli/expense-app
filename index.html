@@ -458,6 +458,7 @@
         // Fix 4: Bypass balance check for Income
         if(p.source === 'Others') p.type = 'Income'; 
       } 
+      // saveTrans फंक्शन के अंदर 'pay' (Bills) वाले हिस्से को ऐसे बदलें:
       else if (type === 'pay') {
         p.type = "Bill Pay"; 
         p.name = document.getElementById("payTo").value; 
@@ -466,15 +467,36 @@
         p.remark = "Paid from " + fromAcc;
         p.billType = document.getElementById("billType").value;
 
-        // Fix 5: Already Paid Check
+        // 1. पहले बटन को 'Processing' मोड में डालें
+        btn.innerText = "PROCESSING...";
+
+        // 2. बैलेंस चेक करें
+        let currentBalance = 0;
+        if (fromAcc === 'Wallet') {
+          currentBalance = Number(db.walletBal);
+        } else {
+          let bank = db.banks.find(b => b.name === fromAcc);
+          currentBalance = bank ? Number(bank.val) : 0;
+        }
+
+        // 3. अगर बैलेंस कम है, तो थोड़ा रुक कर (ताकि प्रोसेसिंग दिखे) एरर दिखाएं
+        if (Number(p.amount) > currentBalance) {
+          setTimeout(() => {
+            btn.innerText = originalText; // बटन वापस ठीक करें
+            notify('Failed', `Insufficient Balance in ${fromAcc}!`, 'error_outline', '#ef4444');
+          }, 2000); // आधा सेकंड की प्रोसेसिंग दिखाएगा
+          return;
+        }
+
+        // 4. Already Paid Check
         if(p.billType === 'loan') {
             const loan = db.loans.find(l => l.name === p.name);
             if(loan && loan.status === 'Paid') {
+                btn.innerText = originalText;
                 return notify('Already Paid', 'इस महीने की EMI पहले ही भरी जा चुकी है!', 'info', '#38bdf8');
             }
         }
       }
-
       if (!p.amount || p.amount <= 0) {
         return notify('Alert', 'Please enter a valid amount', 'warning', '#f59e0b');
       }
