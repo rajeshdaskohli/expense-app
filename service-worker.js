@@ -1,16 +1,11 @@
-const CACHE_NAME = "expense-app-cache-v1";
-
-self.addEventListener("install", event => {
-  console.log("Service Worker Installed");
-  self.skipWaiting();
+self.addEventListener("install", () => {
+  console.log("SW Installed");
 });
 
-self.addEventListener("activate", event => {
-  console.log("Service Worker Activated");
-  event.waitUntil(clients.claim());
+self.addEventListener("activate", () => {
+  console.log("SW Activated");
 });
 
-self.addEventListener("fetch", event => {
-  // फिलहाल सिर्फ pass-through
+self.addEventListener("fetch", (event) => {
   event.respondWith(fetch(event.request));
 });
