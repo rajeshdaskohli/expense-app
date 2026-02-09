@@ -112,7 +112,7 @@
   </div>
 
   <div class="header">
-    <h1 id="headerTitle">EXPENSE SEVA PRO</h1>
+    <h1 id="headerTitle">EXPENSE PRO</h1>
     <div class="controls">
       <i class="material-icons-round" onclick="refreshData()" id="sBtn">sync</i>
       <i class="material-icons-round" onclick="toggleMenu()">more_vert</i>
@@ -300,7 +300,7 @@
 
     async function showPage(idx) {
       curPage = idx;
-      const titles = ["EXPENSE SEVA PRO", "ENTRY", "TRANSFER", "BILLS"];
+      const titles = ["EXPENSE PRO", "ENTRY", "TRANSFER", "BILLS"];
       document.getElementById('headerTitle').innerText = titles[idx];
       
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
