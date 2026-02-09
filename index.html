@@ -270,6 +270,14 @@
       registerSW();
     };
 
+    function registerSW() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(() => console.log("Service Worker Registered"))
+          .catch(err => console.log("Service Worker Error:", err));
+      }
+    }
+    
     function toggleMenu() { document.getElementById('settingsMenu').classList.toggle('show'); }
     window.onclick = (e) => { if (!e.target.matches('.material-icons-round')) document.getElementById('settingsMenu').classList.remove('show'); };
 
