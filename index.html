@@ -492,8 +492,16 @@
       document.getElementById("divBank").style.display = (m==='bank') ? 'block' : 'none';
       document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
     }
+window.addEventListener("load", () => {
+  showPage(0);
 
-window.onload = () => showPage(0);
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(() => console.log("Service Worker Registered"))
+      .catch(err => console.log("SW Error:", err));
+  }
+});
+    
   </script>
 </body>
 </html>
