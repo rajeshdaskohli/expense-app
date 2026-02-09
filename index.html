@@ -483,11 +483,11 @@
       document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
     }
 
-    // PWA Registration
-    function registerSW() {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log("SW Fail:", err));
-      }
+    // सर्विस वर्कर को रजिस्टर करना (इंस्टॉल बटन के लिए ज़रूरी)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('data:text/javascript;base64,' + btoa('self.addEventListener("fetch", function(e){})'))
+  .then(() => console.log("Service Worker Registered"));
+}
     }
   </script>
 </body>
