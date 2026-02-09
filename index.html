@@ -312,14 +312,27 @@
     }
 
     async function refreshData() {
-      const sBtn = document.getElementById('sBtn');
-      sBtn.classList.add('spinning');
-      try {
-        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
-        if(res.ok) { db = res; updateUI(); }
-      } catch(e) { console.error("Sync Error"); }
-      sBtn.classList.remove('spinning');
+  const sBtn = document.getElementById('sBtn');
+  if(sBtn) sBtn.classList.add('spinning');
+
+  // 1. मेमोरी से पुराना डेटा तुरंत उठाएं ताकि 0 न दिखे
+  const cached = localStorage.getItem('app_db_cache');
+  if(cached && !db) {
+    db = JSON.parse(cached);
+    updateUI(); 
+  }
+
+  // 2. अब सर्वर से नया डेटा मंगाएं
+  try {
+    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
+    if(res.ok) { 
+      db = res; 
+      localStorage.setItem('app_db_cache', JSON.stringify(res)); // भविष्य के लिए सेव करें
+      updateUI(); 
     }
+  } catch(e) { console.error("Sync Failed"); }
+  if(sBtn) sBtn.classList.remove('spinning');
+}
 
     function updateUI() {
       const s = db.summary;
