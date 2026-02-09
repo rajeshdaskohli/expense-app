@@ -1,20 +1,20 @@
 {
   "name": "Expense Seva Pro",
   "short_name": "ExpensePro",
-  "start_url": "/expense-app/",
+  "start_url": "/./",
   "display": "standalone",
   "background_color": "#070b14",
   "theme_color": "#070b14",
   "icons": [
-    {
-      "src": "https://i.ibb.co/6R0pT8q/449167.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://i.ibb.co/6R0pT8q/449167.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+  {
+    "src": "icon-192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  },
+  {
+    "src": "icon-512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }
+]
 }
