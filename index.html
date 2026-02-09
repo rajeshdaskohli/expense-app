@@ -437,12 +437,12 @@
         p.remark = "Paid from " + fromAcc;
         p.billType = document.getElementById("billType").value;
 
-        // Fix 5: Already Paid Check
-        if(p.billType === 'loan') {
-            const loan = db.loans.find(l => l.name === p.name);
-            if(loan && loan.status === 'Paid') {
-                return notify('Already Paid', 'इस महीने की EMI पहले ही भरी जा चुकी है!', 'info', '#38bdf8');
-            }
+        // सर्विस वर्कर को रजिस्टर करना (इंस्टॉल बटन के लिए ज़रूरी)
+        if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('data:text/javascript;base64,' + btoa('self.addEventListener("fetch", function(e){})'))
+       .then(() => console.log("Service Worker Registered"));
+      }
+
         }
       }
 
