@@ -493,14 +493,11 @@
       document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
     }
 
-    // सर्विस वर्कर रजिस्टर करें (ताकि क्रोम इंस्टॉल का विकल्प दे)
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('data:text/javascript;base64,' + btoa('self.addEventListener("fetch", function(e){})'))
-    .then(function(reg) { console.log('Service Worker Registered'); })
-    .catch(function(err) { console.log('SW Registration failed: ', err); });
-  });
-}
+    // PWA Registration
+    function registerSW() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log("SW Fail:", err));
+      }
     }
   </script>
 </body>
