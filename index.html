@@ -394,7 +394,8 @@
       document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
         <div class="row"><div class="meta"><b>${t.name} <span style="font-size:9px; opacity:0.5;">${t.category}</span></b><small>${t.date}</small></div><b class="${t.type==='Add Fund' || t.type==='Income' ?'val-pos':'val-neg'}">${t.type==='Add Fund' || t.type==='Income' ?'+':'-'}${fmt(t.amount)}</b></div>
       `).join("");
-
+      
+     // --- Update 4: Only refill dropdowns if not currently on entry pages to prevent reset ---
       if(curPage === 0) fillDropdowns();
     }
 
