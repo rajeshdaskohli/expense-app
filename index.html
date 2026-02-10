@@ -29,14 +29,14 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
 
-    /* --- Update: Processing Button (Dull Background, White Text) --- */
-    .btn-main:active { transform: scale(0.96); }
-    .loading-btn { 
-      background: #64748b !important; /* डल ग्रे-ब्लू बैकग्राउंड */
-      color: #ffffff !important;      /* टेक्स्ट एकदम वाइट */
-      pointer-events: none; 
-      filter: saturate(0.5); 
-    }
+    /* Processing Button: Muted Blue (Not Gray) with White Text */
+.loading-btn { 
+  background: #0369a1 !important; /* यह आपके नीले कलर का एक गहरा/डल शेड है */
+  color: #ffffff !important;      /* टेक्स्ट एकदम सफेद रहेगा */
+  pointer-events: none; 
+  cursor: not-allowed;
+  box-shadow: none;               /* प्रोसेसिंग के समय चमक हटा दी */
+}
     /* Header & Menu */
     .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
     .header h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
