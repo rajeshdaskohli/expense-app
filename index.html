@@ -479,9 +479,6 @@
         p.remark = "Paid from " + fromAcc;
         p.billType = document.getElementById("billType").value;
 
-        // 1. पहले बटन को 'Processing' मोड में डालें
-        btn.innerText = "PROCESSING...";
-
         // 2. बैलेंस चेक करें
         let currentBalance = 0;
         if (fromAcc === 'Wallet') {
