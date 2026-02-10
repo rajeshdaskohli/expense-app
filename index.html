@@ -395,7 +395,7 @@
         <div class="row"><div class="meta"><b>${t.name} <span style="font-size:9px; opacity:0.5;">${t.category}</span></b><small>${t.date}</small></div><b class="${t.type==='Add Fund' || t.type==='Income' ?'val-pos':'val-neg'}">${t.type==='Add Fund' || t.type==='Income' ?'+':'-'}${fmt(t.amount)}</b></div>
       `).join("");
 
-      fillDropdowns();
+      if(curPage === 0) fillDropdowns();
     }
 
     function fillDropdowns() {
