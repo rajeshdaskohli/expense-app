@@ -313,8 +313,15 @@
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       document.getElementById(['pageDashboard','pageEntry','pageFund','pageBills'][idx]).classList.add('active');
       document.querySelectorAll('.nav-item')[idx].classList.add('active');
-      if(idx === 0) await refreshData();
-      if(idx === 2) updateFundSources();
+
+      /* --- Update 4: Dropdown Blink Fix - Only refresh if on Dashboard --- */
+      if(idx === 0) {
+          await refreshData();
+      } else {
+          // If moving away from dashboard, just ensure current dropdowns are filled once
+          if(db) fillDropdowns(); 
+          if(idx === 2) updateFundSources();
+      }
     }
 
     async function refreshData() {
