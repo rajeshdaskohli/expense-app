@@ -7,7 +7,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <link rel="manifest" href="manifest.json">
-  
   <link rel="apple-touch-icon" href="https://i.ibb.co/6R0pT8q/449167.png">
   <link rel="icon" href="https://i.ibb.co/6R0pT8q/449167.png">
   
@@ -29,18 +28,19 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
 
-    /* Header & Menu */
+    /* --- Update 2: Processing Button Logic --- */
+    .btn-main:active { transform: scale(0.96); }
+    .loading-btn { background: #1e40af !important; pointer-events: none; filter: brightness(0.8); }
+
     .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
     .header h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
     .controls { display: flex; align-items: center; position: relative; }
     .controls i { cursor: pointer; margin-left: 15px; color: var(--text-dim); }
     
-    /* Rotation Fix for Sync Icon */
-    #sBtn { transform: scaleX(-1); } /* Arrow right side face logic */
+    #sBtn { transform: scaleX(-1); }
     @keyframes spin { from { transform: rotate(0deg) scaleX(-1); } to { transform: rotate(360deg) scaleX(-1); } }
     .spinning { animation: spin 1s linear infinite; color: var(--primary) !important; }
 
-    /* Settings Dropdown */
     .menu-dropdown { display: none; position: absolute; top: 40px; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 150px; z-index: 200; }
     .menu-dropdown.show { display: block; }
     .menu-item { display: flex; align-items: center; padding: 12px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 10px; }
@@ -52,12 +52,20 @@
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 0; scrollbar-width: none; }
-    .hero-card { min-width: 140px; background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    /* --- Update 1: New Hero Scroll Cards Setup --- */
+    .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 0; scrollbar-width: none; scroll-snap-type: x mandatory; }
+    .hero-scroll::-webkit-scrollbar { display: none; }
+    .hero-card { min-width: 85%; scroll-snap-align: center; flex-shrink: 0; background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     .hero-card span { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
-    .hero-card p { margin: 8px 0 0; font-size: 16px; font-weight: 800; }
+    .hero-card p { margin: 5px 0; font-size: 24px; font-weight: 800; }
+    
     .wallet-card { background: linear-gradient(135deg, #6366f1, #a855f7) !important; color: white !important; }
     .wallet-card span { color: rgba(255,255,255,0.7) !important; }
+    .last-month-card { background: linear-gradient(135deg, #1e293b, #020617) !important; color: white !important; }
+
+    .prog-bg { width: 100%; background: rgba(255,255,255,0.1); height: 6px; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+    .prog-bar { height: 100%; transition: 1s ease; }
+    .status-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; margin-top: 5px; }
 
     .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
     .cat-item { background: var(--card); padding: 15px 5px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
@@ -66,7 +74,6 @@
     .cat-item small { color: var(--primary); font-size: 10px; font-weight: 800; }
 
     .list-container { background: var(--card); border-radius: 28px; padding: 10px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-    /* Fix 6: Recent Activity Scrollable Area */
     .scroll-area { max-height: 350px; overflow-y: auto; scrollbar-width: none; padding-right: 5px; }
     
     .row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
@@ -88,7 +95,7 @@
     .inp-group { margin-bottom: 15px; }
     .inp-group label { display: block; font-size: 10px; font-weight: 800; color: var(--primary); margin-left: 5px; margin-bottom: 5px; text-transform: uppercase; }
     .inp { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; color: var(--text); font-size: 15px; outline: none; }
-    .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); cursor: pointer; }
     
     #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .modal-box { background: var(--card); padding: 30px; border-radius: 32px; width: 85%; max-width: 320px; text-align: center; transform: scale(0.9); transition: 0.3s; }
@@ -133,9 +140,24 @@
   <div class="container">
     <div class="page active" id="pageDashboard">
       <div class="hero-scroll">
+        <div class="hero-card wallet-card">
+          <span>THIS MONTH STATUS</span>
+          <p id="monthPLValue">₹0</p>
+          <div class="prog-bg"><div id="plProgress" class="prog-bar"></div></div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <small id="plStatusLabel" style="font-weight:700; font-size:10px;">PROFIT</small>
+            <small id="percentLabel" style="font-size:10px; opacity:0.8;">0% Spent</small>
+          </div>
+        </div>
+
+        <div class="hero-card last-month-card">
+          <span>LAST MONTH STATUS</span>
+          <p id="lastMonthValue">₹0</p>
+          <div id="lastMonthTag" class="status-tag">Checking...</div>
+          <div style="margin-top:10px;"><small style="opacity:0.6; font-size:9px;">ARCHIVED ON 1ST</small></div>
+        </div>
+        
         <div class="hero-card"><span>Today Exp</span><p id="sumToday">₹0</p></div>
-        <div class="hero-card"><span>Month Exp</span><p id="sumMonth">₹0</p></div>
-        <div class="hero-card"><span>Month Fund</span><p id="sumFund">₹0</p></div>
         <div class="hero-card"><span>Wallet Bal</span><p id="sumWallet">₹0</p></div>
       </div>
 
@@ -255,11 +277,12 @@
   </div>
 
   <script>
-    // इसे <script> के तुरंत बाद सबसे ऊपर डालें
-(function() {
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', savedTheme);
-})();
+    /* --- Update 3: Sync Background immediately with Theme --- */
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      document.body.style.backgroundColor = (savedTheme === 'dark') ? '#070b14' : '#f8fafc';
+    })();
     
     const API_URL = "https://script.google.com/macros/s/AKfycbxGwFBHXOgUTwgconAWDF0qZXPJwxtHc-TFwv-2Q_wHcZcGJtNg_i5JdNydifhP3BFBBA/exec";
     let db = null;
@@ -269,23 +292,12 @@
     setInterval(() => { if (curPage === 0) refreshData(); }, 30000);
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === 'visible') refreshData(); });
 
-    // Initialize Theme & Persistence
     window.onload = () => {
       const savedTheme = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', savedTheme);
       updateThemeUI(savedTheme);
       showPage(0);
-      registerSW();
     };
 
-    function registerSW() {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./service-worker.js')
-          .then(() => console.log("Service Worker Registered"))
-          .catch(err => console.log("Service Worker Error:", err));
-      }
-    }
-    
     function toggleMenu() { document.getElementById('settingsMenu').classList.toggle('show'); }
     window.onclick = (e) => { if (!e.target.matches('.material-icons-round')) document.getElementById('settingsMenu').classList.remove('show'); };
 
@@ -293,6 +305,7 @@
       let h = document.documentElement;
       let newTheme = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       h.setAttribute('data-theme', newTheme);
+      document.body.style.backgroundColor = (newTheme === 'dark') ? '#070b14' : '#f8fafc';
       localStorage.setItem('theme', newTheme);
       updateThemeUI(newTheme);
     }
@@ -313,38 +326,81 @@
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       document.getElementById(['pageDashboard','pageEntry','pageFund','pageBills'][idx]).classList.add('active');
       document.querySelectorAll('.nav-item')[idx].classList.add('active');
-      if(idx === 0) await refreshData();
-      if(idx === 2) updateFundSources();
+      
+      /* --- Update 4: Dropdown Blink Fix - Only refresh if on Dashboard --- */
+      if(idx === 0) {
+          await refreshData();
+      } else {
+          // If moving away from dashboard, just ensure current dropdowns are filled once
+          if(db) fillDropdowns(); 
+          if(idx === 2) updateFundSources();
+      }
     }
 
     async function refreshData() {
-  const sBtn = document.getElementById('sBtn');
-  if(sBtn) sBtn.classList.add('spinning');
+      const sBtn = document.getElementById('sBtn');
+      if(sBtn) sBtn.classList.add('spinning');
 
-  // 1. मेमोरी से पुराना डेटा तुरंत उठाएं ताकि 0 न दिखे
-  const cached = localStorage.getItem('app_db_cache');
-  if(cached && !db) {
-    db = JSON.parse(cached);
-    updateUI(); 
-  }
+      const cached = localStorage.getItem('app_db_cache');
+      if(cached && !db) {
+        db = JSON.parse(cached);
+        updateUI(); 
+      }
 
-  // 2. अब सर्वर से नया डेटा मंगाएं
-  try {
-    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
-    if(res.ok) { 
-      db = res; 
-      localStorage.setItem('app_db_cache', JSON.stringify(res)); // भविष्य के लिए सेव करें
-      updateUI(); 
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
+        if(res.ok) { 
+          db = res; 
+          localStorage.setItem('app_db_cache', JSON.stringify(res));
+          updateUI(); 
+        }
+      } catch(e) { console.error("Sync Failed"); }
+      if(sBtn) sBtn.classList.remove('spinning');
     }
-  } catch(e) { console.error("Sync Failed"); }
-  if(sBtn) sBtn.classList.remove('spinning');
-}
 
     function updateUI() {
       const s = db.summary;
+      
+      /* --- Update 1: Calculate Profit/Loss for Cards --- */
+      const income = Number(s.totalIncome || 0);
+      const expense = Number(s.monthExp || 0);
+      const netPL = income - expense;
+
+      // Current Month Card
+      document.getElementById("monthPLValue").innerText = fmt(netPL);
+      const prog = document.getElementById("plProgress");
+      const label = document.getElementById("plStatusLabel");
+      const perc = document.getElementById("percentLabel");
+      const spentPercent = income > 0 ? Math.min((expense / income) * 100, 100) : (expense > 0 ? 100 : 0);
+      
+      prog.style.width = spentPercent + "%";
+      perc.innerText = Math.round(spentPercent) + "% Spent";
+      
+      if(netPL >= 0) {
+        label.innerText = "OVERALL PROFIT";
+        label.style.color = "#10b981";
+        prog.style.background = "#10b981";
+      } else {
+        label.innerText = "OVERALL LOSS";
+        label.style.color = "#ff4444";
+        prog.style.background = "#ff4444";
+      }
+
+      // Last Month Card
+      const lastPL = Number(s.lastMonthPL || 0);
+      document.getElementById("lastMonthValue").innerText = fmt(lastPL);
+      const lastTag = document.getElementById("lastMonthTag");
+      if(lastPL >= 0) {
+          lastTag.innerText = "PROFITABLE";
+          lastTag.style.background = "rgba(16, 185, 129, 0.2)";
+          lastTag.style.color = "#10b981";
+      } else {
+          lastTag.innerText = "IN LOSS";
+          lastTag.style.background = "rgba(239, 68, 68, 0.2)";
+          lastTag.style.color = "#ff4444";
+      }
+
       document.getElementById("sumToday").innerText = fmt(s.todayExp);
-      document.getElementById("sumMonth").innerText = fmt(s.monthExp);
-      document.getElementById("sumFund").innerText = fmt(s.monthFund);
       document.getElementById("sumWallet").innerText = fmt(db.walletBal);
 
       document.getElementById("catGrid").innerHTML = db.categories.map(c => `
@@ -352,43 +408,26 @@
       `).join("");
 
       const getSum = (arr) => arr.reduce((acc, i) => acc + (Number(i.val) || Number(i.emi) || 0), 0);
-
-      // Banks
       document.getElementById("bankSub").innerText = fmt(getSum(db.banks));
       document.getElementById("bankList").innerHTML = db.banks.map(b => `
-        <div class="row">
-          <div class="meta"><b>${b.name}</b><small>Balance</small></div>
-          <b class="${b.val < 0 ? 'val-neg' : 'val-pos'}">${fmt(b.val)}</b>
-        </div>`).join("");
+        <div class="row"><div class="meta"><b>${b.name}</b><small>Balance</small></div><b class="${b.val < 0 ? 'val-neg' : 'val-pos'}">${fmt(b.val)}</b></div>`).join("");
 
-      // Fix 3: Credit Card Color Coding (Red if > 0, Green if 0)
       document.getElementById("cardSub").innerText = fmt(getSum(db.cards));
       document.getElementById("cardList").innerHTML = db.cards.map(c => `
-        <div class="row">
-          <div class="meta"><b>${c.name}</b><small>Outstanding</small></div>
-          <b class="${Number(c.val) > 0 ? 'val-neg' : 'val-pos'}">${fmt(c.val)}</b>
-        </div>`).join("");
+        <div class="row"><div class="meta"><b>${c.name}</b><small>Outstanding</small></div><b class="${Number(c.val) > 0 ? 'val-neg' : 'val-pos'}">${fmt(c.val)}</b></div>`).join("");
 
-      // Fix 5: Loans & EMI with Status
       document.getElementById("loanSub").innerText = fmt(getSum(db.loans));
       document.getElementById("loanList").innerHTML = db.loans.map(l => {
         const isPaid = l.status === 'Paid';
-        return `
-        <div class="row">
-          <div class="meta">
-            <b>${l.name} <span class="status-badge ${isPaid?'bg-green':'bg-red'}">${isPaid?'PAID':'UNPAID'}</span></b>
-            <small>Monthly EMI</small>
-          </div>
-          <b class="val-neg">${fmt(l.val)}</b>
-        </div>`;
+        return `<div class="row"><div class="meta"><b>${l.name} <span class="status-badge ${isPaid?'bg-green':'bg-red'}">${isPaid?'PAID':'UNPAID'}</span></b><small>Monthly EMI</small></div><b class="val-neg">${fmt(l.val)}</b></div>`;
       }).join("");
 
-      // Recent History
       document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
         <div class="row"><div class="meta"><b>${t.name} <span style="font-size:9px; opacity:0.5;">${t.category}</span></b><small>${t.date}</small></div><b class="${t.type==='Add Fund' || t.type==='Income' ?'val-pos':'val-neg'}">${t.type==='Add Fund' || t.type==='Income' ?'+':'-'}${fmt(t.amount)}</b></div>
       `).join("");
 
-      fillDropdowns();
+      // --- Update 4: Only refill dropdowns if not currently on entry pages to prevent reset ---
+      if(curPage === 0) fillDropdowns();
     }
 
     function fillDropdowns() {
@@ -399,7 +438,7 @@
       document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
       updateBillTarget();
     }
-    // Fix 5: Auto-fill EMI Amount
+
     function autoFillEmi() {
         const type = document.getElementById("billType").value;
         const selectedName = document.getElementById("payTo").value;
@@ -422,7 +461,6 @@
       const dest = document.getElementById("targetType").value;
       const targetBankDiv = document.getElementById("divTargetBank");
       let options = '<option value="Others">💳 Other/Salary Source</option>';
-      
       if(dest === 'Wallet') {
         targetBankDiv.style.display = "none";
         options += db.banks.filter(b=>b.name!=='Wallet' && b.name!=='Cash').map(b=>`<option value="${b.name}">🏦 From ${b.name}</option>`).join("");
@@ -449,58 +487,29 @@
         p.remark = document.getElementById("expRem").value;
       } 
       else if (type === 'fund') {
-        p.type = "Add Fund"; 
-        p.amount = document.getElementById("fundAmt").value; 
+        p.type = "Add Fund"; p.amount = document.getElementById("fundAmt").value; 
         p.source = document.getElementById("fundSource").value;
         p.name = (document.getElementById("targetType").value === 'Wallet') ? 'Wallet' : document.getElementById("targetBankName").value;
         p.remark = "Transfer from " + p.source;
-
-        // Fix 4: Bypass balance check for Income
         if(p.source === 'Others') p.type = 'Income'; 
       } 
-      // saveTrans फंक्शन के अंदर 'pay' (Bills) वाले हिस्से को ऐसे बदलें:
       else if (type === 'pay') {
-        p.type = "Bill Pay"; 
-        p.name = document.getElementById("payTo").value; 
+        p.type = "Bill Pay"; p.name = document.getElementById("payTo").value; 
         p.amount = document.getElementById("payAmt").value;
         let fromAcc = document.getElementById("payFrom").value;
         p.remark = "Paid from " + fromAcc;
         p.billType = document.getElementById("billType").value;
 
-        // 1. पहले बटन को 'Processing' मोड में डालें
-        btn.innerText = "PROCESSING...";
-
-        // 2. बैलेंस चेक करें
-        let currentBalance = 0;
-        if (fromAcc === 'Wallet') {
-          currentBalance = Number(db.walletBal);
-        } else {
-          let bank = db.banks.find(b => b.name === fromAcc);
-          currentBalance = bank ? Number(bank.val) : 0;
-        }
-
-        // 3. अगर बैलेंस कम है, तो थोड़ा रुक कर (ताकि प्रोसेसिंग दिखे) एरर दिखाएं
+        let currentBalance = (fromAcc === 'Wallet') ? Number(db.walletBal) : (db.banks.find(b => b.name === fromAcc)?.val || 0);
         if (Number(p.amount) > currentBalance) {
-          setTimeout(() => {
-            btn.innerText = originalText; // बटन वापस ठीक करें
-            notify('Failed', `Insufficient Balance in ${fromAcc}!`, 'error_outline', '#ef4444');
-          }, 2000); // आधा सेकंड की प्रोसेसिंग दिखाएगा
+          notify('Failed', `Insufficient Balance in ${fromAcc}!`, 'error_outline', '#ef4444');
           return;
         }
-
-        // 4. Already Paid Check
-        if(p.billType === 'loan') {
-            const loan = db.loans.find(l => l.name === p.name);
-            if(loan && loan.status === 'Paid') {
-                btn.innerText = originalText;
-                return notify('Already Paid', 'इस महीने की EMI पहले ही भरी जा चुकी है!', 'info', '#38bdf8');
-            }
-        }
-      }
-      if (!p.amount || p.amount <= 0) {
-        return notify('Alert', 'Please enter a valid amount', 'warning', '#f59e0b');
       }
 
+      if (!p.amount || p.amount <= 0) return notify('Alert', 'Please enter a valid amount', 'warning', '#f59e0b');
+
+      /* --- Update 2: Visual Processing State --- */
       btn.classList.add('loading-btn'); 
       btn.innerText = "PROCESSING...";
 
@@ -508,14 +517,14 @@
         const response = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) });
         const res = await response.json();
         if (res.ok) {
-          notify('Success', 'Transaction recorded successfully!', 'check_circle', '#10b981');
+          notify('Success', 'Transaction recorded!', 'check_circle', '#10b981');
           document.querySelectorAll('.inp').forEach(i => { if(i.type === 'number' || i.type === 'text') i.value = ""; });
           setTimeout(() => { showPage(0); }, 500);
         } else {
           notify('Failed', res.error, 'error_outline', '#ef4444');
         }
       } catch (e) {
-        notify('Error', 'Network connection failed!', 'error', '#ef4444');
+        notify('Error', 'Network failed!', 'error', '#ef4444');
       } finally {
         btn.classList.remove('loading-btn'); 
         btn.innerText = originalText;
@@ -533,16 +542,6 @@
       document.getElementById("divBank").style.display = (m==='bank') ? 'block' : 'none';
       document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
     }
-window.addEventListener("load", () => {
-  showPage(0);
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(() => console.log("Service Worker Registered"))
-      .catch(err => console.log("SW Error:", err));
-  }
-});
-    
   </script>
 </body>
 </html>
