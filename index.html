@@ -29,6 +29,10 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
 
+    /* --- Update 2: Processing Button Logic --- */
+    .btn-main:active { transform: scale(0.96); }
+    .loading-btn { background: #1e40af !important; pointer-events: none; filter: brightness(0.8); }
+    
     /* Header & Menu */
     .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
     .header h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
