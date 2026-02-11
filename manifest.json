@@ -1,6 +1,6 @@
 {
   "name": "Expense Seva Pro",
-  "short_name": "Expense Pro",
+  "short_name": "ExpensePro",
   "start_url": "/expense-app/",
   "scope": "/expense-app/",
   "display": "standalone",
