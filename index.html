@@ -18,12 +18,15 @@
   
   <style>
     :root {
-      --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --text-dim: #64748b;
-      --primary: #2563eb; --green: #10b981; --red: #ef4444; --border: rgba(0,0,0,0.05);
+       --bg: #0b1120; --surface: #151c2f; --input: #1e293b;
+      --text: #f8fafc; --text-muted: #94a3b8; --border: rgba(255, 255, 255, 0.08);
+      --primary: #673ab7; --primary-grad: linear-gradient(135deg, #673ab7, #512da8);
+      --success: #00c853; --danger: #ff3d00; --nav-bg: rgba(21, 28, 47, 0.95);
     }
-    [data-theme="dark"] {
-      --bg: #070b14; --card: #121826; --text: #f8fafc; --text-dim: #94a3b8;
-      --primary: #38bdf8; --border: rgba(255,255,255,0.05);
+    [data-theme="light"] {
+      --bg: #f4f7fe; --surface: #ffffff; --input: #f1f5f9;
+      --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0;
+      --primary: #5e35b1; --nav-bg: rgba(255, 255, 255, 0.95);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
