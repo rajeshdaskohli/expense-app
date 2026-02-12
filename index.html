@@ -30,7 +30,8 @@
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 120px; transition: 0.3s; }
+    
 
 /* Update 2: Processing Button Logic (Dull Color) */
 .btn-main:active { 
@@ -61,7 +62,23 @@
     .menu-item:hover { background: var(--border); }
     .menu-item i { margin-right: 10px; font-size: 18px; margin-left: 0 !important; }
 
-    .container { max-width: 500px; margin: 0 auto; padding: 0 16px; }
+        .container { max-width: 480px; margin: 0 auto; padding: 0 16px; }
+    .header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 1000; }
+    
+    /* Dashboard Cards */
+    .balance-card { background: var(--primary-grad); padding: 25px; border-radius: 28px; color: white; margin: 10px 0; box-shadow: 0 15px 30px -10px rgba(103, 58, 183, 0.5); }
+    .balance-card h2 { font-size: 32px; margin: 5px 0 0; font-weight: 800; }
+
+    .section-title { display: flex; justify-content: space-between; align-items: center; margin: 25px 5px 12px; }
+    .section-title h3 { font-size: 14px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 0; }
+    
+    .list-box { background: var(--surface); border-radius: 24px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 15px; }
+    .item { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); }
+    .item:last-child { border-bottom: none; }
+    .item b { font-size: 14px; display: block; }
+    .item small { color: var(--text-muted); font-size: 11px; }
+    .val { font-weight: 700; font-size: 14px; }
+
     .page { display: none; min-height: 70vh; animation: fadeIn 0.4s ease; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
