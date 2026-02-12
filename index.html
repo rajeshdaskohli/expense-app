@@ -63,12 +63,36 @@
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 0; scrollbar-width: none; }
-    .hero-card { min-width: 140px; background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+     /* --- Hero Scroll Cards (Transparent) --- */
+    .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 0; scrollbar-width: none; scroll-snap-type: x mandatory; }
+    .hero-scroll::-webkit-scrollbar { display: none; }
+    
+    .hero-card { 
+      min-width: 85%; scroll-snap-align: center; flex-shrink: 0; 
+      background: var(--card); /* Transparent Variable */
+      backdrop-filter: blur(12px); /* Glass Effect */
+      padding: 20px; border-radius: 24px; 
+      border: 1px solid var(--border); 
+    }
     .hero-card span { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
-    .hero-card p { margin: 8px 0 0; font-size: 16px; font-weight: 800; }
-    .wallet-card { background: linear-gradient(135deg, #6366f1, #a855f7) !important; color: white !important; }
-    .wallet-card span { color: rgba(255,255,255,0.7) !important; }
+    .hero-card p { margin: 5px 0; font-size: 26px; font-weight: 800; }
+    
+    /* Progress Bar */
+    .prog-bg { width: 100%; background: rgba(120, 120, 120, 0.2); height: 6px; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+    .prog-bar { height: 100%; transition: 1s ease; }
+
+    /* --- Wallet Bar (New Position & Style) --- */
+    .wallet-bar {
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      margin: 10px 0 25px 0; 
+      padding: 18px 24px; 
+      border-radius: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      color: white; 
+      box-shadow: 0 10px 20px rgba(56, 189, 248, 0.25);
+    }
+    .wallet-bar-label { font-size: 11px; font-weight: 700; opacity: 0.9; letter-spacing: 0.5px; }
+    .wallet-bar-val { font-size: 22px; font-weight: 800; }
 
     .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
     .cat-item { background: var(--card); padding: 15px 5px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
