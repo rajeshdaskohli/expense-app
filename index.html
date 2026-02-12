@@ -183,7 +183,7 @@
           <label>Payment Method</label>
           <select class="inp" id="payMode" onchange="toggleFields()">
             <option value="Digital Wallet">👛 Wallet</option>
-            <option value="bank">🏦 Bank Transfer</option>
+            <option value="bank">🏦 Bank</option>
             <option value="card">💳 Credit Card</option>
           </select>
         </div>
@@ -414,7 +414,7 @@
       const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
       document.getElementById("expBank").innerHTML = opt(db.banks, "name");
       document.getElementById("expCard").innerHTML = opt(db.cards, "name");
-      document.getElementById("payFrom").innerHTML = `<option value="Wallet">Digital Wallet</option>` + opt(db.banks, "name");
+      document.getElementById("payFrom").innerHTML = `<option value="Wallet">Wallet</option>` + opt(db.banks, "name");
       document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
       updateBillTarget();
     }
@@ -448,7 +448,7 @@
       } else {
         targetBankDiv.style.display = "block";
         document.getElementById("targetBankName").innerHTML = db.banks.filter(b=>b.name!=='Wallet' && b.name!=='Cash').map(b=>`<option value="${b.name}">${b.name}</option>`).join("");
-        options += '<option value="Wallet">👛 From Digital Wallet</option>';
+        options += '<option value="Wallet">👛 From Wallet</option>';
         options += '<option value="Cash">💵 From Cash Hand</option>';
       }
       document.getElementById("fundSource").innerHTML = options;
