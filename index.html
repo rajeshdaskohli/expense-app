@@ -3,268 +3,411 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://i.ibb.co/6R0pT8q/449167.png">
+  <link rel="icon" href="https://i.ibb.co/6R0pT8q/449167.png">
   <title>Expense Pro Max</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  
   <style>
     :root {
-      --bg: #070b14; --card: rgba(255,255,255,0.06); --text: #f8fafc; --text-dim: #94a3b8;
-      --primary: #38bdf8; --green: #10b981; --red: #ef4444; --border: rgba(255,255,255,0.1);
+      --bg: #f8fafc; --card: rgba(255,255,255,0.8); --text: #0f172a; --text-dim: #64748b;
+      --primary: #2563eb; --green: #10b981; --red: #ef4444; --border: rgba(0,0,0,0.08);
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.3s ease; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 100px; }
-    
+    [data-theme="dark"] {
+      --bg: #070b14; --card: rgba(255,255,255,0.06); --text: #f8fafc; --text-dim: #94a3b8;
+      --primary: #38bdf8; --border: rgba(255,255,255,0.1);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
+
+    /* Processing Button Logic */
+    .loading-btn { 
+      background: #0369a1 !important; color: #fff !important;
+      opacity: 0.7; pointer-events: none; filter: saturate(0.6); 
+    }
+
+    /* Header & Menu */
     .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
+    .header h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
+    #sBtn { transform: scaleX(-1); cursor: pointer; }
+    @keyframes spin { from { transform: rotate(0deg) scaleX(-1); } to { transform: rotate(360deg) scaleX(-1); } }
+    .spinning { animation: spin 1s linear infinite; color: var(--primary) !important; }
+
     .container { max-width: 500px; margin: 0 auto; padding: 0 16px; }
-    
+    .page { display: none; min-height: 70vh; animation: fadeIn 0.4s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
     /* P/L Cards */
     .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 0; scrollbar-width: none; }
-    .hero-card { min-width: 260px; background: var(--card); backdrop-filter: blur(10px); padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
-    .hero-card span { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
-    .hero-card p { margin: 5px 0; font-size: 28px; font-weight: 800; }
+    .hero-card { min-width: 85%; background: var(--card); backdrop-filter: blur(10px); padding: 20px; border-radius: 24px; border: 1px solid var(--border); flex-shrink: 0; }
+    .hero-card span { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
+    .hero-card p { margin: 8px 0 0; font-size: 24px; font-weight: 800; }
+
+    /* Credit Card Tracker */
+    .cc-item { background: var(--card); padding: 18px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 12px; }
+    .cc-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .cc-limit-bg { width: 100%; height: 6px; background: rgba(120,120,120,0.2); border-radius: 10px; overflow: hidden; margin: 10px 0; }
+    .cc-limit-fill { height: 100%; background: var(--primary); border-radius: 10px; }
 
     /* Wallet Bar */
     .wallet-bar { background: linear-gradient(90deg, #38bdf8, #818cf8); margin: 20px 0; padding: 18px 24px; border-radius: 24px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2); }
 
-    /* Credit Card Tracker */
-    .cc-item { background: var(--card); padding: 18px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 12px; }
-    .cc-info { display: flex; justify-content: space-between; margin-bottom: 10px; }
-    .cc-limit-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
-    .cc-limit-fill { height: 100%; background: var(--primary); border-radius: 10px; }
+    /* Grid & Lists */
+    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .cat-item { background: var(--card); padding: 15px 5px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
+    .list-container { background: var(--card); border-radius: 28px; padding: 10px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border); }
+    .row:last-child { border: none; }
 
     /* Navigation */
     .nav-wrapper { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; }
-    .nav-bar { background: rgba(15,23,42,0.9); backdrop-filter: blur(15px); display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px; border-radius: 24px; border: 1px solid var(--border); width: 94%; max-width: 450px; }
-    .nav-item { padding: 10px; text-align: center; color: var(--text-dim); cursor: pointer; font-size: 10px; font-weight: 700; }
+    .nav-bar { background: var(--card); backdrop-filter: blur(15px); display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px; border-radius: 24px; border: 1px solid var(--border); width: 94%; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .nav-item { padding: 8px; text-align: center; color: var(--text-dim); cursor: pointer; font-size: 9px; font-weight: 700; }
     .nav-item.active { background: var(--primary); color: #fff; border-radius: 18px; }
-    .nav-item i { display: block; font-size: 22px; margin-bottom: 2px; }
+    .nav-item i { display: block; font-size: 20px; margin-bottom: 2px; }
 
-    /* Processing Button Style */
-    .loading-btn { background: #0369a1 !important; color: #fff !important; pointer-events: none; opacity: 0.8; }
+    /* Inputs */
+    .inp { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; color: var(--text); font-size: 15px; outline: none; margin-bottom: 15px; }
+    .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; cursor: pointer; }
     
-    .page { display: none; animation: fadeIn 0.4s ease; }
-    .page.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal-box { background: var(--card); padding: 30px; border-radius: 32px; width: 85%; max-width: 320px; text-align: center; border: 1px solid var(--border); }
     
-    .inp { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; color: var(--text); font-size: 16px; margin-bottom: 15px; outline: none; }
-    .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 800; cursor: pointer; }
-    
-    .row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
     .val-pos { color: var(--green); } .val-neg { color: var(--red); }
+    .status-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; font-weight: 800; text-transform: uppercase; }
   </style>
 </head>
 <body>
 
+  <div id="modal">
+    <div class="modal-box">
+      <i class="material-icons-round" id="mIcon" style="font-size: 50px;">check_circle</i>
+      <h2 id="mTitle" style="margin: 15px 0 5px;">Success</h2>
+      <p id="mText" style="color: var(--text-dim); margin-bottom: 20px;"></p>
+      <button class="btn-main" onclick="closeModal()">OK</button>
+    </div>
+  </div>
+
   <div class="header">
-    <h1 id="hTitle">EXPENSE PRO</h1>
-    <i class="material-icons-round" onclick="refreshData()" id="sBtn">sync</i>
+    <h1 id="headerTitle">EXPENSE PRO</h1>
+    <div style="display: flex; align-items: center;">
+      <i class="material-icons-round" onclick="refreshData()" id="sBtn">sync</i>
+      <i class="material-icons-round" onclick="toggleTheme()" style="margin-left: 15px; cursor: pointer;">contrast</i>
+    </div>
   </div>
 
   <div class="container">
     <div class="page active" id="p0">
       <div class="hero-scroll">
-        <div class="hero-card"><span>Current P/L</span><p id="plNow">₹0</p><small id="plStat" style="font-weight:800"></small></div>
-        <div class="hero-card"><span>Last Month P/L</span><p id="plPrev">₹0</p></div>
+        <div class="hero-card">
+          <span>Current Month P/L</span>
+          <p id="plNow">₹0</p>
+          <small id="plNowStat" style="font-weight:800;"></small>
+        </div>
+        <div class="hero-card">
+          <span>Last Month P/L</span>
+          <p id="plPrev">₹0</p>
+          <small id="plPrevStat" style="font-weight:800;"></small>
+        </div>
         <div class="hero-card"><span>Today's Exp</span><p id="sumToday">₹0</p></div>
       </div>
 
-      <div class="wallet-bar"><span>WALLET BALANCE</span><b id="sumWallet">₹0</b></div>
+      <div class="wallet-bar">
+        <span>WALLET BALANCE</span>
+        <b id="sumWallet">₹0</b>
+      </div>
 
-      <h3>CREDIT CARDS</h3>
+      <div style="margin: 25px 5px 10px; display:flex; justify-content:space-between;">
+        <h3 style="font-size:11px; color:var(--text-dim);">CREDIT CARDS</h3>
+        <span id="cardSub" style="font-weight:800; font-size:12px;">₹0</span>
+      </div>
       <div id="cardList"></div>
 
-      <h3>LOANS & EMIs</h3>
+      <div style="margin: 25px 5px 10px; display:flex; justify-content:space-between;">
+        <h3 style="font-size:11px; color:var(--text-dim);">LOANS & EMIS</h3>
+        <span id="loanSub" style="font-weight:800; font-size:12px;">₹0</span>
+      </div>
       <div id="loanList"></div>
-      
-      <br>
-      <h3>BANKS</h3>
-      <div id="bankList" style="background: var(--card); padding: 15px; border-radius: 20px;"></div>
+
+      <div style="margin: 25px 5px 10px;">
+        <h3 style="font-size:11px; color:var(--text-dim);">BANKS</h3>
+      </div>
+      <div class="list-container" id="bankList"></div>
+
+      <div style="margin: 25px 5px 10px;">
+        <h3 style="font-size:11px; color:var(--text-dim);">CATEGORIES</h3>
+      </div>
+      <div class="cat-grid" id="catGrid"></div>
     </div>
 
     <div class="page" id="p1">
-      <div style="background: var(--card); padding: 25px; border-radius: 24px; margin-top: 20px;">
-        <select class="inp" id="eMode" onchange="toggleE()"><option value="Digital Wallet">Wallet</option><option value="bank">Bank</option><option value="card">Credit Card</option></select>
-        <select class="inp" id="eAcc" style="display:none"></select>
+      <div class="list-container" style="padding: 25px; margin-top: 20px;">
+        <select class="inp" id="eMode" onchange="toggleEFields()"><option value="Digital Wallet">👛 Wallet</option><option value="bank">🏦 Bank Transfer</option><option value="card">💳 Credit Card</option></select>
+        <div id="divEAcc" style="display:none;"><select class="inp" id="eAcc"></select></div>
         <select class="inp" id="eCat"></select>
-        <input type="number" class="inp" id="eAmt" placeholder="Amount">
+        <input type="number" class="inp" id="eAmt" placeholder="0.00">
         <input type="text" class="inp" id="eRem" placeholder="Remark">
-        <button class="btn-main" id="btnE" onclick="save('entry')">SAVE EXPENSE</button>
+        <button class="btn-main" id="btnSaveE" onclick="saveTrans('entry')">SAVE EXPENSE</button>
       </div>
     </div>
 
     <div class="page" id="p2">
-       <div style="background: var(--card); padding: 25px; border-radius: 24px; margin-top: 20px;">
-         <select class="inp" id="fDest" onchange="updateF()"><option value="Wallet">To Wallet</option><option value="Bank">To Bank</option></select>
-         <select class="inp" id="fTgt" style="display:none"></select>
-         <select class="inp" id="fSrc"></select>
-         <input type="number" class="inp" id="fAmt" placeholder="Amount">
-         <button class="btn-main" id="btnF" onclick="save('fund')">TRANSFER NOW</button>
-       </div>
+      <div class="list-container" style="padding: 25px; margin-top: 20px;">
+        <select class="inp" id="fDest" onchange="updateFSources()"><option value="Wallet">To Wallet</option><option value="Bank">To Bank Account</option></select>
+        <div id="divFTgt" style="display:none;"><select class="inp" id="fTgt"></select></div>
+        <select class="inp" id="fSrc"></select>
+        <input type="number" class="inp" id="fAmt" placeholder="0.00">
+        <button class="btn-main" id="btnSaveF" onclick="saveTrans('fund')">CONFIRM TRANSFER</button>
+      </div>
     </div>
 
     <div class="page" id="p3">
-      <div style="background: var(--card); padding: 25px; border-radius: 24px; margin-top: 20px;">
-        <select class="inp" id="bType" onchange="updateB()"><option value="card">Pay Card Bill</option><option value="loan">Pay Loan EMI</option></select>
+      <div class="list-container" style="padding: 25px; margin-top: 20px;">
+        <select class="inp" id="bType" onchange="updateBTarget()"><option value="card">💳 Credit Card Bill</option><option value="loan">📅 Loan / EMI</option></select>
         <select class="inp" id="bFrom"></select>
-        <select class="inp" id="bTo" onchange="autoB()"></select>
-        <input type="number" class="inp" id="bAmt" placeholder="Amount">
-        <button class="btn-main" id="btnB" onclick="save('pay')">PAY BILL</button>
+        <select class="inp" id="bTo" onchange="autoFillB()"></select>
+        <input type="number" class="inp" id="bAmt" placeholder="0.00">
+        <button class="btn-main" id="btnSaveB" onclick="saveTrans('pay')">PAY NOW</button>
       </div>
     </div>
 
     <div class="page" id="p4">
-      <h3>TRANSACTION HISTORY</h3>
-      <div id="histList" style="background: var(--card); padding: 15px; border-radius: 24px;"></div>
+      <div style="margin: 20px 5px 10px;"><h3 style="font-size:11px; color:var(--text-dim);">TRANSACTION HISTORY</h3></div>
+      <div class="list-container" id="historyList"></div>
     </div>
   </div>
 
   <div class="nav-wrapper">
     <div class="nav-bar">
-      <div class="nav-item active" onclick="show(0)"><i class="material-icons-round">home</i><span>Home</span></div>
-      <div class="nav-item" onclick="show(1)"><i class="material-icons-round">add</i><span>Add</span></div>
-      <div class="nav-item" onclick="show(2)"><i class="material-icons-round">sync_alt</i><span>Move</span></div>
-      <div class="nav-item" onclick="show(3)"><i class="material-icons-round">receipt</i><span>Bills</span></div>
-      <div class="nav-item" onclick="show(4)"><i class="material-icons-round">history</i><span>History</span></div>
+      <div class="nav-item active" onclick="showPage(0)"><i class="material-icons-round">home</i><span>Home</span></div>
+      <div class="nav-item" onclick="showPage(1)"><i class="material-icons-round">add_circle</i><span>Entry</span></div>
+      <div class="nav-item" onclick="showPage(2)"><i class="material-icons-round">swap_horiz</i><span>Move</span></div>
+      <div class="nav-item" onclick="showPage(3)"><i class="material-icons-round">receipt</i><span>Bills</span></div>
+      <div class="nav-item" onclick="showPage(4)"><i class="material-icons-round">history</i><span>History</span></div>
     </div>
   </div>
 
   <script>
-    const API = "YOUR_DEPLOYED_URL_HERE";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxGwFBHXOgUTwgconAWDF0qZXPJwxtHc-TFwv-2Q_wHcZcGJtNg_i5JdNydifhP3BFBBA/exec";
     let db = null;
+    let curIdx = 0;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
 
-    async function show(idx) {
+    // Initial Load & Theme
+    window.onload = () => {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      showPage(0);
+    };
+
+    function toggleTheme() {
+      let h = document.documentElement;
+      let newTheme = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      h.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+
+    async function showPage(idx) {
+      curIdx = idx;
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById('p'+idx).classList.add('active');
+      document.getElementById('p' + idx).classList.add('active');
       document.querySelectorAll('.nav-item')[idx].classList.add('active');
-      if(idx === 0) refreshData(); else fill();
+      
+      const titles = ["EXPENSE PRO", "ADD ENTRY", "TRANSFER", "PAY BILLS", "HISTORY"];
+      document.getElementById('headerTitle').innerText = titles[idx];
+
+      if (idx === 0 || idx === 4) await refreshData();
+      else { if(db) fillDropdowns(); }
     }
 
     async function refreshData() {
-      const s = document.getElementById('sBtn'); s.style.animation = "spin 1s linear infinite";
+      const sBtn = document.getElementById('sBtn');
+      sBtn.classList.add('spinning');
+      
+      // Cache Load
+      const cached = localStorage.getItem('app_cache');
+      if(cached && !db) { db = JSON.parse(cached); updateUI(); }
+
       try {
-        const r = await fetch(API, { method: "POST", body: JSON.stringify({action:"getDashboard"}) });
-        db = await r.json();
-        updateUI();
-      } catch(e) { console.error(e); }
-      s.style.animation = "";
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
+        if(res.ok) { 
+          db = res; 
+          localStorage.setItem('app_cache', JSON.stringify(db));
+          updateUI(); 
+        }
+      } catch(e) { console.error("Sync Failed"); }
+      sBtn.classList.remove('spinning');
     }
 
     function updateUI() {
       const s = db.summary;
+      
+      // P/L Cards
       document.getElementById('plNow').innerText = fmt(s.plNow);
+      document.getElementById('plNowStat').innerText = s.plNow >= 0 ? "MONTH PROFIT" : "MONTH LOSS";
+      document.getElementById('plNowStat').className = s.plNow >= 0 ? "val-pos" : "val-neg";
+      
       document.getElementById('plPrev').innerText = fmt(s.plPrev);
+      document.getElementById('plPrevStat').innerText = s.plPrev >= 0 ? "STABLE" : "OVERSPENT";
+      document.getElementById('plPrevStat').className = s.plPrev >= 0 ? "val-pos" : "val-neg";
+      
       document.getElementById('sumToday').innerText = fmt(s.todayExp);
       document.getElementById('sumWallet').innerText = fmt(db.walletBal);
-      
-      const plStat = document.getElementById('plStat');
-      plStat.innerText = s.plNow >= 0 ? "PROFIT" : "OVERSPENT";
-      plStat.className = s.plNow >= 0 ? "val-pos" : "val-neg";
 
-      // Card Tracking
+      // Banks
+      document.getElementById('bankList').innerHTML = db.banks.map(b => `
+        <div class="row"><span>${b.name}</span><b class="${b.balance < 0 ? 'val-neg' : ''}">${fmt(b.balance)}</b></div>
+      `).join("");
+
+      // Credit Cards
+      const cardSub = db.cards.reduce((acc, c) => acc + Number(c.outstanding), 0);
+      document.getElementById('cardSub').innerText = fmt(cardSub);
       document.getElementById('cardList').innerHTML = db.cards.map(c => {
         let pct = (c.outstanding / c.limit) * 100;
-        return `<div class="cc-item">
+        return `
+        <div class="cc-item">
           <div class="cc-info"><b>${c.name}</b><span class="val-neg">${fmt(c.outstanding)}</span></div>
-          <div class="cc-limit-bg"><div class="cc-limit-fill" style="width:${Math.min(pct,100)}%; background:${pct>80?'#ef4444':'#38bdf8'}"></div></div>
-          <div style="display:flex; justify-content:space-between; font-size:10px; margin-top:5px; color:var(--text-dim)">
+          <div class="cc-limit-bg"><div class="cc-limit-fill" style="width:${Math.min(pct,100)}%; background:${pct>85?'var(--red)':'var(--primary)'}"></div></div>
+          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim);">
             <span>Limit: ${fmt(c.limit)}</span><span>Due: ${c.duedate}</span>
           </div>
         </div>`;
       }).join("");
 
-      // Loan Tracking
+      // Loans
+      const loanSub = db.loans.reduce((acc, l) => acc + Number(l.balance), 0);
+      document.getElementById('loanSub').innerText = fmt(loanSub);
       document.getElementById('loanList').innerHTML = db.loans.map(l => `
         <div class="cc-item">
-          <div class="cc-info"><b>${l.name}</b><span class="val-neg">${fmt(l.emiamount)}</span></div>
-          <div style="font-size:11px; color:var(--text-dim)">
-            Balance: ${fmt(l.balance)} | Left: ${l.totalmonths - l.paidmonths} Months
+          <div class="cc-info"><b>${l.name}</b><span class="val-neg">${fmt(l.balance)}</span></div>
+          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim);">
+            <span>EMI: ${fmt(l.emiamount)}</span>
+            <span>Paid: ${l.paidmonths}/${l.totalmonths} Months</span>
           </div>
         </div>
       `).join("");
 
-      // History
-      document.getElementById('histList').innerHTML = s.history.map(h => `
-        <div class="row">
-          <div><b>${h[1]}</b><br><small style="color:var(--text-dim)">${h[4]}</small></div>
-          <b class="${h[3].includes('Income')?'val-pos':'val-neg'}">${fmt(h[2])}</b>
-        </div>
+      // History Tab & Dashboard Categories
+      document.getElementById('catGrid').innerHTML = db.categories.map(c => `
+        <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small style="color:var(--primary);">${fmt(s.catTotals[c.name.toLowerCase().trim()] || 0)}</small></div>
       `).join("");
 
-      // Banks
-      document.getElementById('bankList').innerHTML = db.banks.map(b => `
-        <div class="row"><span>${b.name}</span><b>${fmt(b.balance)}</b></div>
-      `).join("");
+      document.getElementById('historyList').innerHTML = s.history.map(h => {
+        const isPlus = (h[3] === 'Income' || h[3] === 'Add Fund');
+        return `<div class="row">
+          <div><b>${h[1]}</b><br><small style="color:var(--text-dim)">${h[4]} • ${new Date(h[0]).toLocaleDateString()}</small></div>
+          <b class="${isPlus ? 'val-pos' : 'val-neg'}">${isPlus ? '+' : '-'}${fmt(h[2])}</b>
+        </div>`;
+      }).join("");
     }
 
-    function fill() {
+    function fillDropdowns() {
       const opt = (arr, key) => arr.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
-      document.getElementById('eCat').innerHTML = opt(db.categories, 'name');
-      document.getElementById('bFrom').innerHTML = `<option value="Wallet">Wallet</option>` + opt(db.banks, 'name');
-      updateB(); updateF(); toggleE();
+      document.getElementById('eCat').innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
+      document.getElementById('bFrom').innerHTML = `<option value="Wallet">👛 Wallet</option>` + opt(db.banks, 'name');
+      updateBTarget(); updateFSources(); toggleEFields();
     }
 
-    function toggleE() {
+    function toggleEFields() {
       const m = document.getElementById('eMode').value;
-      const acc = document.getElementById('eAcc');
-      acc.style.display = m === 'Digital Wallet' ? 'none' : 'block';
-      acc.innerHTML = m === 'bank' ? opt(db.banks, 'name') : opt(db.cards, 'name');
+      const div = document.getElementById('divEAcc');
+      div.style.display = (m === 'Digital Wallet') ? 'none' : 'block';
+      document.getElementById('eAcc').innerHTML = (m === 'bank') ? opt(db.banks, 'name') : opt(db.cards, 'name');
     }
 
-    function updateB() {
+    function updateBTarget() {
       const type = document.getElementById('bType').value;
-      document.getElementById('bTo').innerHTML = opt(type==='card'?db.cards:db.loans, 'name');
-      autoB();
+      document.getElementById('bTo').innerHTML = (type === 'card') ? opt(db.cards, 'name') : opt(db.loans, 'name');
+      autoFillB();
     }
 
-    function autoB() {
+    function autoFillB() {
       if(document.getElementById('bType').value === 'loan') {
-        const l = db.loans.find(i => i.name === document.getElementById('bTo').value);
-        if(l) document.getElementById('bAmt').value = l.emiamount;
-      }
+        const loan = db.loans.find(l => l.name === document.getElementById('bTo').value);
+        if(loan) document.getElementById('bAmt').value = loan.emiamount;
+      } else { document.getElementById('bAmt').value = ""; }
     }
 
-    function updateF() {
+    function updateFSources() {
       const dest = document.getElementById('fDest').value;
-      document.getElementById('fTgt').style.display = dest === 'Wallet' ? 'none' : 'block';
-      document.getElementById('fTgt').innerHTML = opt(db.banks, 'name');
-      document.getElementById('fSrc').innerHTML = `<option value="Others">Salary/Income</option>` + (dest === 'Wallet' ? opt(db.banks, 'name') : `<option value="Wallet">Wallet</option>`);
+      const divTgt = document.getElementById('divFTgt');
+      let srcOpts = '<option value="Others">💳 Salary / Income</option>';
+      if(dest === 'Wallet') {
+        divTgt.style.display = 'none';
+        srcOpts += opt(db.banks, 'name');
+      } else {
+        divTgt.style.display = 'block';
+        document.getElementById('fTgt').innerHTML = opt(db.banks, 'name');
+        srcOpts += '<option value="Wallet">👛 Wallet</option>';
+      }
+      document.getElementById('fSrc').innerHTML = srcOpts;
     }
 
-    async function save(type) {
+    async function saveTrans(type) {
       const btn = event.target;
-      const old = btn.innerText;
-      let p = { action: "save", type: type };
+      const oldTxt = btn.innerText;
+      let p = { action: "save" };
 
-      if(type==='entry') {
-        p.type = document.getElementById('eMode').value;
-        p.name = p.type === 'Digital Wallet' ? 'Wallet' : document.getElementById('eAcc').value;
+      if(type === 'entry') {
+        const m = document.getElementById('eMode').value;
+        p.type = m;
+        p.name = (m === 'Digital Wallet') ? 'Wallet' : document.getElementById('eAcc').value;
         p.amount = document.getElementById('eAmt').value;
         p.category = document.getElementById('eCat').value;
         p.remark = document.getElementById('eRem').value;
-      } else if(type==='fund') {
-        p.type = document.getElementById('fSrc').value === 'Others' ? "Income" : "Add Fund";
-        p.name = document.getElementById('fDest').value === 'Wallet' ? 'Wallet' : document.getElementById('fTgt').value;
+      } 
+      else if(type === 'fund') {
+        p.type = document.getElementById('fSrc').value === 'Others' ? 'Income' : 'Add Fund';
+        p.name = (document.getElementById('fDest').value === 'Wallet') ? 'Wallet' : document.getElementById('fTgt').value;
         p.amount = document.getElementById('fAmt').value;
         p.remark = "From " + document.getElementById('fSrc').value;
-      } else {
+      } 
+      else if(type === 'pay') {
         p.type = "Bill Pay";
         p.billType = document.getElementById('bType').value;
         p.name = document.getElementById('bTo').value;
         p.from = document.getElementById('bFrom').value;
         p.amount = document.getElementById('bAmt').value;
         p.remark = "Paid from " + p.from;
+        
+        // Balance Check
+        let bal = (p.from === 'Wallet') ? db.walletBal : db.banks.find(b => b.name === p.from).balance;
+        if(Number(p.amount) > bal) return notify("Failed", "Insufficient Balance in " + p.from, "error_outline", "var(--red)");
       }
 
-      if(!p.amount || p.amount <= 0) return alert("Enter amount");
+      if(!p.amount || p.amount <= 0) return notify("Alert", "Enter valid amount", "warning", "#f59e0b");
 
-      btn.classList.add('loading-btn'); btn.innerText = "PROCESSING...";
-      const r = await fetch(API, { method: "POST", body: JSON.stringify(p) }).then(res => res.json());
-      btn.classList.remove('loading-btn'); btn.innerText = old;
+      btn.classList.add('loading-btn');
+      btn.innerText = "PROCESSING...";
+
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) }).then(r => r.json());
+        if(res.ok) {
+          notify("Success", "Transaction Recorded!", "check_circle", "var(--green)");
+          document.querySelectorAll('.inp').forEach(i => { if(i.type==='number' || i.type==='text') i.value = ""; });
+          setTimeout(() => showPage(0), 1000);
+        } else { notify("Error", res.error, "error", "var(--red)"); }
+      } catch(e) { notify("Error", "Network Failed", "wifi_off", "var(--red)"); }
       
-      if(r.ok) { alert("Success!"); show(0); }
+      btn.classList.remove('loading-btn');
+      btn.innerText = oldTxt;
     }
+
+    function notify(title, text, icon, color) {
+      document.getElementById('mTitle').innerText = title;
+      document.getElementById('mText').innerText = text;
+      const ic = document.getElementById('mIcon'); ic.innerText = icon; ic.style.color = color;
+      document.getElementById('modal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function opt(arr, key) { return arr.map(i => `<option value="${i[key]}">${i[key]}</option>`).join(""); }
+
   </script>
 </body>
 </html>
