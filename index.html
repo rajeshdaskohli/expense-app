@@ -296,10 +296,14 @@
       </div>
     </div>
 
+  <div class="page" id="p4">
+      <h3 style="margin: 10px 5px">Transaction History</h3>
+      <div class="list-box" id="listHistory"></div>
+    </div>
+
   </div>
 
-  <div class="nav-wrapper">
-    <div class="nav-bar">
+  <div class="nav">
      <div class="nav-item active" onclick="nav(0)"><i class="material-icons-round">home</i><span>Home</span></div>
     <div class="nav-item" onclick="nav(2)"><i class="material-icons-round">swap_horiz</i><span>Transfer</span></div>
     <div class="nav-center" onclick="nav(1)"><i class="material-icons-round" style="font-size:32px">add</i></div>
@@ -470,10 +474,12 @@
         </div>`;
       }).join("");
 
-      // Recent History
-      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-        <div class="row"><div class="meta"><b>${t.name} <span style="font-size:9px; opacity:0.5;">${t.category}</span></b><small>${t.date}</small></div><b class="${t.type==='Add Fund' || t.type==='Income' ?'val-pos':'val-neg'}">${t.type==='Add Fund' || t.type==='Income' ?'+':'-'}${fmt(t.amount)}</b></div>
-      `).join("");
+        // History
+      document.getElementById('listHistory').innerHTML = db.summary.recentTrans.map(t => `
+        <div class="item">
+          <div><b>${t.category}</b><small>${t.date} • ${t.name}</small></div>
+          <div class="val ${t.type.includes('Income') ? 'text-green' : 'text-red'}">${t.type.includes('Income')?'+':'-'}${fmt(t.amount)}</div>
+        </div>`).join('');
       
      // --- Update 4: Only refill dropdowns if not currently on entry pages to prevent reset ---
       if(curPage === 0) fillDropdowns();
