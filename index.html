@@ -16,9 +16,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   
-  <style>
+   <style>
     :root {
-       --bg: #0b1120; --surface: #151c2f; --input: #1e293b;
+      --bg: #0b1120; --surface: #151c2f; --input: #1e293b;
       --text: #f8fafc; --text-muted: #94a3b8; --border: rgba(255, 255, 255, 0.08);
       --primary: #673ab7; --primary-grad: linear-gradient(135deg, #673ab7, #512da8);
       --success: #00c853; --danger: #ff3d00; --nav-bg: rgba(21, 28, 47, 0.95);
@@ -29,40 +29,10 @@
       --primary: #5e35b1; --nav-bg: rgba(255, 255, 255, 0.95);
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 120px; transition: 0.3s; }
     
-
-/* Update 2: Processing Button Logic (Dull Color) */
-.btn-main:active { 
-  transform: scale(0.96); 
-}
-
-.loading-btn { 
-  opacity: 0.7;              /* बटन को 40% धुंधला/फीका कर देगा */
-  pointer-events: none;      /* प्रोसेसिंग के दौरान दोबारा क्लिक नहीं होगा */
-  cursor: not-allowed;       /* माउस ले जाने पर 'रुकने' का साइन दिखेगा */
-  filter: saturate(0.6);     /* रंगों को थोड़ा फीका (Dull) कर देगा */
-}
-    /* Header & Menu */
-    .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
-    .header h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
-    .controls { display: flex; align-items: center; position: relative; }
-    .controls i { cursor: pointer; margin-left: 15px; color: var(--text-dim); }
-    
-    /* Rotation Fix for Sync Icon */
-    #sBtn { transform: scaleX(-1); } /* Arrow right side face logic */
-    @keyframes spin { from { transform: rotate(0deg) scaleX(-1); } to { transform: rotate(360deg) scaleX(-1); } }
-    .spinning { animation: spin 1s linear infinite; color: var(--primary) !important; }
-
-    /* Settings Dropdown */
-    .menu-dropdown { display: none; position: absolute; top: 40px; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 150px; z-index: 200; }
-    .menu-dropdown.show { display: block; }
-    .menu-item { display: flex; align-items: center; padding: 12px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 10px; }
-    .menu-item:hover { background: var(--border); }
-    .menu-item i { margin-right: 10px; font-size: 18px; margin-left: 0 !important; }
-
-        .container { max-width: 480px; margin: 0 auto; padding: 0 16px; }
+    .container { max-width: 480px; margin: 0 auto; padding: 0 16px; }
     .header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 1000; }
     
     /* Dashboard Cards */
@@ -79,241 +49,108 @@
     .item small { color: var(--text-muted); font-size: 11px; }
     .val { font-weight: 700; font-size: 14px; }
 
-    .page { display: none; min-height: 70vh; animation: fadeIn 0.4s ease; }
+    /* Forms */
+    .page { display: none; animation: fadeIn 0.3s ease; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-     /* --- Hero Scroll Cards (Transparent) --- */
-    .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 0; scrollbar-width: none; scroll-snap-type: x mandatory; }
-    .hero-scroll::-webkit-scrollbar { display: none; }
+    .form-card { background: var(--surface); padding: 25px; border-radius: 28px; border: 1px solid var(--border); }
+    .label { display: block; font-size: 11px; font-weight: 800; color: var(--primary); margin: 0 0 8px 5px; }
+    .inp { width: 100%; background: var(--input); border: 1px solid var(--border); color: var(--text); padding: 16px; border-radius: 16px; margin-bottom: 20px; font-weight: 600; }
     
-    .hero-card { 
-      min-width: 85%; scroll-snap-align: center; flex-shrink: 0; 
-      background: var(--card); /* Transparent Variable */
-      backdrop-filter: blur(12px); /* Glass Effect */
-      padding: 20px; border-radius: 24px; 
-      border: 1px solid var(--border); 
-    }
-    .hero-card span { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
-    .hero-card p { margin: 5px 0; font-size: 26px; font-weight: 800; }
-    
-    /* Progress Bar */
-    .prog-bg { width: 100%; background: rgba(120, 120, 120, 0.2); height: 6px; border-radius: 10px; margin: 10px 0; overflow: hidden; }
-    .prog-bar { height: 100%; transition: 1s ease; }
+    .btn-main { width: 100%; background: var(--primary-grad); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 10px 20px rgba(103, 58, 183, 0.3); }
+    .btn-main:disabled { background: #475569; opacity: 0.6; }
 
-    /* --- Wallet Bar (New Position & Style) --- */
-    .wallet-bar {
-      background: linear-gradient(90deg, #38bdf8, #818cf8);
-      margin: 10px 0 25px 0; 
-      padding: 18px 24px; 
-      border-radius: 24px;
-      display: flex; justify-content: space-between; align-items: center;
-      color: white; 
-      box-shadow: 0 10px 20px rgba(56, 189, 248, 0.25);
-    }
-    .wallet-bar-label { font-size: 11px; font-weight: 700; opacity: 0.9; letter-spacing: 0.5px; }
-    .wallet-bar-val { font-size: 22px; font-weight: 800; }
+    /* Nav */
+    .nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; height: 75px; background: var(--nav-bg); backdrop-filter: blur(20px); border-radius: 25px; display: flex; justify-content: space-around; align-items: center; border: 1px solid var(--border); z-index: 2000; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .nav-item { flex: 1; text-align: center; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+    .nav-item i { font-size: 24px; }
+    .nav-item span { font-size: 10px; font-weight: 700; margin-top: 3px; }
+    .nav-item.active { color: var(--primary); }
+    .nav-center { position: relative; top: -25px; width: 65px; height: 65px; background: var(--primary-grad); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 5px solid var(--bg); box-shadow: 0 10px 20px rgba(103, 58, 183, 0.4); }
 
-    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-    .cat-item { background: var(--card); padding: 15px 5px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
-    .cat-item div { font-size: 18px; margin-bottom: 5px; }
-    .cat-item b { font-size: 11px; display: block; }
-    .cat-item small { color: var(--primary); font-size: 10px; font-weight: 800; }
-
-    .list-container { background: var(--card); border-radius: 28px; padding: 10px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-    /* Fix 6: Recent Activity Scrollable Area */
-    .scroll-area { max-height: 350px; overflow-y: auto; scrollbar-width: none; padding-right: 5px; }
-    
-    .row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
-    .row:last-child { border: none; }
-    .meta b { display: block; font-size: 14px; }
-    .meta small { color: var(--text-dim); font-size: 11px; }
-
-    .label-row { display: flex; justify-content: space-between; align-items: center; margin: 25px 5px 10px; }
-    .label-row h3 { font-size: 11px; font-weight: 800; color: var(--text-dim); margin: 0; letter-spacing: 1px; }
-    .subtotal { font-weight: 800; font-size: 12px; color: var(--text); }
-
-    .nav-wrapper { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; }
-    .nav-bar { background: var(--card); display: flex; padding: 8px; border-radius: 24px; border: 1px solid var(--border); width: 92%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-    .nav-item { flex: 1; padding: 10px; border-radius: 18px; text-align: center; color: var(--text-dim); cursor: pointer; }
-    .nav-item.active { background: var(--primary); color: #fff; }
-    .nav-item i { display: block; font-size: 22px; margin-bottom: 2px; }
-    .nav-item span { font-size: 10px; font-weight: 700; }
-
-    .inp-group { margin-bottom: 15px; }
-    .inp-group label { display: block; font-size: 10px; font-weight: 800; color: var(--primary); margin-left: 5px; margin-bottom: 5px; text-transform: uppercase; }
-    .inp { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 15px; color: var(--text); font-size: 15px; outline: none; }
-    .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-    
-    #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-    .modal-box { background: var(--card); padding: 30px; border-radius: 32px; width: 85%; max-width: 320px; text-align: center; transform: scale(0.9); transition: 0.3s; }
-    .modal-box.show { transform: scale(1); }
-    
-    .val-pos { color: var(--green); } .val-neg { color: var(--red); }
-    .status-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; margin-left: 5px; vertical-align: middle; font-weight: 800; }
-    .bg-red { background: rgba(239, 68, 68, 0.1); color: var(--red); }
-    .bg-green { background: rgba(16, 185, 129, 0.1); color: var(--green); }
+    .text-green { color: var(--success); }
+    .text-red { color: var(--danger); }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-  <div id="modal">
-    <div class="modal-box" id="mBox">
-      <i class="material-icons-round" id="mIcon" style="font-size: 50px;">check_circle</i>
-      <h2 id="mTitle" style="margin: 15px 0 5px;">Success</h2>
-      <p id="mText" style="color: var(--text-dim);"></p>
-      <button class="btn-main" onclick="closeModal()">OK</button>
-    </div>
-  </div>
-
   <div class="header">
-    <h1 id="headerTitle">EXPENSE PRO</h1>
-    <div class="controls">
-      <i class="material-icons-round" onclick="refreshData()" id="sBtn">sync</i>
-      <i class="material-icons-round" onclick="toggleMenu()">more_vert</i>
-      
-      <div class="menu-dropdown" id="settingsMenu">
-        <div class="menu-item" onclick="toggleTheme()">
-          <i class="material-icons-round" id="themeIcon">light_mode</i>
-          <span id="themeText">Light Mode</span>
-        </div>
-        <div class="menu-item" onclick="refreshData()">
-          <i class="material-icons-round">refresh</i>
-          <span>Force Sync</span>
-        </div>
-      </div>
+    <div style="font-weight: 900; font-size: 20px; letter-spacing: -1px;">EXPENSE PRO</div>
+    <div style="display: flex; gap: 15px;">
+      <i class="material-icons-round" onclick="toggleTheme()" style="cursor:pointer">dark_mode</i>
+      <i class="material-icons-round" id="syncBtn" onclick="refreshData()" style="cursor:pointer">sync</i>
     </div>
   </div>
 
   <div class="container">
     
-    <div class="page active" id="pageDashboard">
-      <div class="hero-scroll">
-        <div class="hero-card">
-          <span>THIS MONTH STATUS</span>
-          <p id="monthPLValue">₹0</p>
-          <div class="prog-bg"><div id="plProgress" class="prog-bar"></div></div>
-          <small id="plStatusLabel" style="font-weight:700; font-size:10px;">PROFIT</small>
-        </div>
-        <div class="hero-card">
-          <span>LAST MONTH STATUS</span>
-          <p id="lastMonthValue">₹0</p>
-          <small id="lastMonthTag" style="font-weight:800; font-size:10px;">Checking...</small>
-        </div>
-        <div class="hero-card"><span>Today Exp</span><p id="sumToday">₹0</p></div>
-        <div class="hero-card"><span>Month Fund</span><p id="sumFund">₹0</p></div>
+    <div class="page active" id="p0">
+      <div class="balance-card">
+        <small>WALLET BALANCE</small>
+        <h2 id="sumWallet">₹0.00</h2>
       </div>
 
-      <div class="label-row"><h3>SPENDING BY CATEGORY</h3></div>
-      <div class="cat-grid" id="catGrid"></div>
+      <div class="section-title"><h3>Bank Accounts</h3><span id="sumBank" style="font-weight:800; font-size:12px;">₹0</span></div>
+      <div class="list-box" id="listBanks"></div>
 
-       <div class="wallet-bar">
-        <span class="wallet-bar-label">WALLET BALANCE</span>
-        <b class="wallet-bar-val" id="sumWallet">₹0</b>
-      </div>
+      <div class="section-title"><h3>Credit Cards</h3><span id="sumCard" style="font-weight:800; font-size:12px;">₹0</span></div>
+      <div class="list-box" id="listCards"></div>
 
-      <div class="label-row">
-        <h3>BANKS</h3>
-        <span id="bankSub" class="subtotal">₹0</span>
-      </div>
-      <div class="list-container" id="bankList"></div>
+      <div class="section-title"><h3>Loans & EMIs</h3><span id="sumLoan" style="font-weight:800; font-size:12px;">₹0</span></div>
+      <div class="list-box" id="listLoans"></div>
+    </div>
 
-      <div class="label-row">
-        <h3>CREDIT CARDS</h3>
-        <span id="cardSub" class="subtotal">₹0</span>
-      </div>
-      <div class="list-container" id="cardList"></div>
-
-      <div class="label-row">
-        <h3>LOANS & EMI</h3>
-        <span id="loanSub" class="subtotal">₹0</span>
-      </div>
-      <div class="list-container" id="loanList"></div>
-
-      <div class="label-row"><h3>RECENT ACTIVITY</h3></div>
-      <div class="list-container">
-         <div class="scroll-area" id="historyList"></div>
+    <div class="page" id="p1">
+      <div class="form-card">
+        <h3 style="margin-top:0">New Expense</h3>
+        <label class="label">Pay From</label>
+        <select class="inp" id="eSrc" onchange="updateEntryFields()"><option value="Wallet">Wallet</option><option value="Bank">Bank Account</option><option value="Card">Credit Card</option></select>
+        <div id="entrySubBox"></div>
+        <label class="label">Category</label>
+        <select class="inp" id="eCat"></select>
+        <label class="label">Amount (₹)</label>
+        <input type="number" class="inp" id="eAmt" placeholder="0.00">
+        <button class="btn-main" id="btn1" onclick="submitData('Expense')">Save Expense</button>
       </div>
     </div>
 
-    <div class="page" id="pageEntry">
-      <div class="list-container" style="padding: 25px; margin-top: 20px;">
-        <div class="inp-group">
-          <label>Payment Method</label>
-          <select class="inp" id="payMode" onchange="toggleFields()">
-            <option value="Digital Wallet">👛 Wallet</option>
-            <option value="bank">🏦 Bank Transfer</option>
-            <option value="card">💳 Credit Card</option>
-          </select>
-        </div>
-        <div id="divBank" style="display:none;" class="inp-group">
-          <label>Select Bank</label><select class="inp" id="expBank"></select>
-        </div>
-        <div id="divCard" style="display:none;" class="inp-group">
-          <label>Select Card</label><select class="inp" id="expCard"></select>
-        </div>
-        <div class="inp-group">
-          <label>Category</label><select class="inp" id="expCat"></select>
-        </div>
-        <div class="inp-group">
-          <label>Amount</label><input type="number" class="inp" id="expAmt" placeholder="0.00">
-        </div>
-        <div class="inp-group">
-          <label>Remark</label><input type="text" class="inp" id="expRem" placeholder="What for?">
-        </div>
-        <button class="btn-main" id="btnSaveExp" onclick="saveTrans('entry')">SAVE EXPENSE</button>
+    <div class="page" id="p2">
+      <div class="form-card">
+        <h3>Money Transfer</h3>
+        <label class="label">Direction</label>
+        <select class="inp" id="tDir">
+          <option value="ToWallet">Bank ➔ Wallet</option>
+          <option value="ToBank">Wallet ➔ Bank</option>
+        </select>
+        <label class="label">Select Bank</label>
+        <select class="inp" id="tBank"></select>
+        <label class="label">Amount (₹)</label>
+        <input type="number" class="inp" id="tAmt" placeholder="0.00">
+        <button class="btn-main" id="btn2" onclick="submitData('Transfer')">Transfer Now</button>
       </div>
     </div>
 
-    <div class="page" id="pageFund">
-      <div class="list-container" style="padding: 25px; margin-top: 20px;">
-        <div class="inp-group">
-          <label>Deposit To (Destination)</label>
-          <select class="inp" id="targetType" onchange="updateFundSources()">
-            <option value="Wallet">👛 Wallet</option>
-            <option value="Bank">🏦 Bank Account</option>
-          </select>
-        </div>
-        <div id="divTargetBank" style="display:none;" class="inp-group">
-          <label>Target Bank</label><select class="inp" id="targetBankName"></select>
-        </div>
-        <div class="inp-group">
-          <label>From (Source)</label>
-          <select class="inp" id="fundSource"></select>
-        </div>
-        <div class="inp-group">
-          <label>Amount</label><input type="number" class="inp" id="fundAmt" placeholder="0.00">
-        </div>
-        <div class="inp-group">
-          <label>Remark</label><input type="text" class="inp" id="fundRem" placeholder="Add Note">
-        </div>
-        <button class="btn-main" id="btnSaveFund" onclick="saveTrans('fund')">CONFIRM TRANSFER</button>
+    <div class="page" id="p3">
+      <div class="form-card">
+        <h3>Pay Bills & EMI</h3>
+        <label class="label">Bill Type</label>
+        <select class="inp" id="bType" onchange="updateBillFields()">
+          <option value="Card">Credit Card Bill</option>
+          <option value="Loan">Loan EMI</option>
+        </select>
+        <label class="label">Select Account</label>
+        <select class="inp" id="bAcc"></select>
+        <label class="label">Pay From</label>
+        <select class="inp" id="bFrom"></select>
+        <label class="label">Amount (₹)</label>
+        <input type="number" class="inp" id="bAmt" placeholder="0.00">
+        <button class="btn-main" id="btn3" onclick="submitData('Bill')">Pay Now</button>
       </div>
     </div>
 
-    <div class="page" id="pageBills">
-      <div class="list-container" style="padding: 25px; margin-top: 20px;">
-        <div class="inp-group">
-          <label>Bill Type</label>
-          <select class="inp" id="billType" onchange="updateBillTarget()">
-            <option value="card">💳 Credit Card Bill</option>
-            <option value="loan">📅 Loan / EMI</option>
-          </select>
-        </div>
-        <div class="inp-group">
-          <label>Pay From</label><select class="inp" id="payFrom"></select>
-        </div>
-        <div class="inp-group">
-          <label>Pay To (Select Account)</label><select class="inp" id="payTo" onchange="autoFillEmi()"></select>
-        </div>
-        <div class="inp-group">
-          <label>Amount</label><input type="number" class="inp" id="payAmt" placeholder="0.00">
-        </div>
-        <button class="btn-main" id="btnSaveBill" onclick="saveTrans('pay')">PAY NOW</button>
-      </div>
-    </div>
-
-  <div class="page" id="p4">
+    <div class="page" id="p4">
       <h3 style="margin: 10px 5px">Transaction History</h3>
       <div class="list-box" id="listHistory"></div>
     </div>
@@ -321,12 +158,11 @@
   </div>
 
   <div class="nav">
-     <div class="nav-item active" onclick="nav(0)"><i class="material-icons-round">home</i><span>Home</span></div>
+    <div class="nav-item active" onclick="nav(0)"><i class="material-icons-round">home</i><span>Home</span></div>
     <div class="nav-item" onclick="nav(2)"><i class="material-icons-round">swap_horiz</i><span>Transfer</span></div>
     <div class="nav-center" onclick="nav(1)"><i class="material-icons-round" style="font-size:32px">add</i></div>
     <div class="nav-item" onclick="nav(3)"><i class="material-icons-round">receipt_long</i><span>Bills</span></div>
     <div class="nav-item" onclick="nav(4)"><i class="material-icons-round">history</i><span>History</span></div>
-  </div>
   </div>
 
   <script>
