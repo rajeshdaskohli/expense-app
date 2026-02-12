@@ -397,26 +397,68 @@
   if(sBtn) sBtn.classList.remove('spinning');
 }
 
+ // --- Update Dashboard UI ---
     function updateUI() {
       const s = db.summary;
+      const netPL = Number(s.totalIncome || 0) - Number(s.monthExp || 0);
+
+      // P/L Card Logic
+      document.getElementById("monthPLValue").innerText = fmt(netPL);
+      const plLabel = document.getElementById("plStatusLabel");
+      const plProg = document.getElementById("plProgress");
+      
+      if(netPL >= 0) {
+        plLabel.innerText = "OVERALL PROFIT";
+        plLabel.style.color = "var(--green)";
+        plProg.style.background = "var(--green)";
+      } else {
+        plLabel.innerText = "OVERALL LOSS";
+        plLabel.style.color = "var(--red)";
+        plProg.style.background = "var(--red)";
+      }
+      plProg.style.width = "100%";
+
+      // Last Month
+      const lastPL = Number(s.lastMonthPL || 0);
+      document.getElementById("lastMonthValue").innerText = fmt(lastPL);
+      const lmTag = document.getElementById("lastMonthTag");
+      lmTag.innerText = lastPL >= 0 ? "PROFITABLE" : "IN LOSS";
+      lmTag.style.color = lastPL >= 0 ? "var(--green)" : "var(--red)";
+
+      // Other Cards
       document.getElementById("sumToday").innerText = fmt(s.todayExp);
-      document.getElementById("sumMonth").innerText = fmt(s.monthExp);
       document.getElementById("sumFund").innerText = fmt(s.monthFund);
       document.getElementById("sumWallet").innerText = fmt(db.walletBal);
 
+      // Categories
       document.getElementById("catGrid").innerHTML = db.categories.map(c => `
-        <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small style="color:var(--primary); font-size:10px;">${fmt(s.catTotals[c.name.toLowerCase().trim()] || 0)}</small></div>
+        <div class="cat-item">
+          <div>${c.icon}</div>
+          <b>${c.name}</b>
+          <small>${fmt(s.catTotals[c.name.toLowerCase().trim()] || 0)}</small>
+        </div>
       `).join("");
 
-      const getSum = (arr) => arr.reduce((acc, i) => acc + (Number(i.val) || Number(i.emi) || 0), 0);
-
       // Banks
-      document.getElementById("bankSub").innerText = fmt(getSum(db.banks));
+      const bankTotal = db.banks.reduce((acc, b) => acc + b.val, 0);
+      document.getElementById("bankSub").innerText = fmt(bankTotal);
       document.getElementById("bankList").innerHTML = db.banks.map(b => `
         <div class="row">
-          <div class="meta"><b>${b.name}</b><small>Balance</small></div>
+          <b>${b.name}</b>
           <b class="${b.val < 0 ? 'val-neg' : 'val-pos'}">${fmt(b.val)}</b>
-        </div>`).join("");
+        </div>
+      `).join("");
+      
+      // Cards
+      const cardTotal = db.cards.reduce((acc, c) => acc + c.val, 0);
+      document.getElementById("cardSub").innerText = fmt(cardTotal);
+      document.getElementById("cardList").innerHTML = db.cards.map(c => `
+        <div class="row">
+          <b>${c.name}</b>
+          <b class="val-neg">${fmt(c.val)}</b>
+        </div>
+      `).join("");
+
 
       // Fix 3: Credit Card Color Coding (Red if > 0, Green if 0)
       document.getElementById("cardSub").innerText = fmt(getSum(db.cards));
