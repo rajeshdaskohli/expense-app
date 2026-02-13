@@ -450,21 +450,10 @@
         </div>`;
       }).join("");
 
-     // updateUI फंक्शन के अंदर इसे अपडेट करें
-     document.getElementById("historyList").innerHTML = db.summary.recentTrans.map(t => `
-     <div class="row">
-     <div class="meta">
-     <b>${t.name} <small style="opacity:0.5;">(${t.category})</small></b>
-     <small>${t.date}</small>
-     </div>
-     <b class="${t.type==='Income' || t.type==='Add Fund' ? 'val-pos' : 'val-neg'}">
-     ${t.type==='Income' || t.type==='Add Fund' ? '+' : '-'}${fmt(t.amount)}
-     </b>
-     </div>
-     `).join("");
-     
-      
-     // --- Update 4: Only refill dropdowns if not currently on entry pages to prevent reset ---
+    const historyContainer = document.getElementById("fullHistory");
+      if(historyContainer && db.summary.recentTrans) {
+        historyContainer.innerHTML = db.summary.recentTrans.map(t => `<div class="row"><div class="meta"><b>${t.name} <small style="opacity:0.5;">(${t.category})</small></b><small>${t.date}</small></div><b class="${t.type==='Income' || t.type==='Add Fund' ? 'val-pos' : 'val-neg'}">${t.type==='Income' || t.type==='Add Fund' ? '+' : '-'}${fmt(t.amount)}</b></div>`).join("");
+      }
       if(curPage === 0) fillDropdowns();
     }
 
