@@ -2,491 +2,310 @@
 <html lang="hi" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Finance 360 PRO</title>
   
-  <link rel="apple-touch-icon" href="https://i.ibb.co/6R0pT8q/449167.png">
-  <link rel="icon" href="https://i.ibb.co/6R0pT8q/449167.png">
-  
-  <title>Expense Pro</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-  
-   <style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
     :root {
-      --bg: #0b1120; --surface: #151c2f; --input: #1e293b;
-      --text: #f8fafc; --text-muted: #94a3b8; --border: rgba(255, 255, 255, 0.08);
-      --primary: #673ab7; --primary-grad: linear-gradient(135deg, #673ab7, #512da8);
-      --success: #00c853; --danger: #ff3d00; --nav-bg: rgba(21, 28, 47, 0.95);
+      --bg: #030712; --surface: #111827; --input: #1f2937;
+      --text: #f9fafb; --text-muted: #9ca3af; --border: rgba(255, 255, 255, 0.08);
+      --primary: #6366f1; --primary-grad: linear-gradient(135deg, #6366f1, #4f46e5);
+      --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
     }
-    [data-theme="light"] {
-      --bg: #f4f7fe; --surface: #ffffff; --input: #f1f5f9;
-      --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0;
-      --primary: #5e35b1; --nav-bg: rgba(255, 255, 255, 0.95);
-    }
-
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 120px; transition: 0.3s; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 120px; overflow-x: hidden; }
+    .container { max-width: 500px; margin: 0 auto; padding: 0 16px; }
+
+    /* --- Hero Card (Correction: Added Today/Month here) --- */
+    .pl-card { background: var(--surface); border-radius: 28px; padding: 25px; border: 1px solid var(--border); margin: 20px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .pl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+    .pl-box { background: var(--input); padding: 15px; border-radius: 20px; text-align: center; }
+    .pl-box small { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .pl-box div { font-size: 15px; font-weight: 800; margin-top: 4px; }
+
+    /* --- Tracking Bars --- */
+    .spend-tracker { background: var(--surface); border-radius: 24px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .track-row { margin-bottom: 15px; }
+    .track-info { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+    .bar-bg { height: 8px; background: var(--input); border-radius: 10px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 10px; width: 0%; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* --- Detail Sections --- */
+    .detail-section { background: var(--surface); border-radius: 24px; border: 1px solid var(--border); margin-bottom: 12px; overflow: hidden; }
+    .section-trigger { padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .trigger-left { display: flex; align-items: center; gap: 15px; }
+    .trigger-left i { font-size: 24px; color: var(--primary); }
+    .section-content { display: none; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border); }
+    .section-content.open { display: block; animation: slideDown 0.3s ease-out; }
+
+    @keyframes slideDown { from { opacity:0; transform: translateY(-10px); } to { opacity:1; transform: translateY(0); } }
+
+    .acc-item { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); }
+
+    /* --- Navigation --- */
+    .navbar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; height: 75px; background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(25px); border-radius: 30px; border: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 2000; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
+    .nav-btn { color: var(--text-muted); text-align: center; cursor: pointer; flex: 1; transition: 0.3s; }
+    .nav-btn.active { color: var(--primary); }
+    .nav-btn i { font-size: 24px; display: block; }
+    .nav-btn span { font-size: 10px; font-weight: 700; }
+    .nav-add { width: 58px; height: 58px; background: var(--primary-grad); border-radius: 50%; margin-top: -45px; display: flex; align-items: center; justify-content: center; color: white; border: 5px solid var(--bg); box-shadow: 0 8px 20px rgba(99, 102, 225, 0.4); }
+
+    .page { display: none; padding-top: 10px; }
+    .page.active { display: block; animation: fadeIn 0.4s; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     
-    .container { max-width: 480px; margin: 0 auto; padding: 0 16px; }
-    .header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 1000; }
-    
-    /* Dashboard Cards */
-    .balance-card { background: var(--primary-grad); padding: 25px; border-radius: 28px; color: white; margin: 10px 0; box-shadow: 0 15px 30px -10px rgba(103, 58, 183, 0.5); }
-    .balance-card h2 { font-size: 32px; margin: 5px 0 0; font-weight: 800; }
+    .btn-save { width: 100%; background: var(--primary-grad); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; margin-top: 20px; cursor: pointer; }
+    .inp { width: 100%; background: var(--input); border: 1px solid var(--border); color: var(--text); padding: 15px; border-radius: 14px; margin-top: 8px; font-size: 14px; }
+    .label { font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
 
-    .section-title { display: flex; justify-content: space-between; align-items: center; margin: 25px 5px 12px; }
-    .section-title h3 { font-size: 14px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 0; }
-    
-    .list-box { background: var(--surface); border-radius: 24px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 15px; }
-    .item { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); }
-    .item:last-child { border-bottom: none; }
-    .item b { font-size: 14px; display: block; }
-    .item small { color: var(--text-muted); font-size: 11px; }
-    .val { font-weight: 700; font-size: 14px; }
-
-    /* Forms */
-    .page { display: none; animation: fadeIn 0.3s ease; }
-    .page.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .form-card { background: var(--surface); padding: 25px; border-radius: 28px; border: 1px solid var(--border); }
-    .label { display: block; font-size: 11px; font-weight: 800; color: var(--primary); margin: 0 0 8px 5px; }
-    .inp { width: 100%; background: var(--input); border: 1px solid var(--border); color: var(--text); padding: 16px; border-radius: 16px; margin-bottom: 20px; font-weight: 600; }
-    
-    .btn-main { width: 100%; background: var(--primary-grad); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; cursor: pointer; box-shadow: 0 10px 20px rgba(103, 58, 183, 0.3); }
-    .btn-main:disabled { background: #475569; opacity: 0.6; }
-
-    /* Nav */
-    .nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; height: 75px; background: var(--nav-bg); backdrop-filter: blur(20px); border-radius: 25px; display: flex; justify-content: space-around; align-items: center; border: 1px solid var(--border); z-index: 2000; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-    .nav-item { flex: 1; text-align: center; color: var(--text-muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; }
-    .nav-item i { font-size: 24px; }
-    .nav-item span { font-size: 10px; font-weight: 700; margin-top: 3px; }
-    .nav-item.active { color: var(--primary); }
-    .nav-center { position: relative; top: -25px; width: 65px; height: 65px; background: var(--primary-grad); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 5px solid var(--bg); box-shadow: 0 10px 20px rgba(103, 58, 183, 0.4); }
-
-    .text-green { color: var(--success); }
-    .text-red { color: var(--danger); }
+    .rotate { animation: spin 1s infinite linear; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <div style="font-weight: 900; font-size: 20px; letter-spacing: -1px;">EXPENSE PRO</div>
-    <div style="display: flex; gap: 15px;">
-      <i class="material-icons-round" onclick="toggleTheme()" style="cursor:pointer">dark_mode</i>
-      <i class="material-icons-round" id="syncBtn" onclick="refreshData()" style="cursor:pointer">sync</i>
-    </div>
-  </div>
-
   <div class="container">
-    
-    <div class="page active" id="p0">
-      <div class="balance-card">
-        <small>WALLET BALANCE</small>
-        <h2 id="sumWallet">₹0.00</h2>
-      </div>
-
-      <div class="section-title"><h3>Bank Accounts</h3><span id="sumBank" style="font-weight:800; font-size:12px;">₹0</span></div>
-      <div class="list-box" id="listBanks"></div>
-
-      <div class="section-title"><h3>Credit Cards</h3><span id="sumCard" style="font-weight:800; font-size:12px;">₹0</span></div>
-      <div class="list-box" id="listCards"></div>
-
-      <div class="section-title"><h3>Loans & EMIs</h3><span id="sumLoan" style="font-weight:800; font-size:12px;">₹0</span></div>
-      <div class="list-box" id="listLoans"></div>
+    <div style="padding: 25px 0 10px; display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="margin:0; font-weight: 900; letter-spacing: -0.5px; color: var(--primary);">FINANCE 360</h2>
+      <i class="material-icons-round" id="sync" onclick="refreshData()" style="cursor:pointer; color:var(--text-muted); font-size: 26px;">sync</i>
     </div>
 
-    <div class="page" id="p1">
-      <div class="form-card">
-        <h3 style="margin-top:0">New Expense</h3>
-        <label class="label">Pay From</label>
-        <select class="inp" id="eSrc" onchange="updateEntryFields()"><option value="Wallet">Wallet</option><option value="Bank">Bank Account</option><option value="Card">Credit Card</option></select>
-        <div id="entrySubBox"></div>
-        <label class="label">Category</label>
-        <select class="inp" id="eCat"></select>
-        <label class="label">Amount (₹)</label>
-        <input type="number" class="inp" id="eAmt" placeholder="0.00">
-        <button class="btn-main" id="btn1" onclick="submitData('Expense')">Save Expense</button>
+    <div class="page active" id="page-home">
+      <div class="pl-card">
+        <small style="font-weight: 800; color: var(--text-muted)">Current Net Worth</small>
+        <h1 id="netTotal" style="margin: 8px 0 0; font-size: 36px; font-weight: 900;">₹0</h1>
+        
+        <div class="pl-row">
+          <div class="pl-box">
+            <small>Today Exp.</small>
+            <div id="hToday" style="color: var(--danger)">₹0</div>
+          </div>
+          <div class="pl-box">
+            <small>This Month Fund</small>
+            <div id="hMonth" style="color: var(--success)">₹0</div>
+          </div>
+        </div>
       </div>
+
+      <div class="spend-tracker">
+        <div style="font-size: 12px; font-weight: 800; margin-bottom: 15px; color: var(--text-muted); letter-spacing: 1px;">SPENDING BY SOURCE</div>
+        <div class="track-row">
+          <div class="track-info"><span>Bank Accounts</span><span id="txtExpBank">₹0</span></div>
+          <div class="bar-bg"><div class="bar-fill" id="fillBank" style="background: #3b82f6;"></div></div>
+        </div>
+        <div class="track-row">
+          <div class="track-info"><span>Credit Cards</span><span id="txtExpCard">₹0</span></div>
+          <div class="bar-bg"><div class="bar-fill" id="fillCard" style="background: #ef4444;"></div></div>
+        </div>
+        <div class="track-row">
+          <div class="track-info"><span>Cash / Wallet</span><span id="txtExpWallet">₹0</span></div>
+          <div class="bar-bg"><div class="bar-fill" id="fillWallet" style="background: #10b981;"></div></div>
+        </div>
+      </div>
+
+      <div class="detail-section"><div class="section-trigger" onclick="toggleSec('secBank')"><div class="trigger-left"><i class="material-icons-round">account_balance</i><b>Banks & Cash</b></div><i class="material-icons-round">expand_more</i></div><div class="section-content" id="secBank"></div></div>
+      <div class="detail-section"><div class="section-trigger" onclick="toggleSec('secCard')"><div class="trigger-left"><i class="material-icons-round">credit_card</i><b>Credit Cards</b></div><i class="material-icons-round">expand_more</i></div><div class="section-content" id="secCard"></div></div>
+      <div class="detail-section"><div class="section-trigger" onclick="toggleSec('secLoan')"><div class="trigger-left"><i class="material-icons-round">handshake</i><b>Active Loans</b></div><i class="material-icons-round">expand_more</i></div><div class="section-content" id="secLoan"></div></div>
     </div>
 
-    <div class="page" id="p2">
-      <div class="form-card">
-        <h3>Money Transfer</h3>
-        <label class="label">Direction</label>
-        <select class="inp" id="tDir">
-          <option value="ToWallet">Bank ➔ Wallet</option>
-          <option value="ToBank">Wallet ➔ Bank</option>
-        </select>
-        <label class="label">Select Bank</label>
-        <select class="inp" id="tBank"></select>
-        <label class="label">Amount (₹)</label>
-        <input type="number" class="inp" id="tAmt" placeholder="0.00">
-        <button class="btn-main" id="btn2" onclick="submitData('Transfer')">Transfer Now</button>
-      </div>
+    <div class="page" id="page-add">
+        <div class="pl-card">
+            <h3 style="margin-top:0">Record Expense</h3>
+            <label class="label">Payment Source</label>
+            <select class="inp" id="eSrc" onchange="renderDynamic()"><option value="Wallet">Wallet / Cash</option><option value="Bank">Bank Account</option><option value="Card">Credit Card</option></select>
+            <div id="dynSrc" style="margin-top:15px"></div>
+            <div style="margin-top:15px"><label class="label">Category</label><select class="inp" id="eCat"></select></div>
+            <div style="margin-top:15px"><label class="label">Amount (₹)</label><input type="number" class="inp" id="eAmt" placeholder="0.00"></div>
+            <button class="btn-save" onclick="submitData('Expense')">Save Transaction</button>
+        </div>
     </div>
 
-    <div class="page" id="p3">
-      <div class="form-card">
-        <h3>Pay Bills & EMI</h3>
-        <label class="label">Bill Type</label>
-        <select class="inp" id="bType" onchange="updateBillFields()">
-          <option value="Card">Credit Card Bill</option>
-          <option value="Loan">Loan EMI</option>
-        </select>
-        <label class="label">Select Account</label>
-        <select class="inp" id="bAcc"></select>
-        <label class="label">Pay From</label>
-        <select class="inp" id="bFrom"></select>
-        <label class="label">Amount (₹)</label>
-        <input type="number" class="inp" id="bAmt" placeholder="0.00">
-        <button class="btn-main" id="btn3" onclick="submitData('Bill')">Pay Now</button>
-      </div>
+    <div class="page" id="page-move">
+        <div class="pl-card">
+            <h3 style="margin-top:0">Fund Transfer</h3>
+            <label class="label">Direction</label>
+            <select class="inp" id="tDir"><option value="B2W">Bank to Wallet</option><option value="W2B">Wallet to Bank</option></select>
+            <div style="margin-top:15px"><label class="label">Bank Account</label><select class="inp" id="tBank"></select></div>
+            <div style="margin-top:15px"><label class="label">Amount</label><input type="number" class="inp" id="tAmt" placeholder="0.00"></div>
+            <button class="btn-save" onclick="submitData('Transfer')">Transfer Now</button>
+        </div>
     </div>
 
-    <div class="page" id="p4">
-      <h3 style="margin: 10px 5px">Transaction History</h3>
-      <div class="list-box" id="listHistory"></div>
+    <div class="page" id="page-bills">
+        <div class="pl-card">
+            <h3 style="margin-top:0">Liability Payment</h3>
+            <label class="label">Payment Type</label>
+            <select class="inp" id="bType" onchange="renderBill()"><option value="Card">Credit Card Bill</option><option value="Loan">Loan EMI</option></select>
+            <div style="margin-top:15px"><label class="label">Paying For</label><select class="inp" id="bTarget"></select></div>
+            <div style="margin-top:15px"><label class="label">Pay From</label><select class="inp" id="bFrom"></select></div>
+            <div style="margin-top:15px"><label class="label">Amount</label><input type="number" class="inp" id="bAmt" placeholder="0.00"></div>
+            <button class="btn-save" onclick="submitData('Bill')">Settle Bill</button>
+        </div>
+    </div>
+
+    <div class="page" id="page-log">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 10px;">
+            <h3>Activity Log</h3>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:700">RECENT 20</span>
+        </div>
+        <div id="histList"></div>
     </div>
 
   </div>
 
-  <div class="nav">
-    <div class="nav-item active" onclick="nav(0)"><i class="material-icons-round">home</i><span>Home</span></div>
-    <div class="nav-item" onclick="nav(2)"><i class="material-icons-round">swap_horiz</i><span>Transfer</span></div>
-    <div class="nav-center" onclick="nav(1)"><i class="material-icons-round" style="font-size:32px">add</i></div>
-    <div class="nav-item" onclick="nav(3)"><i class="material-icons-round">receipt_long</i><span>Bills</span></div>
-    <div class="nav-item" onclick="nav(4)"><i class="material-icons-round">history</i><span>History</span></div>
+  <div class="navbar">
+    <div class="nav-btn active" onclick="showPage('home')"><i class="material-icons-round">grid_view</i><span>Home</span></div>
+    <div class="nav-btn" onclick="showPage('move')"><i class="material-icons-round">swap_horiz</i><span>Move</span></div>
+    <div class="nav-add" onclick="showPage('add')"><i class="material-icons-round">add</i></div>
+    <div class="nav-btn" onclick="showPage('bills')"><i class="material-icons-round">receipt_long</i><span>Bills</span></div>
+    <div class="nav-btn" onclick="showPage('log')"><i class="material-icons-round">history</i><span>Log</span></div>
   </div>
 
   <script>
-    // इसे <script> के तुरंत बाद सबसे ऊपर डालें
-(function() {
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', savedTheme);
-})();
-    
     const API_URL = "https://script.google.com/macros/s/AKfycbxGwFBHXOgUTwgconAWDF0qZXPJwxtHc-TFwv-2Q_wHcZcGJtNg_i5JdNydifhP3BFBBA/exec";
-    let db = null;
-    let curPage = 0;
-    const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
+    let database = null;
 
-    setInterval(() => { if (curPage === 0) refreshData(); }, 30000);
-    document.addEventListener("visibilitychange", () => { if (document.visibilityState === 'visible') refreshData(); });
-
-    // Initialize Theme & Persistence
-    window.onload = () => {
-      const savedTheme = localStorage.getItem('theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', savedTheme);
-      updateThemeUI(savedTheme);
-      showPage(0);
-      registerSW();
-    };
-
-    function registerSW() {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./service-worker.js')
-          .then(() => console.log("Service Worker Registered"))
-          .catch(err => console.log("Service Worker Error:", err));
-      }
-    }
-    
-    function toggleMenu() { document.getElementById('settingsMenu').classList.toggle('show'); }
-    window.onclick = (e) => { if (!e.target.matches('.material-icons-round')) document.getElementById('settingsMenu').classList.remove('show'); };
-
-    function toggleTheme() {
-      let h = document.documentElement;
-      let newTheme = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      h.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      updateThemeUI(newTheme);
-    }
-
-    function updateThemeUI(theme) {
-      const icon = document.getElementById('themeIcon');
-      const text = document.getElementById('themeText');
-      icon.innerText = theme === 'dark' ? 'light_mode' : 'dark_mode';
-      text.innerText = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
-    }
-
-    async function showPage(idx) {
-      curPage = idx;
-      const titles = ["EXPENSE PRO", "ENTRY", "TRANSFER", "BILLS"];
-      document.getElementById('headerTitle').innerText = titles[idx];
-      
+    // Proper Navigation Logic
+    function showPage(pId) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById(['pageDashboard','pageEntry','pageFund','pageBills'][idx]).classList.add('active');
-      document.querySelectorAll('.nav-item')[idx].classList.add('active');
-
-      /* --- Update 4: Dropdown Blink Fix - Only refresh if on Dashboard --- */
-      if(idx === 0) {
-          await refreshData();
-      } else {
-          // If moving away from dashboard, just ensure current dropdowns are filled once
-          if(db) fillDropdowns(); 
-          if(idx === 2) updateFundSources();
-      }
+      document.getElementById('page-' + pId).classList.add('active');
+      
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if(btn.innerText.toLowerCase().includes(pId)) btn.classList.add('active');
+        if(pId === 'add') btn.classList.remove('active');
+      });
+      if(pId === 'home') refreshData();
     }
 
     async function refreshData() {
-  const sBtn = document.getElementById('sBtn');
-  if(sBtn) sBtn.classList.add('spinning');
-
-  // 1. मेमोरी से पुराना डेटा तुरंत उठाएं ताकि 0 न दिखे
-  const cached = localStorage.getItem('app_db_cache');
-  if(cached && !db) {
-    db = JSON.parse(cached);
-    updateUI(); 
-  }
-
-  // 2. अब सर्वर से नया डेटा मंगाएं
-  try {
-    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) }).then(r => r.json());
-    if(res.ok) { 
-      db = res; 
-      localStorage.setItem('app_db_cache', JSON.stringify(res)); // भविष्य के लिए सेव करें
-      updateUI(); 
+      const syncIcon = document.getElementById('sync');
+      syncIcon.classList.add('rotate');
+      try {
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action:"getDashboard"}) });
+        database = await res.json();
+        updateUI();
+      } catch(e) { 
+        Swal.fire({ icon: 'error', title: 'Connection Error', text: 'सर्वर से संपर्क नहीं हो पाया।', background: '#111827', color: '#fff' });
+      }
+      syncIcon.classList.remove('rotate');
     }
-  } catch(e) { console.error("Sync Failed"); }
-  if(sBtn) sBtn.classList.remove('spinning');
-}
 
-    // --- Update Dashboard UI ---
     function updateUI() {
-      const s = db.summary;
-      const netPL = Number(s.totalIncome || 0) - Number(s.monthExp || 0);
-
-      // P/L Card Logic
-      document.getElementById("monthPLValue").innerText = fmt(netPL);
-      const plLabel = document.getElementById("plStatusLabel");
-      const plProg = document.getElementById("plProgress");
+      if(!database) return;
+      const fmt = (n) => "₹" + Math.abs(n).toLocaleString('en-IN');
       
-      if(netPL >= 0) {
-        plLabel.innerText = "OVERALL PROFIT";
-        plLabel.style.color = "var(--green)";
-        plProg.style.background = "var(--green)";
-      } else {
-        plLabel.innerText = "OVERALL LOSS";
-        plLabel.style.color = "var(--red)";
-        plProg.style.background = "var(--red)";
-      }
-      plProg.style.width = "100%";
+      const bSum = database.banks.reduce((a,b)=>a+Number(b.val),0);
+      const cSum = database.cards.reduce((a,b)=>a+Number(b.val),0);
+      const lSum = database.loans.reduce((a,b)=>a+Number(b.val),0);
+      const net = (bSum + database.walletBal) - (cSum + lSum);
 
-      // Last Month
-      const lastPL = Number(s.lastMonthPL || 0);
-      document.getElementById("lastMonthValue").innerText = fmt(lastPL);
-      const lmTag = document.getElementById("lastMonthTag");
-      lmTag.innerText = lastPL >= 0 ? "PROFITABLE" : "IN LOSS";
-      lmTag.style.color = lastPL >= 0 ? "var(--green)" : "var(--red)";
+      // Hero Card Correction
+      document.getElementById('netTotal').innerText = fmt(net);
+      document.getElementById('hToday').innerText = fmt(database.summary.todayExp);
+      document.getElementById('hMonth').innerText = fmt(database.summary.monthExp);
 
-      // Other Cards
-      document.getElementById("sumToday").innerText = fmt(s.todayExp);
-      document.getElementById("sumFund").innerText = fmt(s.monthFund);
-      document.getElementById("sumWallet").innerText = fmt(db.walletBal);
+      // Bars Logic
+      let eB=0, eC=0, eW=0;
+      database.summary.recentTrans.forEach(t => {
+          if(t.type==="Expense") {
+              if(t.name==="Wallet") eW+=Number(t.amount);
+              else if(database.banks.some(b=>b.name===t.name)) eB+=Number(t.amount);
+              else if(database.cards.some(c=>c.name===t.name)) eC+=Number(t.amount);
+          }
+      });
+      document.getElementById('txtExpBank').innerText = fmt(eB);
+      document.getElementById('txtExpCard').innerText = fmt(eC);
+      document.getElementById('txtExpWallet').innerText = fmt(eW);
+      const total = (eB+eC+eW) || 1;
+      document.getElementById('fillBank').style.width = (eB/total*100) + "%";
+      document.getElementById('fillCard').style.width = (eC/total*100) + "%";
+      document.getElementById('fillWallet').style.width = (eW/total*100) + "%";
 
-      document.getElementById("catGrid").innerHTML = db.categories.map(c => `
-        <div class="cat-item"><div>${c.icon}</div><b>${c.name}</b><small style="color:var(--primary); font-size:10px;">${fmt(s.catTotals[c.name.toLowerCase().trim()] || 0)}</small></div>
-      `).join("");
+      // Accordions
+      const row = (n,v,r) => `<div class="acc-item"><span>${n}</span><b style="color:${r?'#ef4444':'#10b981'}">${fmt(v)}</b></div>`;
+      document.getElementById('secBank').innerHTML = row('Cash Wallet', database.walletBal, false) + database.banks.map(b=>row(b.name, b.val, false)).join('');
+      document.getElementById('secCard').innerHTML = database.cards.map(c=>row(c.name, c.val, true)).join('');
+      document.getElementById('secLoan').innerHTML = database.loans.map(l=>row(l.name, l.val, true)).join('');
 
-      const getSum = (arr) => arr.reduce((acc, i) => acc + (Number(i.val) || Number(i.emi) || 0), 0);
-
-      // Banks
-      document.getElementById("bankSub").innerText = fmt(getSum(db.banks));
-      document.getElementById("bankList").innerHTML = db.banks.map(b => `
-        <div class="row">
-          <div class="meta"><b>${b.name}</b><small>Balance</small></div>
-          <b class="${b.val < 0 ? 'val-neg' : 'val-pos'}">${fmt(b.val)}</b>
-        </div>`).join("");
-
-      // Fix 3: Credit Card Color Coding (Red if > 0, Green if 0)
-      document.getElementById("cardSub").innerText = fmt(getSum(db.cards));
-      document.getElementById("cardList").innerHTML = db.cards.map(c => `
-        <div class="row">
-          <div class="meta"><b>${c.name}</b><small>Outstanding</small></div>
-          <b class="${Number(c.val) > 0 ? 'val-neg' : 'val-pos'}">${fmt(c.val)}</b>
-        </div>`).join("");
-
-      // Fix 5: Loans & EMI with Status
-      document.getElementById("loanSub").innerText = fmt(getSum(db.loans));
-      document.getElementById("loanList").innerHTML = db.loans.map(l => {
-        const isPaid = l.status === 'Paid';
-        return `
-        <div class="row">
-          <div class="meta">
-            <b>${l.name} <span class="status-badge ${isPaid?'bg-green':'bg-red'}">${isPaid?'PAID':'UNPAID'}</span></b>
-            <small>Monthly EMI</small>
-          </div>
-          <b class="val-neg">${fmt(l.val)}</b>
-        </div>`;
-      }).join("");
-
-        // History
-      document.getElementById('listHistory').innerHTML = db.summary.recentTrans.map(t => `
-        <div class="item">
-          <div><b>${t.category}</b><small>${t.date} • ${t.name}</small></div>
-          <div class="val ${t.type.includes('Income') ? 'text-green' : 'text-red'}">${t.type.includes('Income')?'+':'-'}${fmt(t.amount)}</div>
+      // History Log Correction
+      document.getElementById('histList').innerHTML = database.summary.recentTrans.map(t => `
+        <div class="pl-card" style="margin: 8px 0; padding: 15px; border-radius:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div><b style="font-size:14px">${t.category}</b><br><small style="color:var(--text-muted)">${t.name} • ${t.date}</small></div>
+                <b style="color:${t.type.includes('Income') || t.type.includes('Add') ?'#10b981':'#ef4444'}">
+                    ${t.type.includes('Income') || t.type.includes('Add') ?'+':'-'}${fmt(t.amount)}
+                </b>
+            </div>
         </div>`).join('');
+
+      // Dropdown Initializations
+      document.getElementById('eCat').innerHTML = database.categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
+      document.getElementById('tBank').innerHTML = database.banks.map(b=>`<option value="${b.name}">${b.name}</option>`).join('');
+      document.getElementById('bFrom').innerHTML = `<option value="Wallet">Wallet</option>` + database.banks.map(b=>`<option value="${b.name}">${b.name}</option>`).join('');
+      renderDynamic(); renderBill();
+    }
+
+    function toggleSec(id) { document.getElementById(id).classList.toggle('open'); }
+
+    function renderDynamic() {
+      const src = document.getElementById('eSrc').value;
+      const dyn = document.getElementById('dynSrc');
+      if(src==='Bank') dyn.innerHTML = `<label class="label">Select Bank Account</label><select class="inp" id="eName">${database.banks.map(b=>`<option value="${b.name}">${b.name}</option>`).join('')}</select>`;
+      else if(src==='Card') dyn.innerHTML = `<label class="label">Select Credit Card</label><select class="inp" id="eName">${database.cards.map(c=>`<option value="${c.name}">${c.name}</option>`).join('')}</select>`;
+      else dyn.innerHTML = "";
+    }
+
+    function renderBill() {
+      const type = document.getElementById('bType').value;
+      const targets = type === 'Card' ? database.cards : database.loans;
+      document.getElementById('bTarget').innerHTML = targets.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+    }
+
+    async function submitData(mode) {
+      let payload = { action: "save" };
       
-     // --- Update 4: Only refill dropdowns if not currently on entry pages to prevent reset ---
-      if(curPage === 0) fillDropdowns();
-    }
-
-    function fillDropdowns() {
-      const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
-      document.getElementById("expBank").innerHTML = opt(db.banks, "name");
-      document.getElementById("expCard").innerHTML = opt(db.cards, "name");
-      document.getElementById("payFrom").innerHTML = `<option value="Wallet">Digital Wallet</option>` + opt(db.banks, "name");
-      document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
-      updateBillTarget();
-    }
-    // Fix 5: Auto-fill EMI Amount
-    function autoFillEmi() {
-        const type = document.getElementById("billType").value;
-        const selectedName = document.getElementById("payTo").value;
-        if(type === 'loan') {
-            const loan = db.loans.find(l => l.name === selectedName);
-            if(loan) document.getElementById("payAmt").value = loan.val;
-        } else {
-            document.getElementById("payAmt").value = "";
-        }
-    }
-
-    function updateBillTarget() {
-      const type = document.getElementById("billType").value;
-      const list = (type === 'card') ? db.cards : db.loans;
-      document.getElementById("payTo").innerHTML = list.map(i => `<option value="${i.name}">${i.name}</option>`).join("");
-      autoFillEmi();
-    }
-
-    function updateFundSources() {
-      const dest = document.getElementById("targetType").value;
-      const targetBankDiv = document.getElementById("divTargetBank");
-      let options = '<option value="Others">💳 Other/Salary Source</option>';
-      
-      if(dest === 'Wallet') {
-        targetBankDiv.style.display = "none";
-        options += db.banks.filter(b=>b.name!=='Wallet' && b.name!=='Cash').map(b=>`<option value="${b.name}">🏦 From ${b.name}</option>`).join("");
-      } else {
-        targetBankDiv.style.display = "block";
-        document.getElementById("targetBankName").innerHTML = db.banks.filter(b=>b.name!=='Wallet' && b.name!=='Cash').map(b=>`<option value="${b.name}">${b.name}</option>`).join("");
-        options += '<option value="Wallet">👛 From Digital Wallet</option>';
-        options += '<option value="Cash">💵 From Cash Hand</option>';
+      if(mode==='Expense') {
+          payload.type="Expense";
+          payload.name = document.getElementById('eSrc').value === 'Wallet' ? 'Wallet' : document.getElementById('eName').value;
+          payload.amount = document.getElementById('eAmt').value;
+          payload.category = document.getElementById('eCat').value;
+      } else if(mode==='Transfer') {
+          const dir = document.getElementById('tDir').value;
+          payload.amount = document.getElementById('tAmt').value;
+          payload.name = dir === 'B2W' ? 'Wallet' : document.getElementById('tBank').value;
+          payload.source = dir === 'B2W' ? document.getElementById('tBank').value : 'Wallet';
+          payload.type = dir === 'B2W' ? "Add Fund" : "Income";
+          payload.category = "Transfer";
+      } else if(mode==='Bill') {
+          payload.type = "Bill Pay";
+          payload.name = document.getElementById('bTarget').value;
+          payload.source = document.getElementById('bFrom').value;
+          payload.amount = document.getElementById('bAmt').value;
+          payload.category = "Bill Payment";
       }
-      document.getElementById("fundSource").innerHTML = options;
-    }
 
-    async function saveTrans(type) {
-      const btn = event.target;
-      const originalText = btn.innerText;
-      let p = { action: "save" };
-
-      if (type === 'entry') {
-        let m = document.getElementById("payMode").value;
-        p.type = m; 
-        p.name = (m === 'Digital Wallet') ? 'Wallet' : (m === 'bank' ? document.getElementById("expBank").value : document.getElementById("expCard").value);
-        p.amount = document.getElementById("expAmt").value; 
-        p.category = document.getElementById("expCat").value; 
-        p.remark = document.getElementById("expRem").value;
-      } 
-      else if (type === 'fund') {
-        p.type = "Add Fund"; 
-        p.amount = document.getElementById("fundAmt").value; 
-        p.source = document.getElementById("fundSource").value;
-        p.name = (document.getElementById("targetType").value === 'Wallet') ? 'Wallet' : document.getElementById("targetBankName").value;
-        p.remark = "Transfer from " + p.source;
-
-        // Fix 4: Bypass balance check for Income
-        if(p.source === 'Others') p.type = 'Income'; 
-      } 
-      // saveTrans फंक्शन के अंदर 'pay' (Bills) वाले हिस्से को ऐसे बदलें:
-      else if (type === 'pay') {
-        p.type = "Bill Pay"; 
-        p.name = document.getElementById("payTo").value; 
-        p.amount = document.getElementById("payAmt").value;
-        let fromAcc = document.getElementById("payFrom").value;
-        p.remark = "Paid from " + fromAcc;
-        p.billType = document.getElementById("billType").value;
-
-        // 2. बैलेंस चेक करें
-        let currentBalance = 0;
-        if (fromAcc === 'Wallet') {
-          currentBalance = Number(db.walletBal);
-        } else {
-          let bank = db.banks.find(b => b.name === fromAcc);
-          currentBalance = bank ? Number(bank.val) : 0;
-        }
-
-        // 3. अगर बैलेंस कम है, तो थोड़ा रुक कर (ताकि प्रोसेसिंग दिखे) एरर दिखाएं
-        if (Number(p.amount) > currentBalance) {
-          setTimeout(() => {
-            btn.innerText = originalText; // बटन वापस ठीक करें
-            notify('Failed', `Insufficient Balance in ${fromAcc}!`, 'error_outline', '#ef4444');
-          }, 2000); // आधा सेकंड की प्रोसेसिंग दिखाएगा
+      if(!payload.amount || payload.amount <= 0) {
+          Swal.fire({ icon: 'warning', title: 'Invalid Amount', text: 'कृपया सही राशि दर्ज करें।', background: '#111827', color: '#fff' });
           return;
-        }
-
-        // 4. Already Paid Check
-        if(p.billType === 'loan') {
-            const loan = db.loans.find(l => l.name === p.name);
-            if(loan && loan.status === 'Paid') {
-                btn.innerText = originalText;
-                return notify('Already Paid', 'इस महीने की EMI पहले ही भरी जा चुकी है!', 'info', '#38bdf8');
-            }
-        }
-      }
-      if (!p.amount || p.amount <= 0) {
-        return notify('Alert', 'Please enter a valid amount', 'warning', '#f59e0b');
       }
 
-      btn.classList.add('loading-btn'); 
-      btn.innerText = "PROCESSING...";
+      Swal.fire({ title: 'Processing...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), background: '#111827', color: '#fff' });
 
       try {
-        const response = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) });
-        const res = await response.json();
-        if (res.ok) {
-          notify('Success', 'Transaction recorded successfully!', 'check_circle', '#10b981');
-          document.querySelectorAll('.inp').forEach(i => { if(i.type === 'number' || i.type === 'text') i.value = ""; });
-          setTimeout(() => { showPage(0); }, 500);
-        } else {
-          notify('Failed', res.error, 'error_outline', '#ef4444');
-        }
-      } catch (e) {
-        notify('Error', 'Network connection failed!', 'error', '#ef4444');
-      } finally {
-        btn.classList.remove('loading-btn'); 
-        btn.innerText = originalText;
+        await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+        Swal.fire({ icon: 'success', title: 'Success!', text: 'ट्रांजैक्शन सफलतापूर्वक रिकॉर्ड हो गया।', timer: 2000, showConfirmButton: false, background: '#111827', color: '#fff' });
+        showPage('home');
+      } catch(e) {
+        Swal.fire({ icon: 'error', title: 'Failed', text: 'कुछ तकनीकी खराबी आ गई।', background: '#111827', color: '#fff' });
       }
     }
 
-    function notify(title, text, icon, color) {
-      document.getElementById('mTitle').innerText = title; document.getElementById('mText').innerText = text;
-      const ic = document.getElementById('mIcon'); ic.innerText = icon; ic.style.color = color;
-      document.getElementById('modal').style.display = 'flex';
-    }
-    function closeModal() { document.getElementById('modal').style.display = 'none'; }
-    function toggleFields() {
-      let m = document.getElementById("payMode").value;
-      document.getElementById("divBank").style.display = (m==='bank') ? 'block' : 'none';
-      document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
-    }
-window.addEventListener("load", () => {
-  showPage(0);
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(() => console.log("Service Worker Registered"))
-      .catch(err => console.log("SW Error:", err));
-  }
-});
-    
+    window.onload = refreshData;
   </script>
 </body>
 </html>
