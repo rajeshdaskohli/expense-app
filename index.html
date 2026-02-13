@@ -20,11 +20,6 @@
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 120px; overflow-x: hidden; }
     .container { max-width: 500px; margin: 0 auto; padding: 0 16px; }
 
-      /* Old Net Worth Style */
-    .hero-card { background: var(--primary-grad); border-radius: 35px; padding: 30px 25px; margin: 20px 0; box-shadow: 0 15px 35px rgba(99, 102, 225, 0.3); }
-    .hero-card small { font-size: 12px; opacity: 0.8; font-weight: 600; text-transform: uppercase; }
-    .hero-card h1 { font-size: 38px; margin: 10px 0 0; font-weight: 800; }
-
     /* --- Hero Card (Correction: Added Today/Month here) --- */
     .pl-card { background: var(--surface); border-radius: 28px; padding: 25px; border: 1px solid var(--border); margin: 20px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     .pl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
@@ -80,19 +75,19 @@
     </div>
 
     <div class="page active" id="page-home">
-      <div class="hero-card">
-        <small>Current Net Worth</small>
-        <h1 id="netTotal">₹0</h1>
-      </div>
-      
-        <div class="exp-grid">
-        <div class="exp-card">
-          <small>Today Expense</small>
-          <div id="hToday" style="color: var(--danger)">₹0</div>
-        </div>
-        <div class="exp-card">
-          <small>Monthly Fund</small>
-          <div id="hMonth" style="color: var(--success)">₹0</div>
+      <div class="pl-card">
+        <small style="font-weight: 800; color: var(--text-muted)">Current Net Worth</small>
+        <h1 id="netTotal" style="margin: 8px 0 0; font-size: 36px; font-weight: 900;">₹0</h1>
+        
+        <div class="pl-row">
+          <div class="pl-box">
+            <small>Today Exp.</small>
+            <div id="hToday" style="color: var(--danger)">₹0</div>
+          </div>
+          <div class="pl-box">
+            <small>This Month Fund</small>
+            <div id="hMonth" style="color: var(--success)">₹0</div>
+          </div>
         </div>
       </div>
 
