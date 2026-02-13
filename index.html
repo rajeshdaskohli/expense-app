@@ -366,26 +366,21 @@
     }
 
     async function showPage(idx) {
-    curPage = idx;
-    const titles = ["EXPENSE PRO", "TRANSFER", "NEW ENTRY", "BILLS", "HISTORY"];
-    document.getElementById('headerTitle').innerText = titles[idx];
-    
-    // सभी पेजों को छुपाएं
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    
-    // सही पेज दिखाएं (ID का क्रम ध्यान रखें)
-    const pages = ['pageDashboard', 'pageFund', 'pageEntry', 'pageBills', 'pageHistory'];
-    document.getElementById(pages[idx]).classList.add('active');
-    document.querySelectorAll('.nav-item')[idx].classList.add('active');
-    
-    // अगर होम या हिस्ट्री पेज पर हैं तो डेटा रिफ्रेश करें
-    if(idx === 0 || idx === 4) {
-    await refreshData();
-      } else {
-          // If moving away from dashboard, just ensure current dropdowns are filled once
-          if(db) fillDropdowns(); 
-          if(idx === 2) updateFundSources();
+      curPage = idx;
+      const titles = ["EXPENSE PRO", "TRANSFER", "NEW ENTRY", "BILLS", "HISTORY"];
+      document.getElementById('headerTitle').innerText = titles[idx];
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const pages = ['pageDashboard', 'pageFund', 'pageEntry', 'pageBills', 'pageHistory'];
+      const targetPage = document.getElementById(pages[idx]);
+      if(targetPage) targetPage.classList.add('active');
+      document.querySelectorAll('.nav-item')[idx].classList.add('active');
+      if(idx === 0 || idx === 4) {
+        await refreshData();
+      } else if(db) {
+        fillDropdowns(); 
+        if(idx === 1) updateFundSources();
+        if(idx === 3) updateBillTarget();
       }
     }
 
