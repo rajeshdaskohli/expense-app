@@ -149,7 +149,9 @@
 
     <div class="page" id="page-log">
         <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 10px;">
-            <h3 style="margin-left:10px">Recent Activity</h3>
+            <h3>Activity Log</h3>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:700">RECENT 20</span>
+        </div>
         <div id="histList"></div>
     </div>
 
@@ -230,12 +232,16 @@
       document.getElementById('secCard').innerHTML = database.cards.map(c=>row(c.name, c.val, true)).join('');
       document.getElementById('secLoan').innerHTML = database.loans.map(l=>row(l.name, l.val, true)).join('');
 
-       // Log
-        document.getElementById('histList').innerHTML = db.summary.recentTrans.map(t => `
-            <div class="exp-card" style="margin-bottom:10px; text-align:left; display:flex; justify-content:space-between; align-items:center;">
-                <div><b>${t.category}</b><br><small>${t.name} • ${t.date}</small></div>
-                <b style="color:${t.type.includes('Income')?'#10b981':'#ef4444'}">${t.type.includes('Income')?'+':'-'}${f(t.amount)}</b>
-            </div>`).join('');
+      // History Log Correction
+      document.getElementById('histList').innerHTML = database.summary.recentTrans.map(t => `
+        <div class="pl-card" style="margin: 8px 0; padding: 15px; border-radius:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div><b style="font-size:14px">${t.category}</b><br><small style="color:var(--text-muted)">${t.name} • ${t.date}</small></div>
+                <b style="color:${t.type.includes('Income') || t.type.includes('Add') ?'#10b981':'#ef4444'}">
+                    ${t.type.includes('Income') || t.type.includes('Add') ?'+':'-'}${fmt(t.amount)}
+                </b>
+            </div>
+        </div>`).join('');
 
       // Dropdown Initializations
       document.getElementById('eCat').innerHTML = database.categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
