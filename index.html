@@ -89,12 +89,47 @@
     .label-row h3 { font-size: 11px; font-weight: 800; color: var(--text-dim); margin: 0; letter-spacing: 1px; }
     .subtotal { font-weight: 800; font-size: 12px; color: var(--text); }
 
-    .nav-wrapper { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; }
-    .nav-bar { background: var(--card); display: flex; padding: 8px; border-radius: 24px; border: 1px solid var(--border); width: 92%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-    .nav-item { flex: 1; padding: 10px; border-radius: 18px; text-align: center; color: var(--text-dim); cursor: pointer; }
-    .nav-item.active { background: var(--primary); color: #fff; }
-    .nav-item i { display: block; font-size: 22px; margin-bottom: 2px; }
-    .nav-item span { font-size: 10px; font-weight: 700; }
+   /* Navigation Bar (5 Tabs Design) */
+   .nav-wrapper { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; }
+   .nav-bar { 
+   background: var(--card); 
+   display: flex; 
+   align-items: center;
+   padding: 10px 5px; 
+   border-radius: 35px; 
+   width: 94%; 
+   max-width: 450px; 
+   box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+   }
+   .nav-item { 
+   flex: 1; 
+   text-align: center; 
+   color: var(--text-dim); 
+   cursor: pointer; 
+   display: flex; 
+   flex-direction: column; 
+   align-items: center; 
+   }
+   .nav-item.active { color: var(--primary); }
+   .nav-item i { font-size: 24px; margin-bottom: 2px; }
+   .nav-item span { font-size: 10px; font-weight: 700; }
+   
+   /* बीच वाला + बटन */
+   .nav-item.center-btn { margin-top: -45px; }
+   .plus-circle {
+   background: #6d28d9; /* बैंगनी रंग */
+   width: 65px;
+   height: 65px;
+   border-radius: 50%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   box-shadow: 0 8px 20px rgba(109, 40, 217, 0.4);
+   border: 5px solid var(--bg);
+   color: white !important;
+   }
+   .plus-circle i { font-size: 35px; color: white; }
+   
 
     .inp-group { margin-bottom: 15px; }
     .inp-group label { display: block; font-size: 10px; font-weight: 800; color: var(--primary); margin-left: 5px; margin-bottom: 5px; text-transform: uppercase; }
@@ -233,6 +268,12 @@
     </div>
 
     <div class="page" id="pageBills">
+    <div class="page" id="pageHistory">
+    <div class="label-row"><h3>TRANSACTION HISTORY</h3></div>
+    <div class="list-container">
+    <div id="historyList"></div> </div>
+    </div>
+    
       <div class="list-container" style="padding: 25px; margin-top: 20px;">
         <div class="inp-group">
           <label>Bill Type</label>
@@ -256,14 +297,30 @@
 
   </div>
 
-  <div class="nav-wrapper">
-    <div class="nav-bar">
-      <div class="nav-item active" onclick="showPage(0)"><i class="material-icons-round">home</i><span>Home</span></div>
-      <div class="nav-item" onclick="showPage(1)"><i class="material-icons-round">add_shopping_cart</i><span>Entry</span></div>
-      <div class="nav-item" onclick="showPage(2)"><i class="material-icons-round">swap_horiz</i><span>Transfer</span></div>
-      <div class="nav-item" onclick="showPage(3)"><i class="material-icons-round">receipt_long</i><span>Bills</span></div>
-    </div>
-  </div>
+ <div class="nav-wrapper">
+ <div class="nav-bar">
+ <div class="nav-item active" onclick="showPage(0)">
+ <i class="material-icons-round">home</i>
+ <span>Home</span>
+ </div>
+ <div class="nav-item" onclick="showPage(1)">
+ <i class="material-icons-round">swap_horiz</i>
+ <span>Transfer</span>
+ </div>
+ <div class="nav-item center-btn" onclick="showPage(2)">
+ <div class="plus-circle"><i class="material-icons-round">add</i></div>
+ </div>
+ <div class="nav-item" onclick="showPage(3)">
+ <i class="material-icons-round">receipt_long</i>
+ <span>Bills</span>
+ </div>
+ <div class="nav-item" onclick="showPage(4)">
+ <i class="material-icons-round">history</i>
+ <span>History</span>
+ </div>
+ </div>
+ </div>
+ 
 
   <script>
     // इसे <script> के तुरंत बाद सबसे ऊपर डालें
@@ -316,18 +373,22 @@
     }
 
     async function showPage(idx) {
-      curPage = idx;
-      const titles = ["EXPENSE PRO", "ENTRY", "TRANSFER", "BILLS"];
-      document.getElementById('headerTitle').innerText = titles[idx];
-      
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById(['pageDashboard','pageEntry','pageFund','pageBills'][idx]).classList.add('active');
-      document.querySelectorAll('.nav-item')[idx].classList.add('active');
-
-      /* --- Update 4: Dropdown Blink Fix - Only refresh if on Dashboard --- */
-      if(idx === 0) {
-          await refreshData();
+    curPage = idx;
+    const titles = ["EXPENSE PRO", "TRANSFER", "NEW ENTRY", "BILLS", "HISTORY"];
+    document.getElementById('headerTitle').innerText = titles[idx];
+    
+    // सभी पेजों को छुपाएं
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    // सही पेज दिखाएं (ID का क्रम ध्यान रखें)
+    const pages = ['pageDashboard', 'pageFund', 'pageEntry', 'pageBills', 'pageHistory'];
+    document.getElementById(pages[idx]).classList.add('active');
+    document.querySelectorAll('.nav-item')[idx].classList.add('active');
+    
+    // अगर होम या हिस्ट्री पेज पर हैं तो डेटा रिफ्रेश करें
+    if(idx === 0 || idx === 4) {
+    await refreshData();
       } else {
           // If moving away from dashboard, just ensure current dropdowns are filled once
           if(db) fillDropdowns(); 
@@ -401,10 +462,19 @@
         </div>`;
       }).join("");
 
-      // Recent History
-      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => `
-        <div class="row"><div class="meta"><b>${t.name} <span style="font-size:9px; opacity:0.5;">${t.category}</span></b><small>${t.date}</small></div><b class="${t.type==='Add Fund' || t.type==='Income' ?'val-pos':'val-neg'}">${t.type==='Add Fund' || t.type==='Income' ?'+':'-'}${fmt(t.amount)}</b></div>
-      `).join("");
+     // updateUI फंक्शन के अंदर इसे अपडेट करें
+     document.getElementById("historyList").innerHTML = db.summary.recentTrans.map(t => `
+     <div class="row">
+     <div class="meta">
+     <b>${t.name} <small style="opacity:0.5;">(${t.category})</small></b>
+     <small>${t.date}</small>
+     </div>
+     <b class="${t.type==='Income' || t.type==='Add Fund' ? 'val-pos' : 'val-neg'}">
+     ${t.type==='Income' || t.type==='Add Fund' ? '+' : '-'}${fmt(t.amount)}
+     </b>
+     </div>
+     `).join("");
+     
       
      // --- Update 4: Only refill dropdowns if not currently on entry pages to prevent reset ---
       if(curPage === 0) fillDropdowns();
@@ -561,4 +631,4 @@ window.addEventListener("load", () => {
     
   </script>
 </body>
-  </html>
+</html>
