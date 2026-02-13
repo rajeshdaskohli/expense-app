@@ -2,310 +2,518 @@
 <html lang="hi" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>Finance 360 PRO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <title>Expense Pro</title>
 
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  
   <style>
     :root {
-      --bg: #030712; --surface: #111827; --input: #1f2937;
-      --text: #f9fafb; --text-muted: #9ca3af; --border: rgba(255, 255, 255, 0.08);
-      --primary: #6366f1; --primary-grad: linear-gradient(135deg, #6366f1, #4f46e5);
-      --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+      --bg: #f8fafc; 
+      --card: rgba(255,255,255,0.8); 
+      --text: #0f172a; 
+      --text-dim: #64748b;
+      --primary: #2563eb; 
+      --green: #10b981; 
+      --red: #ef4444; 
+      --border: rgba(0,0,0,0.08);
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 120px; overflow-x: hidden; }
-    .container { max-width: 500px; margin: 0 auto; padding: 0 16px; }
-
-    /* --- Hero Card (Correction: Added Today/Month here) --- */
-    .pl-card { background: var(--surface); border-radius: 28px; padding: 25px; border: 1px solid var(--border); margin: 20px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .pl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-    .pl-box { background: var(--input); padding: 15px; border-radius: 20px; text-align: center; }
-    .pl-box small { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .pl-box div { font-size: 15px; font-weight: 800; margin-top: 4px; }
-
-    /* --- Tracking Bars --- */
-    .spend-tracker { background: var(--surface); border-radius: 24px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-    .track-row { margin-bottom: 15px; }
-    .track-info { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
-    .bar-bg { height: 8px; background: var(--input); border-radius: 10px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 10px; width: 0%; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
-
-    /* --- Detail Sections --- */
-    .detail-section { background: var(--surface); border-radius: 24px; border: 1px solid var(--border); margin-bottom: 12px; overflow: hidden; }
-    .section-trigger { padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-    .trigger-left { display: flex; align-items: center; gap: 15px; }
-    .trigger-left i { font-size: 24px; color: var(--primary); }
-    .section-content { display: none; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border); }
-    .section-content.open { display: block; animation: slideDown 0.3s ease-out; }
-
-    @keyframes slideDown { from { opacity:0; transform: translateY(-10px); } to { opacity:1; transform: translateY(0); } }
-
-    .acc-item { display: flex; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); }
-
-    /* --- Navigation --- */
-    .navbar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; height: 75px; background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(25px); border-radius: 30px; border: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 2000; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
-    .nav-btn { color: var(--text-muted); text-align: center; cursor: pointer; flex: 1; transition: 0.3s; }
-    .nav-btn.active { color: var(--primary); }
-    .nav-btn i { font-size: 24px; display: block; }
-    .nav-btn span { font-size: 10px; font-weight: 700; }
-    .nav-add { width: 58px; height: 58px; background: var(--primary-grad); border-radius: 50%; margin-top: -45px; display: flex; align-items: center; justify-content: center; color: white; border: 5px solid var(--bg); box-shadow: 0 8px 20px rgba(99, 102, 225, 0.4); }
-
-    .page { display: none; padding-top: 10px; }
-    .page.active { display: block; animation: fadeIn 0.4s; }
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     
-    .btn-save { width: 100%; background: var(--primary-grad); color: white; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 16px; margin-top: 20px; cursor: pointer; }
-    .inp { width: 100%; background: var(--input); border: 1px solid var(--border); color: var(--text); padding: 15px; border-radius: 14px; margin-top: 8px; font-size: 14px; }
-    .label { font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+    [data-theme="dark"] {
+      --bg: #070b14; 
+      --card: rgba(255,255,255,0.06); /* पारदर्शी कार्ड */
+      --text: #f8fafc; 
+      --text-dim: #94a3b8;
+      --primary: #38bdf8; 
+      --border: rgba(255,255,255,0.1);
+    }
 
-    .rotate { animation: spin 1s infinite linear; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: 0.2s ease; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
+
+    /* --- Processing Button Style (Muted Blue, White Text) --- */
+    .btn-main:active { transform: scale(0.96); }
+    
+    .loading-btn { 
+      background: #0369a1 !important; /* Muted Deep Blue */
+      color: #ffffff !important;      /* Pure White Text */
+      pointer-events: none; 
+      cursor: not-allowed;
+      filter: saturate(0.8); 
+    }
+
+    /* Header */
+    .header { padding: 20px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
+    .header h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
+    .controls i { cursor: pointer; margin-left: 15px; color: var(--text-dim); }
+    
+    #sBtn { transform: scaleX(-1); }
+    @keyframes spin { from { transform: rotate(0deg) scaleX(-1); } to { transform: rotate(360deg) scaleX(-1); } }
+    .spinning { animation: spin 1s linear infinite; color: var(--primary) !important; }
+
+    /* Layout */
+    .container { max-width: 500px; margin: 0 auto; padding: 0 16px; }
+    .page { display: none; min-height: 70vh; animation: fadeIn 0.4s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- Hero Scroll Cards (Transparent) --- */
+    .hero-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px 0; scrollbar-width: none; scroll-snap-type: x mandatory; }
+    .hero-scroll::-webkit-scrollbar { display: none; }
+    
+    .hero-card { 
+      min-width: 85%; scroll-snap-align: center; flex-shrink: 0; 
+      background: var(--card); /* Transparent Variable */
+      backdrop-filter: blur(12px); /* Glass Effect */
+      padding: 20px; border-radius: 24px; 
+      border: 1px solid var(--border); 
+    }
+    .hero-card span { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
+    .hero-card p { margin: 5px 0; font-size: 26px; font-weight: 800; }
+    
+    /* Progress Bar */
+    .prog-bg { width: 100%; background: rgba(120, 120, 120, 0.2); height: 6px; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+    .prog-bar { height: 100%; transition: 1s ease; }
+
+    /* --- Wallet Bar (New Position & Style) --- */
+    .wallet-bar {
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      margin: 10px 0 25px 0; 
+      padding: 18px 24px; 
+      border-radius: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      color: white; 
+      box-shadow: 0 10px 20px rgba(56, 189, 248, 0.25);
+    }
+    .wallet-bar-label { font-size: 11px; font-weight: 700; opacity: 0.9; letter-spacing: 0.5px; }
+    .wallet-bar-val { font-size: 22px; font-weight: 800; }
+
+    /* Categories Grid */
+    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+    .cat-item { 
+      background: var(--card); backdrop-filter: blur(10px);
+      padding: 15px 5px; border-radius: 20px; text-align: center; border: 1px solid var(--border); 
+    }
+    .cat-item div { font-size: 20px; margin-bottom: 5px; }
+    .cat-item b { font-size: 11px; display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .cat-item small { color: var(--primary); font-size: 10px; font-weight: 800; }
+
+    /* Lists */
+    .list-container { 
+      background: var(--card); backdrop-filter: blur(10px);
+      border-radius: 28px; padding: 10px 20px; border: 1px solid var(--border); margin-bottom: 20px; 
+    }
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .row:last-child { border: none; }
+    
+    .label-row { display: flex; justify-content: space-between; align-items: center; margin: 25px 5px 10px; }
+    .label-row h3 { font-size: 11px; font-weight: 800; color: var(--text-dim); margin: 0; letter-spacing: 1px; }
+
+    /* Navigation */
+    .nav-wrapper { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; }
+    .nav-bar { 
+      background: rgba(15, 23, 42, 0.85); /* Semi-transparent dark */
+      backdrop-filter: blur(15px);
+      display: flex; padding: 8px; border-radius: 24px; border: 1px solid var(--border); 
+      width: 92%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+    }
+    [data-theme="light"] .nav-bar { background: rgba(255, 255, 255, 0.85); }
+    
+    .nav-item { flex: 1; padding: 10px; border-radius: 18px; text-align: center; color: var(--text-dim); cursor: pointer; }
+    .nav-item.active { background: var(--primary); color: #fff; }
+    .nav-item i { display: block; font-size: 22px; margin-bottom: 2px; }
+    .nav-item span { font-size: 10px; font-weight: 700; }
+
+    /* Inputs & Buttons */
+    .inp-group { margin-bottom: 15px; }
+    .inp-group label { display: block; font-size: 10px; font-weight: 800; color: var(--primary); margin-left: 5px; margin-bottom: 5px; text-transform: uppercase; }
+    .inp { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 16px; color: var(--text); font-size: 16px; outline: none; }
+    .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    
+    /* Modal */
+    #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .modal-box { background: #1e293b; padding: 30px; border-radius: 32px; width: 85%; max-width: 320px; text-align: center; border: 1px solid var(--border); }
+    
+    .val-pos { color: var(--green); } .val-neg { color: var(--red); }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div style="padding: 25px 0 10px; display: flex; justify-content: space-between; align-items: center;">
-      <h2 style="margin:0; font-weight: 900; letter-spacing: -0.5px; color: var(--primary);">FINANCE 360</h2>
-      <i class="material-icons-round" id="sync" onclick="refreshData()" style="cursor:pointer; color:var(--text-muted); font-size: 26px;">sync</i>
+  <div id="modal">
+    <div class="modal-box">
+      <i class="material-icons-round" id="mIcon" style="font-size: 50px;">check_circle</i>
+      <h2 id="mTitle" style="margin: 15px 0 5px; color: white;">Success</h2>
+      <p id="mText" style="color: #94a3b8; margin-bottom: 20px;"></p>
+      <button class="btn-main" onclick="closeModal()">OK</button>
     </div>
-
-    <div class="page active" id="page-home">
-      <div class="pl-card">
-        <small style="font-weight: 800; color: var(--text-muted)">Current Net Worth</small>
-        <h1 id="netTotal" style="margin: 8px 0 0; font-size: 36px; font-weight: 900;">₹0</h1>
-        
-        <div class="pl-row">
-          <div class="pl-box">
-            <small>Today Exp.</small>
-            <div id="hToday" style="color: var(--danger)">₹0</div>
-          </div>
-          <div class="pl-box">
-            <small>This Month Fund</small>
-            <div id="hMonth" style="color: var(--success)">₹0</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="spend-tracker">
-        <div style="font-size: 12px; font-weight: 800; margin-bottom: 15px; color: var(--text-muted); letter-spacing: 1px;">SPENDING BY SOURCE</div>
-        <div class="track-row">
-          <div class="track-info"><span>Bank Accounts</span><span id="txtExpBank">₹0</span></div>
-          <div class="bar-bg"><div class="bar-fill" id="fillBank" style="background: #3b82f6;"></div></div>
-        </div>
-        <div class="track-row">
-          <div class="track-info"><span>Credit Cards</span><span id="txtExpCard">₹0</span></div>
-          <div class="bar-bg"><div class="bar-fill" id="fillCard" style="background: #ef4444;"></div></div>
-        </div>
-        <div class="track-row">
-          <div class="track-info"><span>Cash / Wallet</span><span id="txtExpWallet">₹0</span></div>
-          <div class="bar-bg"><div class="bar-fill" id="fillWallet" style="background: #10b981;"></div></div>
-        </div>
-      </div>
-
-      <div class="detail-section"><div class="section-trigger" onclick="toggleSec('secBank')"><div class="trigger-left"><i class="material-icons-round">account_balance</i><b>Banks & Cash</b></div><i class="material-icons-round">expand_more</i></div><div class="section-content" id="secBank"></div></div>
-      <div class="detail-section"><div class="section-trigger" onclick="toggleSec('secCard')"><div class="trigger-left"><i class="material-icons-round">credit_card</i><b>Credit Cards</b></div><i class="material-icons-round">expand_more</i></div><div class="section-content" id="secCard"></div></div>
-      <div class="detail-section"><div class="section-trigger" onclick="toggleSec('secLoan')"><div class="trigger-left"><i class="material-icons-round">handshake</i><b>Active Loans</b></div><i class="material-icons-round">expand_more</i></div><div class="section-content" id="secLoan"></div></div>
-    </div>
-
-    <div class="page" id="page-add">
-        <div class="pl-card">
-            <h3 style="margin-top:0">Record Expense</h3>
-            <label class="label">Payment Source</label>
-            <select class="inp" id="eSrc" onchange="renderDynamic()"><option value="Wallet">Wallet / Cash</option><option value="Bank">Bank Account</option><option value="Card">Credit Card</option></select>
-            <div id="dynSrc" style="margin-top:15px"></div>
-            <div style="margin-top:15px"><label class="label">Category</label><select class="inp" id="eCat"></select></div>
-            <div style="margin-top:15px"><label class="label">Amount (₹)</label><input type="number" class="inp" id="eAmt" placeholder="0.00"></div>
-            <button class="btn-save" onclick="submitData('Expense')">Save Transaction</button>
-        </div>
-    </div>
-
-    <div class="page" id="page-move">
-        <div class="pl-card">
-            <h3 style="margin-top:0">Fund Transfer</h3>
-            <label class="label">Direction</label>
-            <select class="inp" id="tDir"><option value="B2W">Bank to Wallet</option><option value="W2B">Wallet to Bank</option></select>
-            <div style="margin-top:15px"><label class="label">Bank Account</label><select class="inp" id="tBank"></select></div>
-            <div style="margin-top:15px"><label class="label">Amount</label><input type="number" class="inp" id="tAmt" placeholder="0.00"></div>
-            <button class="btn-save" onclick="submitData('Transfer')">Transfer Now</button>
-        </div>
-    </div>
-
-    <div class="page" id="page-bills">
-        <div class="pl-card">
-            <h3 style="margin-top:0">Liability Payment</h3>
-            <label class="label">Payment Type</label>
-            <select class="inp" id="bType" onchange="renderBill()"><option value="Card">Credit Card Bill</option><option value="Loan">Loan EMI</option></select>
-            <div style="margin-top:15px"><label class="label">Paying For</label><select class="inp" id="bTarget"></select></div>
-            <div style="margin-top:15px"><label class="label">Pay From</label><select class="inp" id="bFrom"></select></div>
-            <div style="margin-top:15px"><label class="label">Amount</label><input type="number" class="inp" id="bAmt" placeholder="0.00"></div>
-            <button class="btn-save" onclick="submitData('Bill')">Settle Bill</button>
-        </div>
-    </div>
-
-    <div class="page" id="page-log">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 10px;">
-            <h3>Activity Log</h3>
-            <span style="font-size:11px; color:var(--text-muted); font-weight:700">RECENT 20</span>
-        </div>
-        <div id="histList"></div>
-    </div>
-
   </div>
 
-  <div class="navbar">
-    <div class="nav-btn active" onclick="showPage('home')"><i class="material-icons-round">grid_view</i><span>Home</span></div>
-    <div class="nav-btn" onclick="showPage('move')"><i class="material-icons-round">swap_horiz</i><span>Move</span></div>
-    <div class="nav-add" onclick="showPage('add')"><i class="material-icons-round">add</i></div>
-    <div class="nav-btn" onclick="showPage('bills')"><i class="material-icons-round">receipt_long</i><span>Bills</span></div>
-    <div class="nav-btn" onclick="showPage('log')"><i class="material-icons-round">history</i><span>Log</span></div>
+  <div class="header">
+    <h1 id="headerTitle">EXPENSE PRO</h1>
+    <div class="controls">
+      <i class="material-icons-round" onclick="refreshData()" id="sBtn">sync</i>
+    </div>
+  </div>
+
+  <div class="container">
+    
+    <div class="page active" id="pageDashboard">
+      <div class="hero-scroll">
+        <div class="hero-card">
+          <span>THIS MONTH STATUS</span>
+          <p id="monthPLValue">₹0</p>
+          <div class="prog-bg"><div id="plProgress" class="prog-bar"></div></div>
+          <small id="plStatusLabel" style="font-weight:700; font-size:10px;">PROFIT</small>
+        </div>
+        <div class="hero-card">
+          <span>LAST MONTH STATUS</span>
+          <p id="lastMonthValue">₹0</p>
+          <small id="lastMonthTag" style="font-weight:800; font-size:10px;">Checking...</small>
+        </div>
+        <div class="hero-card"><span>Today Exp</span><p id="sumToday">₹0</p></div>
+        <div class="hero-card"><span>Month Fund</span><p id="sumFund">₹0</p></div>
+      </div>
+
+      <div class="label-row"><h3>SPENDING BY CATEGORY</h3></div>
+      <div class="cat-grid" id="catGrid"></div>
+
+      <div class="wallet-bar">
+        <span class="wallet-bar-label">WALLET BALANCE</span>
+        <b class="wallet-bar-val" id="sumWallet">₹0</b>
+      </div>
+
+      <div class="label-row"><h3>BANKS</h3><span id="bankSub" style="font-weight:800; font-size:12px;">₹0</span></div>
+      <div class="list-container" id="bankList"></div>
+
+      <div class="label-row"><h3>CREDIT CARDS</h3><span id="cardSub" style="font-weight:800; font-size:12px;">₹0</span></div>
+      <div class="list-container" id="cardList"></div>
+
+      <div class="label-row"><h3>LOANS & EMI</h3><span id="loanSub" style="font-weight:800; font-size:12px;">₹0</span></div>
+      <div class="list-container" id="loanList"></div>
+
+      <div class="label-row"><h3>RECENT ACTIVITY</h3></div>
+      <div class="list-container" id="historyList"></div>
+    </div>
+
+    <div class="page" id="pageEntry">
+      <div class="list-container" style="padding: 25px; margin-top: 20px;">
+        <div class="inp-group">
+          <label>Payment Method</label>
+          <select class="inp" id="payMode" onchange="toggleFields()">
+            <option value="Digital Wallet">👛 Wallet</option>
+            <option value="bank">🏦 Bank Transfer</option>
+            <option value="card">💳 Credit Card</option>
+          </select>
+        </div>
+        <div id="divBank" style="display:none;" class="inp-group"><label>Select Bank</label><select class="inp" id="expBank"></select></div>
+        <div id="divCard" style="display:none;" class="inp-group"><label>Select Card</label><select class="inp" id="expCard"></select></div>
+        <div class="inp-group"><label>Category</label><select class="inp" id="expCat"></select></div>
+        <div class="inp-group"><label>Amount</label><input type="number" class="inp" id="expAmt" placeholder="0.00"></div>
+        <div class="inp-group"><label>Remark</label><input type="text" class="inp" id="expRem" placeholder="Optional"></div>
+        <button class="btn-main" id="btnSaveExp" onclick="saveTrans('entry')">SAVE EXPENSE</button>
+      </div>
+    </div>
+
+    <div class="page" id="pageFund">
+        <div class="list-container" style="padding: 25px; margin-top: 20px;">
+          <div class="inp-group"><label>Deposit To</label><select class="inp" id="targetType" onchange="updateFundSources()"><option value="Wallet">👛 Wallet</option><option value="Bank">🏦 Bank Account</option></select></div>
+          <div id="divTargetBank" style="display:none;" class="inp-group"><label>Target Bank</label><select class="inp" id="targetBankName"></select></div>
+          <div class="inp-group"><label>From Source</label><select class="inp" id="fundSource"></select></div>
+          <div class="inp-group"><label>Amount</label><input type="number" class="inp" id="fundAmt" placeholder="0.00"></div>
+          <div class="inp-group"><label>Remark</label><input type="text" class="inp" id="fundRem" placeholder="Add Note"></div>
+          <button class="btn-main" id="btnSaveFund" onclick="saveTrans('fund')">CONFIRM TRANSFER</button>
+        </div>
+    </div>
+
+    <div class="page" id="pageBills">
+        <div class="list-container" style="padding: 25px; margin-top: 20px;">
+          <div class="inp-group"><label>Bill Type</label><select class="inp" id="billType" onchange="updateBillTarget()"><option value="card">💳 Credit Card Bill</option><option value="loan">📅 Loan / EMI</option></select></div>
+          <div class="inp-group"><label>Pay From</label><select class="inp" id="payFrom"></select></div>
+          <div class="inp-group"><label>Pay To</label><select class="inp" id="payTo" onchange="autoFillEmi()"></select></div>
+          <div class="inp-group"><label>Amount</label><input type="number" class="inp" id="payAmt" placeholder="0.00"></div>
+          <button class="btn-main" id="btnSaveBill" onclick="saveTrans('pay')">PAY NOW</button>
+        </div>
+    </div>
+  </div>
+
+  <div class="nav-wrapper">
+    <div class="nav-bar">
+      <div class="nav-item active" onclick="showPage(0)"><i class="material-icons-round">home</i><span>Home</span></div>
+      <div class="nav-item" onclick="showPage(1)"><i class="material-icons-round">add_shopping_cart</i><span>Entry</span></div>
+      <div class="nav-item" onclick="showPage(2)"><i class="material-icons-round">swap_horiz</i><span>Transfer</span></div>
+      <div class="nav-item" onclick="showPage(3)"><i class="material-icons-round">receipt_long</i><span>Bills</span></div>
+    </div>
   </div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxGwFBHXOgUTwgconAWDF0qZXPJwxtHc-TFwv-2Q_wHcZcGJtNg_i5JdNydifhP3BFBBA/exec";
-    let database = null;
+    let db = null;
+    let curPage = 0;
+    
+    // भारतीय रुपया फॉर्मेट
+    const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(n) || 0);
 
-    // Proper Navigation Logic
-    function showPage(pId) {
+    window.onload = () => { showPage(0); };
+
+    // --- Page Navigation ---
+    async function showPage(idx) {
+      curPage = idx;
+      const titles = ["EXPENSE PRO", "ADD EXPENSE", "TRANSFER FUNDS", "PAY BILLS"];
+      document.getElementById('headerTitle').innerText = titles[idx];
+
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-' + pId).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if(btn.innerText.toLowerCase().includes(pId)) btn.classList.add('active');
-        if(pId === 'add') btn.classList.remove('active');
-      });
-      if(pId === 'home') refreshData();
+      const ids = ['pageDashboard','pageEntry','pageFund','pageBills'];
+      document.getElementById(ids[idx]).classList.add('active');
+      document.querySelectorAll('.nav-item')[idx].classList.add('active');
+
+      if(idx === 0) await refreshData();
+      else { 
+        if(db) fillDropdowns(); 
+        if(idx === 2) updateFundSources(); 
+      }
     }
 
+    // --- Fetch Data ---
     async function refreshData() {
-      const syncIcon = document.getElementById('sync');
-      syncIcon.classList.add('rotate');
+      const sBtn = document.getElementById('sBtn');
+      sBtn.classList.add('spinning');
       try {
-        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({action:"getDashboard"}) });
-        database = await res.json();
-        updateUI();
+        const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({action: "getDashboard"}) });
+        const res = await response.json();
+        if(res.ok) { 
+          db = res; 
+          updateUI(); 
+        }
       } catch(e) { 
-        Swal.fire({ icon: 'error', title: 'Connection Error', text: 'सर्वर से संपर्क नहीं हो पाया।', background: '#111827', color: '#fff' });
+        console.error("Sync Failed", e); 
       }
-      syncIcon.classList.remove('rotate');
+      sBtn.classList.remove('spinning');
     }
 
+    // --- Update Dashboard UI ---
     function updateUI() {
-      if(!database) return;
-      const fmt = (n) => "₹" + Math.abs(n).toLocaleString('en-IN');
+      const s = db.summary;
+      const netPL = Number(s.totalIncome || 0) - Number(s.monthExp || 0);
+
+      // P/L Card Logic
+      document.getElementById("monthPLValue").innerText = fmt(netPL);
+      const plLabel = document.getElementById("plStatusLabel");
+      const plProg = document.getElementById("plProgress");
       
-      const bSum = database.banks.reduce((a,b)=>a+Number(b.val),0);
-      const cSum = database.cards.reduce((a,b)=>a+Number(b.val),0);
-      const lSum = database.loans.reduce((a,b)=>a+Number(b.val),0);
-      const net = (bSum + database.walletBal) - (cSum + lSum);
+      if(netPL >= 0) {
+        plLabel.innerText = "OVERALL PROFIT";
+        plLabel.style.color = "var(--green)";
+        plProg.style.background = "var(--green)";
+      } else {
+        plLabel.innerText = "OVERALL LOSS";
+        plLabel.style.color = "var(--red)";
+        plProg.style.background = "var(--red)";
+      }
+      plProg.style.width = "100%";
 
-      // Hero Card Correction
-      document.getElementById('netTotal').innerText = fmt(net);
-      document.getElementById('hToday').innerText = fmt(database.summary.todayExp);
-      document.getElementById('hMonth').innerText = fmt(database.summary.monthExp);
+      // Last Month
+      const lastPL = Number(s.lastMonthPL || 0);
+      document.getElementById("lastMonthValue").innerText = fmt(lastPL);
+      const lmTag = document.getElementById("lastMonthTag");
+      lmTag.innerText = lastPL >= 0 ? "PROFITABLE" : "IN LOSS";
+      lmTag.style.color = lastPL >= 0 ? "var(--green)" : "var(--red)";
 
-      // Bars Logic
-      let eB=0, eC=0, eW=0;
-      database.summary.recentTrans.forEach(t => {
-          if(t.type==="Expense") {
-              if(t.name==="Wallet") eW+=Number(t.amount);
-              else if(database.banks.some(b=>b.name===t.name)) eB+=Number(t.amount);
-              else if(database.cards.some(c=>c.name===t.name)) eC+=Number(t.amount);
-          }
-      });
-      document.getElementById('txtExpBank').innerText = fmt(eB);
-      document.getElementById('txtExpCard').innerText = fmt(eC);
-      document.getElementById('txtExpWallet').innerText = fmt(eW);
-      const total = (eB+eC+eW) || 1;
-      document.getElementById('fillBank').style.width = (eB/total*100) + "%";
-      document.getElementById('fillCard').style.width = (eC/total*100) + "%";
-      document.getElementById('fillWallet').style.width = (eW/total*100) + "%";
+      // Other Cards
+      document.getElementById("sumToday").innerText = fmt(s.todayExp);
+      document.getElementById("sumFund").innerText = fmt(s.monthFund);
+      document.getElementById("sumWallet").innerText = fmt(db.walletBal);
 
-      // Accordions
-      const row = (n,v,r) => `<div class="acc-item"><span>${n}</span><b style="color:${r?'#ef4444':'#10b981'}">${fmt(v)}</b></div>`;
-      document.getElementById('secBank').innerHTML = row('Cash Wallet', database.walletBal, false) + database.banks.map(b=>row(b.name, b.val, false)).join('');
-      document.getElementById('secCard').innerHTML = database.cards.map(c=>row(c.name, c.val, true)).join('');
-      document.getElementById('secLoan').innerHTML = database.loans.map(l=>row(l.name, l.val, true)).join('');
+      // Categories
+      document.getElementById("catGrid").innerHTML = db.categories.map(c => `
+        <div class="cat-item">
+          <div>${c.icon}</div>
+          <b>${c.name}</b>
+          <small>${fmt(s.catTotals[c.name.toLowerCase().trim()] || 0)}</small>
+        </div>
+      `).join("");
 
-      // History Log Correction
-      document.getElementById('histList').innerHTML = database.summary.recentTrans.map(t => `
-        <div class="pl-card" style="margin: 8px 0; padding: 15px; border-radius:18px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div><b style="font-size:14px">${t.category}</b><br><small style="color:var(--text-muted)">${t.name} • ${t.date}</small></div>
-                <b style="color:${t.type.includes('Income') || t.type.includes('Add') ?'#10b981':'#ef4444'}">
-                    ${t.type.includes('Income') || t.type.includes('Add') ?'+':'-'}${fmt(t.amount)}
-                </b>
-            </div>
-        </div>`).join('');
-
-      // Dropdown Initializations
-      document.getElementById('eCat').innerHTML = database.categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
-      document.getElementById('tBank').innerHTML = database.banks.map(b=>`<option value="${b.name}">${b.name}</option>`).join('');
-      document.getElementById('bFrom').innerHTML = `<option value="Wallet">Wallet</option>` + database.banks.map(b=>`<option value="${b.name}">${b.name}</option>`).join('');
-      renderDynamic(); renderBill();
-    }
-
-    function toggleSec(id) { document.getElementById(id).classList.toggle('open'); }
-
-    function renderDynamic() {
-      const src = document.getElementById('eSrc').value;
-      const dyn = document.getElementById('dynSrc');
-      if(src==='Bank') dyn.innerHTML = `<label class="label">Select Bank Account</label><select class="inp" id="eName">${database.banks.map(b=>`<option value="${b.name}">${b.name}</option>`).join('')}</select>`;
-      else if(src==='Card') dyn.innerHTML = `<label class="label">Select Credit Card</label><select class="inp" id="eName">${database.cards.map(c=>`<option value="${c.name}">${c.name}</option>`).join('')}</select>`;
-      else dyn.innerHTML = "";
-    }
-
-    function renderBill() {
-      const type = document.getElementById('bType').value;
-      const targets = type === 'Card' ? database.cards : database.loans;
-      document.getElementById('bTarget').innerHTML = targets.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
-    }
-
-    async function submitData(mode) {
-      let payload = { action: "save" };
+      // Banks
+      const bankTotal = db.banks.reduce((acc, b) => acc + b.val, 0);
+      document.getElementById("bankSub").innerText = fmt(bankTotal);
+      document.getElementById("bankList").innerHTML = db.banks.map(b => `
+        <div class="row">
+          <b>${b.name}</b>
+          <b class="${b.val < 0 ? 'val-neg' : 'val-pos'}">${fmt(b.val)}</b>
+        </div>
+      `).join("");
       
-      if(mode==='Expense') {
-          payload.type="Expense";
-          payload.name = document.getElementById('eSrc').value === 'Wallet' ? 'Wallet' : document.getElementById('eName').value;
-          payload.amount = document.getElementById('eAmt').value;
-          payload.category = document.getElementById('eCat').value;
-      } else if(mode==='Transfer') {
-          const dir = document.getElementById('tDir').value;
-          payload.amount = document.getElementById('tAmt').value;
-          payload.name = dir === 'B2W' ? 'Wallet' : document.getElementById('tBank').value;
-          payload.source = dir === 'B2W' ? document.getElementById('tBank').value : 'Wallet';
-          payload.type = dir === 'B2W' ? "Add Fund" : "Income";
-          payload.category = "Transfer";
-      } else if(mode==='Bill') {
-          payload.type = "Bill Pay";
-          payload.name = document.getElementById('bTarget').value;
-          payload.source = document.getElementById('bFrom').value;
-          payload.amount = document.getElementById('bAmt').value;
-          payload.category = "Bill Payment";
+      // Cards
+      const cardTotal = db.cards.reduce((acc, c) => acc + c.val, 0);
+      document.getElementById("cardSub").innerText = fmt(cardTotal);
+      document.getElementById("cardList").innerHTML = db.cards.map(c => `
+        <div class="row">
+          <b>${c.name}</b>
+          <b class="val-neg">${fmt(c.val)}</b>
+        </div>
+      `).join("");
+
+      // Loans
+      const loanTotal = db.loans.reduce((acc, l) => acc + Number(l.val), 0);
+      document.getElementById("loanSub").innerText = fmt(loanTotal);
+      document.getElementById("loanList").innerHTML = db.loans.map(l => `
+        <div class="row">
+          <div>
+            <b>${l.name}</b>
+            <small style="font-size:10px; opacity:0.7;">Due: ${l.dueDate}</small>
+          </div>
+          <div style="text-align:right">
+            <b class="val-neg">${fmt(l.val)}</b>
+            <br>
+            <span style="font-size:9px; padding:2px 4px; border-radius:4px; background:${l.status==='Paid'?'rgba(16,185,129,0.2)':'rgba(239,68,68,0.2)'}; color:${l.status==='Paid'?'var(--green)':'var(--red)'}">${l.status}</span>
+          </div>
+        </div>
+      `).join("");
+
+      // History
+      document.getElementById("historyList").innerHTML = s.recentTrans.map(t => {
+        let isPlus = (t.type === 'Add Fund' || t.type === 'Income');
+        return `
+        <div class="row">
+          <div>
+            <b>${t.name}</b>
+            <small style="font-size:10px; color:var(--text-dim)">${t.date} • ${t.category}</small>
+          </div>
+          <b class="${isPlus ? 'val-pos' : 'val-neg'}">
+            ${isPlus ? '+' : '-'}${fmt(t.amount)}
+          </b>
+        </div>`;
+      }).join("");
+    }
+
+    // --- Helper Functions ---
+    function fillDropdowns() {
+      const opt = (list, key) => list.map(i => `<option value="${i[key]}">${i[key]}</option>`).join("");
+      
+      document.getElementById("expBank").innerHTML = opt(db.banks, "name");
+      document.getElementById("expCard").innerHTML = opt(db.cards, "name");
+      
+      document.getElementById("payFrom").innerHTML = `<option value="Wallet">👛 Wallet</option>` + opt(db.banks, "name");
+      
+      document.getElementById("expCat").innerHTML = db.categories.map(c => `<option value="${c.name}">${c.icon} ${c.name}</option>`).join("");
+      
+      updateBillTarget();
+    }
+
+    function updateBillTarget() {
+      const type = document.getElementById("billType").value;
+      const list = (type === 'card') ? db.cards : db.loans;
+      document.getElementById("payTo").innerHTML = list.map(i => `<option value="${i.name}">${i.name}</option>`).join("");
+      autoFillEmi();
+    }
+
+    function autoFillEmi() {
+        const type = document.getElementById("billType").value;
+        const selectedName = document.getElementById("payTo").value;
+        if(type === 'loan') {
+            const loan = db.loans.find(l => l.name === selectedName);
+            if(loan) document.getElementById("payAmt").value = loan.val;
+        } else {
+            document.getElementById("payAmt").value = "";
+        }
+    }
+
+    function updateFundSources() {
+      const dest = document.getElementById("targetType").value;
+      const targetBankDiv = document.getElementById("divTargetBank");
+      let options = '<option value="Others">💳 Salary/Income</option>';
+      
+      if(dest === 'Wallet') {
+        targetBankDiv.style.display = "none";
+        // बैंक लिस्ट
+        options += db.banks.map(b=>`<option value="${b.name}">🏦 From ${b.name}</option>`).join("");
+      } else {
+        targetBankDiv.style.display = "block";
+        document.getElementById("targetBankName").innerHTML = db.banks.map(b=>`<option value="${b.name}">${b.name}</option>`).join("");
+        options += '<option value="Wallet">👛 From Wallet</option>';
+      }
+      document.getElementById("fundSource").innerHTML = options;
+    }
+
+    function toggleFields() {
+      let m = document.getElementById("payMode").value;
+      document.getElementById("divBank").style.display = (m==='bank') ? 'block' : 'none';
+      document.getElementById("divCard").style.display = (m==='card') ? 'block' : 'none';
+    }
+
+    // --- Save Transaction ---
+    async function saveTrans(type) {
+      const btn = event.target;
+      const originalText = btn.innerText;
+      let p = { action: "save" };
+
+      // Data collection based on Type
+      if (type === 'entry') {
+        p.type = document.getElementById("payMode").value; 
+        p.name = (p.type === 'Digital Wallet') ? 'Wallet' : (p.type === 'bank' ? document.getElementById("expBank").value : document.getElementById("expCard").value);
+        p.amount = document.getElementById("expAmt").value; 
+        p.category = document.getElementById("expCat").value; 
+        p.remark = document.getElementById("expRem").value;
+      } 
+      else if (type === 'fund') {
+        p.type = "Add Fund"; 
+        p.amount = document.getElementById("fundAmt").value; 
+        p.source = document.getElementById("fundSource").value;
+        p.name = (document.getElementById("targetType").value === 'Wallet') ? 'Wallet' : document.getElementById("targetBankName").value;
+        p.remark = "Transfer from " + p.source;
+        if(p.source === 'Others') p.type = 'Income'; 
+      }
+      else if (type === 'pay') {
+        p.type = "Bill Pay"; 
+        p.name = document.getElementById("payTo").value; 
+        p.amount = document.getElementById("payAmt").value;
+        p.remark = "Paid from " + document.getElementById("payFrom").value;
+        p.billType = document.getElementById("billType").value;
       }
 
-      if(!payload.amount || payload.amount <= 0) {
-          Swal.fire({ icon: 'warning', title: 'Invalid Amount', text: 'कृपया सही राशि दर्ज करें।', background: '#111827', color: '#fff' });
-          return;
-      }
+      // Validation
+      if (!p.amount || p.amount <= 0) return notify("Alert", "Please enter a valid amount", "warning", "#f59e0b");
 
-      Swal.fire({ title: 'Processing...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), background: '#111827', color: '#fff' });
+      // UI Loading State
+      btn.classList.add('loading-btn'); 
+      btn.innerText = "PROCESSING...";
 
       try {
-        await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-        Swal.fire({ icon: 'success', title: 'Success!', text: 'ट्रांजैक्शन सफलतापूर्वक रिकॉर्ड हो गया।', timer: 2000, showConfirmButton: false, background: '#111827', color: '#fff' });
-        showPage('home');
-      } catch(e) {
-        Swal.fire({ icon: 'error', title: 'Failed', text: 'कुछ तकनीकी खराबी आ गई।', background: '#111827', color: '#fff' });
+        const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(p) }).then(r => r.json());
+        if (res.ok) { 
+          notify('Success', 'Transaction Saved Successfully!', 'check_circle', '#10b981'); 
+          // Clear inputs
+          document.querySelectorAll('.inp').forEach(i => { if(i.tagName === 'INPUT') i.value = ""; });
+          setTimeout(() => { showPage(0); }, 1000);
+        } else {
+          notify('Error', res.error, 'error', '#ef4444');
+        }
+      } catch (e) { 
+        notify('Error', 'Connection Failed', 'wifi_off', '#ef4444'); 
+      } finally { 
+        btn.classList.remove('loading-btn'); 
+        btn.innerText = originalText; 
       }
     }
 
-    window.onload = refreshData;
+    // Custom Modal Notification
+    function notify(title, text, icon, color) {
+      document.getElementById('mTitle').innerText = title; 
+      document.getElementById('mText').innerText = text;
+      const ic = document.getElementById('mIcon'); 
+      ic.innerText = icon; 
+      ic.style.color = color;
+      document.getElementById('modal').style.display = 'flex';
+    }
+    
+    function closeModal() { 
+      document.getElementById('modal').style.display = 'none'; 
+    }
   </script>
 </body>
 </html>
