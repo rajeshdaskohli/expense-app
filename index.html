@@ -205,11 +205,6 @@
         <span id="loanSub" class="subtotal">₹0</span>
       </div>
       <div class="list-container" id="loanList"></div>
-
-      <div class="label-row"><h3>RECENT ACTIVITY</h3></div>
-      <div class="list-container">
-         <div class="scroll-area" id="historyList"></div>
-      </div>
     </div>
 
     <div class="page" id="pageEntry">
@@ -266,14 +261,8 @@
         <button class="btn-main" id="btnSaveFund" onclick="saveTrans('fund')">CONFIRM TRANSFER</button>
       </div>
     </div>
-
-    <div class="page" id="pageBills">
-    <div class="page" id="pageHistory">
-    <div class="label-row"><h3>TRANSACTION HISTORY</h3></div>
-    <div class="list-container">
-    <div id="historyList"></div> </div>
-    </div>
     
+    <div class="page" id="pageBills">
       <div class="list-container" style="padding: 25px; margin-top: 20px;">
         <div class="inp-group">
           <label>Bill Type</label>
@@ -295,6 +284,12 @@
       </div>
     </div>
 
+  <div class="page" id="pageHistory">
+      <div class="label-row"><h3>TRANSACTION HISTORY</h3></div>
+      <div class="list-container">
+        <div id="fullHistory"></div>
+      </div>
+    </div>
   </div>
 
  <div class="nav-wrapper">
@@ -319,8 +314,6 @@
  <span>History</span>
  </div>
  </div>
- </div>
- 
 
   <script>
     // इसे <script> के तुरंत बाद सबसे ऊपर डालें
