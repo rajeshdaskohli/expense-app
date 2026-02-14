@@ -443,8 +443,9 @@
         return `
         <div class="row">
           <div class="meta">
-            <b>${l.name} <span class="status-badge ${isPaid?'bg-green':'bg-red'}">${isPaid?'PAID':'UNPAID'}</span></b>
+            <b>${l.name}</b>
             <small>Monthly EMI</small>
+            <span class="status-badge ${isPaid?'bg-green':'bg-red'}">${isPaid?'PAID':'UNPAID'}</span></b>
           </div>
           <b class="val-neg">${fmt(l.val)}</b>
         </div>`;
