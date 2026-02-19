@@ -111,24 +111,49 @@
 
       // Fix 3: Credit Card Color Coding (Red if > 0, Green if 0)
       document.getElementById("cardSub").innerText = fmt(getSum(db.cards));
-      document.getElementById("cardList").innerHTML = db.cards.map(c => `
-        <div class="row">
-          <div class="meta"><b>${c.name}</b><small>Outstanding</small></div>
-          <b class="${Number(c.val) > 0 ? 'val-neg' : 'val-pos'}">${fmt(c.val)}</b>
-        </div>`).join("");
+      document.getElementById("cardList").innerHTML = db.cards.map(c => {
+        const limit = Number(c.limit) || 0; // शीट से आएगी
+        const used = Number(c.val);
+        const avail = limit - used;
+        const per = limit > 0 ? (used / limit) * 100 : 0;
+        const dDate = c.dueDate || 'N/A'; // शीट से आएगी
 
-      // Fix 5: Loans & EMI with Status
-      document.getElementById("loanSub").innerText = fmt(getSum(db.loans));
-      document.getElementById("loanList").innerHTML = db.loans.map(l => {
-        const isPaid = l.status === 'Paid';
         return `
-        <div class="row">
-          <div class="meta">
-            <b>${l.name}</b>
-            <small>Monthly EMI</small>
-            <span class="status-badge ${isPaid?'bg-green':'bg-red'}">${isPaid?'PAID':'UNPAID'}</span></b>
+        <div class="db-card">
+          <div class="db-card-header"><b>💳 ${c.name}</b><span class="status-badge ${used>0?'bg-red':'bg-green'}">${used>0?'DUE':'CLEAN'}</span></div>
+          <div class="progress-line"><div class="progress-fill" style="width: ${per}%"></div></div>
+          <div class="db-card-grid">
+            <div class="stat-box"><span>Used Amount</span><b class="${used>0?'red-text':''}">${fmt(used)}</b></div>
+            <div class="stat-box" style="text-align:right;"><span>Available</span><b style="color:var(--green)">${fmt(avail)}</b></div>
           </div>
-          <b class="val-neg">${fmt(l.val)}</b>
+          <div class="db-card-footer">
+            <span>Limit: <b>${fmt(limit)}</b></span>
+            <span>Due Date: <b class="red-text">${dDate}</b></span>
+          </div>
+        </div>`;
+      }).join("");
+
+      // --- LOANS & EMI (WITH PROGRESS BAR) ---
+      document.getElementById("loanList").innerHTML = db.loans.map(l => {
+        const total = Number(l.totalAmt) || 0;
+        const paid = Number(l.paidAmt) || 0;
+        const rem = total - paid;
+        const per = total > 0 ? (paid / total) * 100 : 0;
+        const mDone = l.monthsPaid || 0;
+        const mLeft = (l.tenure || 0) - mDone;
+
+        return `
+        <div class="db-card">
+          <div class="db-card-header"><b>🏠 ${l.name}</b><span class="status-badge ${l.status==='Paid'?'bg-green':'bg-red'}">${l.status==='Paid'?'PAID':'UNPAID'}</span></div>
+          <div class="progress-line"><div class="progress-fill loan-fill" style="width: ${per}%"></div></div>
+          <div class="db-card-grid">
+            <div class="stat-box"><span>Paid Amount</span><b>${fmt(paid)}</b><small>Month Done: ${mDone}</small></div>
+            <div class="stat-box" style="text-align:right;"><span>Remaining</span><b class="red-text">${fmt(rem)}</b><small class="red-text">Left: ${mLeft} Mo</small></div>
+          </div>
+          <div class="db-card-footer">
+            <span>Total Loan: <b>${fmt(total)}</b></span>
+            <span>Tenure: <b>${l.tenure || 0} Months</b></span>
+          </div>
         </div>`;
       }).join("");
 
