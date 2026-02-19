@@ -70,6 +70,27 @@
     .label-row h3 { font-size: 11px; font-weight: 800; color: var(--text-dim); margin: 0; letter-spacing: 1px; }
     .subtotal { font-weight: 800; font-size: 12px; color: var(--text); }
 
+/* Modern UI Card */
+    .db-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 18px; margin-bottom: 15px; }
+    .db-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .db-card-header b { font-size: 15px; font-weight: 800; }
+    .db-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .stat-box { display: flex; flex-direction: column; }
+    .stat-box span { font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
+    .stat-box b { font-size: 14px; margin: 2px 0; font-weight: 800; }
+    .stat-box small { font-size: 11px; color: var(--green); font-weight: 700; }
+    .red-text { color: var(--red) !important; }
+    
+    .progress-line { height: 6px; background: var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--primary); border-radius: 10px; transition: 0.5s ease; }
+    .loan-fill { background: var(--green); } /* लोन के लिए अलग कलर */
+
+    .db-card-footer { border-top: 1px dashed var(--border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); }
+    .db-card-footer b { color: var(--text); }
+
+    .label-row { display: flex; justify-content: space-between; align-items: center; margin: 25px 5px 10px; }
+    .label-row h3 { font-size: 11px; font-weight: 800; color: var(--text-dim); margin: 0; letter-spacing: 1px; }
+
    /* Navigation Bar (5 Tabs Design) */
    .nav-wrapper { position: fixed; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; }
    .nav-bar { 
