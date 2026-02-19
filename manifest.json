@@ -1,8 +1,7 @@
 {
-  "name": "Expense Seva Pro",
+  "name": "Expense Pro",
   "short_name": "ExpensePro",
-  "start_url": "/expense-app/",
-  "scope": "/expense-app/",
+  "start_url": "index.htnl",
   "display": "standalone",
   "background_color": "#070b14",
   "theme_color": "#070b14",
