@@ -134,12 +134,7 @@
 
     const historyContainer = document.getElementById("fullHistory");
       if(historyContainer && db.summary.recentTrans) {
-        db.summary.recentTrans.sort((a,b)=>{
-  if(new Date(b.date)-new Date(a.date)!==0){
-    return new Date(b.date)-new Date(a.date);
-  }
-  return a.type==="Add Fund"?1:-1;
-});
+        
         historyContainer.innerHTML = db.summary.recentTrans.map(t => `<div class="row"><div class="meta"><b>${t.name} <small style="opacity:0.5;">(${t.category})</small></b><small>${t.date}</small></div><b class="${t.type==='Income' || t.type==='Add Fund' ? 'val-pos' : 'val-neg'}">${t.type==='Income' || t.type==='Add Fund' ? '+' : '-'}${fmt(t.amount)}</b></div>`).join("");
       }
       if(curPage === 0) fillDropdowns();
