@@ -76,25 +76,14 @@
     .cat-item b { font-size: 11px; display: block; }
     .cat-item small { color: var(--primary); font-size: 10px; font-weight: 800; }
 
-    /* Modern UI Card */
-    .db-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 18px; margin-bottom: 15px; }
-    .db-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .db-card-header b { font-size: 15px; font-weight: 800; }
-    .db-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-    .stat-box { display: flex; flex-direction: column; }
-    .stat-box span { font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
-    .stat-box b { font-size: 14px; margin: 2px 0; font-weight: 800; }
-    .stat-box small { font-size: 11px; color: var(--green); font-weight: 700; }
-    .red-text { color: var(--red) !important; }
-    
-    .progress-line { height: 6px; background: var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--primary); border-radius: 10px; transition: 0.5s ease; }
-    .loan-fill { background: var(--green); } /* लोन के लिए अलग कलर */
-
-    .db-card-footer { border-top: 1px dashed var(--border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); }
-    .db-card-footer b { color: var(--text); }
-    
     .list-container { background: var(--card); border-radius: 28px; padding: 10px 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+    /* Fix 6: Recent Activity Scrollable Area */
+    .scroll-area { max-height: 350px; overflow-y: auto; scrollbar-width: none; padding-right: 5px; }
+    
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .row:last-child { border: none; }
+    .meta b { display: block; font-size: 14px; }
+    .meta small { color: var(--text-dim); font-size: 11px; }
 
     .label-row { display: flex; justify-content: space-between; align-items: center; margin: 25px 5px 10px; }
     .label-row h3 { font-size: 11px; font-weight: 800; color: var(--text-dim); margin: 0; letter-spacing: 1px; }
@@ -333,7 +322,7 @@
   document.documentElement.setAttribute('data-theme', savedTheme);
 })();
     
-    const API_URL = "https://script.google.com/macros/s/AKfycbx-Hxr3bpXTedY8LF8_XcepAP2c_S-EZ_dGJtIcg6Y_urFyYTVX9TepJ2noKNHAixfUwQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxGwFBHXOgUTwgconAWDF0qZXPJwxtHc-TFwv-2Q_wHcZcGJtNg_i5JdNydifhP3BFBBA/exec";
     let db = null;
     let curPage = 0;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
@@ -441,49 +430,24 @@
 
       // Fix 3: Credit Card Color Coding (Red if > 0, Green if 0)
       document.getElementById("cardSub").innerText = fmt(getSum(db.cards));
-      document.getElementById("cardList").innerHTML = db.cards.map(c => {
-        const limit = Number(c.limit) || 0; // शीट से आएगी
-        const used = Number(c.val);
-        const avail = limit - used;
-        const per = limit > 0 ? (used / limit) * 100 : 0;
-        const dDate = c.dueDate || 'N/A'; // शीट से आएगी
+      document.getElementById("cardList").innerHTML = db.cards.map(c => `
+        <div class="row">
+          <div class="meta"><b>${c.name}</b><small>Outstanding</small></div>
+          <b class="${Number(c.val) > 0 ? 'val-neg' : 'val-pos'}">${fmt(c.val)}</b>
+        </div>`).join("");
 
-        return `
-        <div class="db-card">
-          <div class="db-card-header"><b>💳 ${c.name}</b><span class="status-badge ${used>0?'bg-red':'bg-green'}">${used>0?'DUE':'CLEAN'}</span></div>
-          <div class="progress-line"><div class="progress-fill" style="width: ${per}%"></div></div>
-          <div class="db-card-grid">
-            <div class="stat-box"><span>Used Amount</span><b class="${used>0?'red-text':''}">${fmt(used)}</b></div>
-            <div class="stat-box" style="text-align:right;"><span>Available</span><b style="color:var(--green)">${fmt(avail)}</b></div>
-          </div>
-          <div class="db-card-footer">
-            <span>Limit: <b>${fmt(limit)}</b></span>
-            <span>Due Date: <b class="red-text">${dDate}</b></span>
-          </div>
-        </div>`;
-      }).join("");
-
-      // --- LOANS & EMI (WITH PROGRESS BAR) ---
+      // Fix 5: Loans & EMI with Status
+      document.getElementById("loanSub").innerText = fmt(getSum(db.loans));
       document.getElementById("loanList").innerHTML = db.loans.map(l => {
-        const total = Number(l.totalAmt) || 0;
-        const paid = Number(l.paidAmt) || 0;
-        const rem = total - paid;
-        const per = total > 0 ? (paid / total) * 100 : 0;
-        const mDone = l.monthsPaid || 0;
-        const mLeft = (l.tenure || 0) - mDone;
-
+        const isPaid = l.status === 'Paid';
         return `
-        <div class="db-card">
-          <div class="db-card-header"><b>🏠 ${l.name}</b><span class="status-badge ${l.status==='Paid'?'bg-green':'bg-red'}">${l.status==='Paid'?'PAID':'UNPAID'}</span></div>
-          <div class="progress-line"><div class="progress-fill loan-fill" style="width: ${per}%"></div></div>
-          <div class="db-card-grid">
-            <div class="stat-box"><span>Paid Amount</span><b>${fmt(paid)}</b><small>Month Done: ${mDone}</small></div>
-            <div class="stat-box" style="text-align:right;"><span>Remaining</span><b class="red-text">${fmt(rem)}</b><small class="red-text">Left: ${mLeft} Mo</small></div>
+        <div class="row">
+          <div class="meta">
+            <b>${l.name}</b>
+            <small>Monthly EMI</small>
+            <span class="status-badge ${isPaid?'bg-green':'bg-red'}">${isPaid?'PAID':'UNPAID'}</span></b>
           </div>
-          <div class="db-card-footer">
-            <span>Total Loan: <b>${fmt(total)}</b></span>
-            <span>Tenure: <b>${l.tenure || 0} Months</b></span>
-          </div>
+          <b class="val-neg">${fmt(l.val)}</b>
         </div>`;
       }).join("");
 
