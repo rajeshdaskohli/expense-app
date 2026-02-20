@@ -5,7 +5,9 @@ const urls=[
 "/index.html",
 "/css/ui.css",
 "/js/logic.js",
-"/manifest.json"
+"/manifest.json",
+"/icons/icon-192.png",
+"/icons/icon-512.png"
 ];
 
 self.addEventListener("install",e=>{
