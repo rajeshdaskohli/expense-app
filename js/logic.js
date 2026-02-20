@@ -3,7 +3,7 @@
   document.documentElement.setAttribute('data-theme', savedTheme);
 })();
     
-    const API_URL = "https://script.google.com/macros/s/AKfycbweJhrSo1d2xOFglklW5Uiv3MqpT8ROXlXJZJgEPXmHtPH2WgNFmUnH5pGRlQ1oO_afgw/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbx9P--p9a-EjnNClLcg9fsKBrSFhLc4_Zko65LaGb-4-Q2Rdm6YSnNGnX5EXO4Afm-zHw/exec";
     let db = null;
     let curPage = 0;
     const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(Number(n) || 0);
