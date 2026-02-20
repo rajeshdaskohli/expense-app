@@ -131,7 +131,7 @@ touch-action: manipulation;
    display: flex;
    align-items: center;
    justify-content: center;
-   box-shadow: 0 5px 10px var(--primary); rgba(0, 0, 0, 0.2);
+   box-shadow: 0 4px 10px var(--primary); rgba(0, 0, 0, 0.2);
    border: 5px solid var(--bg);
    color: white !important;
    }
