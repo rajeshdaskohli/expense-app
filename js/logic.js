@@ -239,6 +239,7 @@
         p.amount = document.getElementById("payAmt").value;
         let fromAcc = document.getElementById("payFrom").value;
         p.remark = "Paid from " + fromAcc;
+        p.from = fromAcc;
         p.billType = document.getElementById("billType").value;
 
         // 2. बैलेंस चेक करें
