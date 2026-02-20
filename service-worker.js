@@ -1,4 +1,14 @@
-const CACHE_NAME="expense-pro-v4";
+let CACHE_NAME="expense-pro";
+
+async function getCacheName(){
+  try{
+    const res=await fetch("/manifest.json");
+    const m=await res.json();
+    CACHE_NAME="expense-pro-"+m.version;
+  }catch(e){
+    CACHE_NAME="expense-pro-fallback";
+  }
+}
 
 const urls=[
 "/",
@@ -11,13 +21,29 @@ const urls=[
 ];
 
 self.addEventListener("install",e=>{
-e.waitUntil(
-caches.open(CACHE_NAME).then(cache=>cache.addAll(urls))
-);
+  e.waitUntil(
+    getCacheName().then(()=>{
+      return caches.open(CACHE_NAME).then(cache=>cache.addAll(urls));
+    })
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener("activate",e=>{
+  e.waitUntil(
+    getCacheName().then(()=>{
+      return caches.keys().then(keys=>{
+        return Promise.all(
+          keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k))
+        );
+      });
+    })
+  );
+  self.clients.claim();
 });
 
 self.addEventListener("fetch",e=>{
-e.respondWith(
-caches.match(e.request).then(res=>res||fetch(e.request))
-);
+  e.respondWith(
+    caches.match(e.request).then(res=>res||fetch(e.request))
+  );
 });
