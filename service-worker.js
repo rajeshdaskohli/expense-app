@@ -1,4 +1,4 @@
-const CACHE_NAME="expense-pro-v3";
+const CACHE_NAME="expense-pro-v4";
 
 const urls=[
 "/",
